@@ -23,7 +23,7 @@ set grid xtics ytics mxtics mytics back lc rgb "#d0d0d0" lw 0.8
 set key off
 
 set logscale x 10
-set xrange [0.1:9.76]
+set xrange [0.1:10]
 set mxtics 10
 
 # Published piece boundaries, shown in both panels.
@@ -51,7 +51,8 @@ unset logscale y
 set yrange [0:1.5]
 set ytics 0.2
 set mytics 2
-set format x "10^{%L}"
+set xtics ("10^{-1}" 0.1, "10^{0}" 1.0, "10^{1}" 10.0)
+set format x "%g"
 set format y "%.1f"
 set xlabel "Centre-of-mass energy E  [MeV]"
 set ylabel "{/Symbol s}(E)  [barn]" offset 1.0,0

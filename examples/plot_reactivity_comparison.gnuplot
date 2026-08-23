@@ -23,7 +23,7 @@ set tics out nomirror
 set grid xtics ytics mxtics mytics back lc rgb "#d0d0d0" lw 0.8
 
 set logscale x 10
-set xrange [10:500]
+set xrange [9:550]
 set mxtics 10
 
 # LT/HT analytic-fit boundary.
@@ -33,18 +33,20 @@ set arrow 1 from 70, graph 0 to 70, graph 1 nohead \
 set multiplot layout 2,1 rowsfirst \
     margins 0.13,0.96,0.10,0.96 spacing 0.0,0.07
 
-# Top panel: the two independently calculated reactivities.
-set logscale y 10
-set yrange [1e-28:1e-21]
-set mytics 10
+# Top panel: the two independently calculated reactivities on a linear axis.
+# Scale the plotted values by 1e22 so the tick labels remain compact.
+unset logscale y
+set yrange [0:6]
+set ytics 1
+set mytics 2
 set format x ""
-set format y "10^{%L}"
-set ylabel "<{/Symbol s}v>  [m^{3} s^{-1}]" offset 1.2,0
-set key at graph 0.97,0.08 right bottom opaque box
+set format y "%.0f"
+set ylabel "<{/Symbol s}v>  [10^{-22} m^{3} s^{-1}]" offset 1.2,0
+set key at graph 0.03,0.08 left bottom opaque box
 set label 1 "(a)" at graph 0.02,0.92 front
-plot input_source using 1:2 with lines lw 3.0 lc rgb "#1f3b73" \
+plot input_source using 1:($2*1.0e22) with lines lw 3.0 lc rgb "#1f3b73" \
          title "Eq. (6) numerical integral", \
-     input_source using 1:3 with lines dt 2 lw 3.0 lc rgb "#e41a1c" \
+     input_source using 1:($3*1.0e22) with lines dt 2 lw 3.0 lc rgb "#e41a1c" \
          title "Eq. (7)-(15) analytic fit"
 
 # Bottom panel: signed relative error makes the agreement and 70 keV switch
@@ -53,7 +55,8 @@ unset logscale y
 set yrange [-2.5:2.5]
 set ytics 1.0
 set mytics 2
-set format x "10^{%L}"
+set xtics ("10^{1}" 10.0, "10^{2}" 100.0, "5×10^{2}" 500.0)
+set format x "%g"
 set format y "%.1f"
 set xlabel "Ion temperature kT  [keV]"
 set ylabel "Relative error  [%]" offset 0.5,0
