@@ -8,8 +8,8 @@ Maxwellian reactivity described by:
 > reactivity, and their analytic approximations”, Nuclear Fusion 63 (2023)
 > 086001. [doi:10.1088/1741-4326/acda4b](https://doi.org/10.1088/1741-4326/acda4b)
 
-The library uses `double` precision throughout.  It does not implement fusion
-power, burn, depletion, non-Maxwellian corrections, or other plasma physics.
+The library uses `double` precision throughout and is intentionally limited to
+the S-factor, cross section, and thermal reactivity.
 
 ## Requirements
 
@@ -150,3 +150,8 @@ gnuplot -c examples/plot_reactivity_comparison.gnuplot \
 With the published, rounded table parameters, the analytic reactivity differs
 from the direct integral by about 2% below 70 keV and less than 1% from 70 to
 500 keV, consistent with the paper.
+
+## License
+
+This project is licensed under the BSD 3-Clause License. See [LICENSE](LICENSE)
+for the complete terms.

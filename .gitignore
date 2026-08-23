@@ -1,0 +1,11 @@
+# Out-of-source CMake builds
+/build*/
+
+# Locally supplied task/reference material
+/Tentori_2023_Nucl._Fusion_63_086001.pdf
+/guide.md
+
+# Generated comparison data and figures
+/*.csv
+/pb11_figure1.png
+/pb11_reactivity_comparison.png
