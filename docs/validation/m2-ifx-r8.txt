@@ -1,0 +1,23 @@
+Test project /tmp/m2-ifx-r8
+    Start 1: pb11_unit_tests
+1/9 Test #1: pb11_unit_tests ..................   Passed    0.00 sec
+    Start 2: pb11_c_abi_tests
+2/9 Test #2: pb11_c_abi_tests .................   Passed    0.00 sec
+    Start 3: pb11_instant_source_tests
+3/9 Test #3: pb11_instant_source_tests ........   Passed    0.00 sec
+    Start 4: fusion_network_tests
+4/9 Test #4: fusion_network_tests .............   Passed    0.00 sec
+    Start 5: fusion_rates_tests
+5/9 Test #5: fusion_rates_tests ...............   Passed    0.00 sec
+    Start 6: fusion_cross_sections_tests
+6/9 Test #6: fusion_cross_sections_tests ......   Passed    0.00 sec
+    Start 7: fusion_closed_box_tests
+7/9 Test #7: fusion_closed_box_tests ..........   Passed    0.00 sec
+    Start 8: pb11_fortran_binding_tests
+8/9 Test #8: pb11_fortran_binding_tests .......   Passed    0.00 sec
+    Start 9: fusion_fortran_binding_tests
+9/9 Test #9: fusion_fortran_binding_tests .....   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 9
+
+Total Test time (real) =   0.02 sec

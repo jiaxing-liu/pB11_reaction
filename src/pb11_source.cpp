@@ -1,4 +1,5 @@
 #include "pb11_source.h"
+#include "fusion_constants.hpp"
 
 #include "pb11_c.h"
 
@@ -12,7 +13,7 @@ namespace {
 constexpr double kJoulesPerKeV = 1.602176634e-16;
 constexpr long double kJoulesPerKeVLong = 1.602176634e-16L;
 constexpr long double kFusionEnergyPerReactionJ =
-    8.68e6L * 1.602176634e-19L;
+    fusion_constants::q_MeV[0] * fusion_constants::joules_per_MeV;
 
 void clear_output(pb11_instant_source_v1* out) {
     out->reaction_rate_m3_s = 0.0;

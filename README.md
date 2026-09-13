@@ -1,17 +1,18 @@
 # pB11_reaction
 
-A small, standalone C++17 library for the thermal proton–boron-11 fusion
-reaction.  It implements the astrophysical factor, fusion cross section, and
-Maxwellian reactivity described by:
+A standalone C++17 library for proton–boron-11 fusion, with an explicit
+thermal DT/DD/D-He3 network extension. The pB astrophysical factor, fusion
+cross section and Maxwellian reactivity are described by:
 
 > A. Tentori and F. Belloni, “Revisiting p-11B fusion cross section and
 > reactivity, and their analytic approximations”, Nuclear Fusion 63 (2023)
 > 086001. [doi:10.1088/1741-4326/acda4b](https://doi.org/10.1088/1741-4326/acda4b)
 
-The library uses `double` precision throughout and is intentionally limited to
-the S-factor, cross section, thermal reactivity, and the explicitly simplified
-instantaneous-thermalization source API below. A kinetic fast-alpha model is
-not yet implemented.
+The public API uses `double` precision. The supported scope is cross sections,
+thermal reaction rates, particle/event and nuclear-release ledgers, plus the
+explicitly simplified pB instantaneous-thermalization source API. A kinetic
+fast-alpha model is not yet implemented. See [thermal network models and
+validation](docs/THERMAL_NETWORK.md) for the extension and its limits.
 
 ## Requirements
 

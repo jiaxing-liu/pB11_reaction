@@ -7,3 +7,10 @@ The approved program is coordinated in the BALDUR repository at `docs/exl50u-pro
 First increment: add an explicit SI instant-thermal source C ABI and Fortran binding while retaining all existing reactivity and cross-section entry points. The source API receives thermal energy kT in joules and densities in m^-3; output particle rates are m^-3 s^-1 and power is W m^-3. This moves already-used source arithmetic out of the BALDUR adapter; it does not claim a new product spectrum, slowing-down or orbit-loss model.
 
 Further increments require documented literature/domain choices, source ownership, state rollback and particle/energy closure. No BALDUR common blocks, species slots, CGS conventions or implicit file output are part of the independent API.
+
+M2 thermal kernel increment implemented: six charged species, five explicit
+channels with separate DD branches and secondary DT/DHe3, Bosch-Hale cross
+sections and common-temperature Maxwellian fits, particle birth/loss and
+nuclear-Q ledgers, and C/Fortran interfaces. See THERMAL_NETWORK.md and
+validation/m2-*.txt. GNU and Intel r4/r8 tests cover this stateless increment;
+full finite-time product kinetics and BALDUR coupling are still outstanding.

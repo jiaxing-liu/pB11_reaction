@@ -27,7 +27,9 @@ if(POLICY CMP0167)
 endif()
 find_package(Boost 1.70 REQUIRED)
 
-add_library(pb11 src/pb11.cpp src/pb11_c.cpp src/pb11_source.cpp)
+add_library(pb11 src/pb11.cpp src/pb11_c.cpp src/pb11_source.cpp
+                   src/fusion_network.cpp src/fusion_rates.cpp
+                   src/fusion_cross_sections.cpp)
 add_library(pb11::pb11 ALIAS pb11)
 
 target_compile_features(pb11 PUBLIC cxx_std_17)
@@ -48,6 +50,8 @@ endif()
 
 add_executable(benchmark_pb11 examples/benchmark_pb11.cpp)
 target_link_libraries(benchmark_pb11 PRIVATE pb11::pb11)
+add_executable(thermal_network examples/thermal_network.cpp)
+target_link_libraries(thermal_network PRIVATE pb11::pb11)
 
 if(PB11_FORTRAN_AVAILABLE)
     add_library(pb11_fortran STATIC fortran/pb11_fortran.f90)
@@ -66,6 +70,23 @@ if(PB11_FORTRAN_AVAILABLE)
             "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>"
     )
     target_link_libraries(pb11_fortran PUBLIC pb11::pb11)
+
+    add_library(fusion_fortran STATIC fortran/fusion_fortran.f90)
+    add_library(pb11::fusion_fortran ALIAS fusion_fortran)
+    set_target_properties(
+        fusion_fortran
+        PROPERTIES
+            Fortran_MODULE_DIRECTORY
+                "${CMAKE_CURRENT_BINARY_DIR}/fortran-mod"
+            EXPORT_NAME fusion_fortran
+    )
+    target_include_directories(
+        fusion_fortran
+        INTERFACE
+            "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>"
+            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>"
+    )
+    target_link_libraries(fusion_fortran PUBLIC pb11::pb11)
 endif()
 
 include(CTest)
@@ -82,6 +103,24 @@ if(BUILD_TESTING)
     target_link_libraries(test_pb11_source PRIVATE pb11::pb11)
     add_test(NAME pb11_instant_source_tests COMMAND test_pb11_source)
 
+    add_executable(test_fusion_network tests/test_fusion_network.cpp)
+    target_link_libraries(test_fusion_network PRIVATE pb11::pb11)
+    add_test(NAME fusion_network_tests COMMAND test_fusion_network)
+
+    add_executable(test_fusion_rates tests/test_fusion_rates.cpp)
+    target_link_libraries(test_fusion_rates PRIVATE pb11::pb11)
+    add_test(NAME fusion_rates_tests COMMAND test_fusion_rates)
+
+    add_executable(test_fusion_cross_sections
+                   tests/test_fusion_cross_sections.cpp)
+    target_link_libraries(test_fusion_cross_sections PRIVATE pb11::pb11)
+    target_include_directories(test_fusion_cross_sections PRIVATE ${Boost_INCLUDE_DIRS})
+    add_test(NAME fusion_cross_sections_tests COMMAND test_fusion_cross_sections)
+
+    add_executable(test_fusion_closed_box tests/test_fusion_closed_box.cpp)
+    target_link_libraries(test_fusion_closed_box PRIVATE pb11::pb11)
+    add_test(NAME fusion_closed_box_tests COMMAND test_fusion_closed_box)
+
     if(PB11_FORTRAN_AVAILABLE)
         add_executable(test_pb11_fortran tests/test_pb11_fortran.f90)
         set_target_properties(test_pb11_fortran PROPERTIES
@@ -89,6 +128,13 @@ if(BUILD_TESTING)
                               LINKER_LANGUAGE Fortran)
         target_link_libraries(test_pb11_fortran PRIVATE pb11::fortran)
         add_test(NAME pb11_fortran_binding_tests COMMAND test_pb11_fortran)
+
+        add_executable(test_fusion_fortran tests/test_fusion_fortran.f90)
+        set_target_properties(test_fusion_fortran PROPERTIES
+                              POSITION_INDEPENDENT_CODE ON
+                              LINKER_LANGUAGE Fortran)
+        target_link_libraries(test_fusion_fortran PRIVATE pb11::fusion_fortran)
+        add_test(NAME fusion_fortran_binding_tests COMMAND test_fusion_fortran)
     endif()
 endif()
 
@@ -101,7 +147,7 @@ install(
 )
 if(PB11_FORTRAN_AVAILABLE)
     install(
-        TARGETS pb11_fortran
+        TARGETS pb11_fortran fusion_fortran
         EXPORT pb11Targets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -115,6 +161,8 @@ if(PB11_FORTRAN_AVAILABLE)
 endif()
 install(
     FILES include/pb11.hpp include/pb11_c.h include/pb11_source.h
+          include/fusion_network.h include/fusion_rates.h
+          include/fusion_cross_sections.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(
