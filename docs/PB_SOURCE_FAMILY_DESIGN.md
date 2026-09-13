@@ -123,7 +123,12 @@ the induced source-shape difference while preserving complete event budgets.
 The source-state manager cannot repair inconsistent birth kinematics.
 
 The fixed-r16 FSCI policy and1024-node numerical control are now implemented;
-see FSCI_SOURCE.md. Incident weights, alpha0 birth, laboratory composition and
+see FSCI_SOURCE.md. Incident weights, laboratory composition and
 full coupled source validation remain subsequent work. In particular, a
 continuum event below the narrow resonance is not automatically an l2 event;
 weight entrance components rather than choosing a parent only by energy.
+
+The analytic alpha0 marginal and explicit conditional three-family CM mixture
+are now implemented in fusion_pb_birth.h; see PB_BIRTH.md. This supplies no
+automatic incident-energy branching or laboratory angular samples. The
+remaining composition steps above are unchanged.

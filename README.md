@@ -283,3 +283,7 @@ channel-resolved pB evidence with target-energy and angular-model caveats.
 Refsgaard Model-II correction at16fm and source-shape refinement to1024
 quadrature nodes. Conditional CM source sensitivity is validated separately
 from incident-branch/laboratory composition and host feedback.
+
+Conditional pB CM birth composition and narrow-width alpha0 source are
+available through `fusion_pb_birth.h` and `fusion_pb_birth_fortran`; see
+[PB_BIRTH](docs/PB_BIRTH.md) for explicit branch inputs and validation scope.

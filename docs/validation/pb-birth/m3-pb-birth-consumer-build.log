@@ -1,0 +1,8 @@
+[ 25%] Building C object CMakeFiles/consumer.dir/main.c.o
+/tmp/m3-pb-birth-consumer/main.c:1:10: fatal error: fusion_pb_birth.h: No such file or directory
+    1 | #include "fusion_pb_birth.h"
+      |          ^~~~~~~~~~~~~~~~~~~
+compilation terminated.
+gmake[2]: *** [CMakeFiles/consumer.dir/build.make:79: CMakeFiles/consumer.dir/main.c.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:90: CMakeFiles/consumer.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2

@@ -34,7 +34,7 @@ add_library(pb11 src/pb11.cpp src/pb11_c.cpp src/pb11_source.cpp
                    src/fusion_products.cpp src/fusion_laboratory.cpp
                    src/fusion_nuclear_coulomb.cpp
                    src/fusion_alpha_amplitudes.cpp
-                   src/fusion_alpha_spectrum.cpp
+                   src/fusion_alpha_spectrum.cpp src/fusion_pb_birth.cpp
                    src/fusion_target_burn.cpp
                    src/fusion_transfer_rate.cpp src/fusion_two_component.cpp
                    src/fusion_handoff.cpp src/fusion_thermal_burn.cpp src/fusion_nuclear_data.cpp src/fusion_source_state.cpp)
@@ -135,6 +135,16 @@ if(PB11_FORTRAN_AVAILABLE)
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>"
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>")
     target_link_libraries(fusion_handoff_fortran PUBLIC pb11::pb11)
+
+    add_library(fusion_pb_birth_fortran STATIC fortran/fusion_pb_birth_fortran.f90)
+    add_library(pb11::fusion_pb_birth_fortran ALIAS fusion_pb_birth_fortran)
+    set_target_properties(fusion_pb_birth_fortran PROPERTIES
+        Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fortran-mod"
+        EXPORT_NAME fusion_pb_birth_fortran)
+    target_include_directories(fusion_pb_birth_fortran INTERFACE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>")
+    target_link_libraries(fusion_pb_birth_fortran PUBLIC pb11::pb11)
 
     add_library(fusion_fsci_fortran STATIC fortran/fusion_fsci_fortran.f90)
     add_library(pb11::fusion_fsci_fortran ALIAS fusion_fsci_fortran)
@@ -349,6 +359,10 @@ if(BUILD_TESTING)
     target_link_libraries(test_fusion_handoff PRIVATE pb11::pb11)
     add_test(NAME fusion_handoff_tests COMMAND test_fusion_handoff)
 
+    add_executable(test_fusion_pb_birth tests/test_fusion_pb_birth.cpp)
+    target_link_libraries(test_fusion_pb_birth PRIVATE pb11::pb11)
+    add_test(NAME fusion_pb_birth_tests COMMAND test_fusion_pb_birth)
+
     add_executable(test_fusion_fsci tests/test_fusion_fsci.cpp)
     target_link_libraries(test_fusion_fsci PRIVATE pb11::pb11)
     add_test(NAME fusion_fsci_tests COMMAND test_fusion_fsci)
@@ -455,6 +469,13 @@ if(BUILD_TESTING)
         target_link_libraries(test_fusion_handoff_fortran PRIVATE pb11::fusion_handoff_fortran)
         add_test(NAME fusion_handoff_fortran_binding_tests COMMAND test_fusion_handoff_fortran)
 
+        add_executable(test_fusion_pb_birth_fortran tests/test_fusion_pb_birth_fortran.f90)
+        set_target_properties(test_fusion_pb_birth_fortran PROPERTIES
+            LINKER_LANGUAGE Fortran
+            Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod")
+        target_link_libraries(test_fusion_pb_birth_fortran PRIVATE pb11::fusion_pb_birth_fortran)
+        add_test(NAME fusion_pb_birth_fortran_binding_tests COMMAND test_fusion_pb_birth_fortran)
+
         add_executable(test_fusion_fsci_fortran tests/test_fusion_fsci_fortran.f90)
         set_target_properties(test_fusion_fsci_fortran PROPERTIES
             LINKER_LANGUAGE Fortran
@@ -546,7 +567,7 @@ if(PB11_FORTRAN_AVAILABLE)
     install(
         TARGETS pb11_fortran fusion_fortran fusion_kinetics_fortran
                 fusion_two_component_fortran fusion_handoff_fortran fusion_thermal_burn_fortran fusion_nuclear_data_fortran fusion_source_state_fortran
-                fusion_beam_fortran fusion_rate_model_fortran fusion_target_burn_fortran fusion_fsci_fortran
+                fusion_beam_fortran fusion_rate_model_fortran fusion_target_burn_fortran fusion_fsci_fortran fusion_pb_birth_fortran
                 fusion_products_fortran
                 fusion_laboratory_fortran fusion_spectrum_fortran
         EXPORT pb11Targets
@@ -569,7 +590,7 @@ install(
           include/fusion_thermal_burn.h include/fusion_nuclear_data.h include/fusion_source_state.h
           include/fusion_products.h include/fusion_laboratory.h
           include/fusion_nuclear_coulomb.h include/fusion_alpha_amplitudes.h
-          include/fusion_alpha_spectrum.h
+          include/fusion_alpha_spectrum.h include/fusion_pb_birth.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(

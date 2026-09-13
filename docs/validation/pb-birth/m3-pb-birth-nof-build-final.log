@@ -1,0 +1,37 @@
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/m3-no-fortran
+[ 27%] Built target pb11
+[ 30%] Built target benchmark_pb11
+[ 32%] Built target thermal_network
+[ 34%] Built target test_pb11_c
+[ 37%] Built target test_pb11
+[ 41%] Built target test_pb11_source
+[ 41%] Built target test_fusion_network
+[ 44%] Built target test_fusion_cross_sections
+[ 46%] Built target test_fusion_rates
+[ 48%] Built target test_fusion_closed_box
+[ 51%] Built target test_fusion_kinetics
+[ 53%] Built target test_fusion_coulomb
+[ 55%] Built target test_fusion_slowing
+[ 58%] Built target test_fusion_rate_model
+[ 60%] Built target test_fusion_beam
+[ 62%] Built target test_fusion_transfer_rate
+[ 65%] Built target test_fusion_two_component
+[ 67%] Built target test_fusion_two_component_slowing
+[ 69%] Built target test_fusion_handoff
+[ 70%] Building CXX object CMakeFiles/test_fusion_pb_birth.dir/tests/test_fusion_pb_birth.cpp.o
+[ 73%] Built target test_fusion_fsci
+[ 75%] Built target test_fusion_source_state
+[ 77%] Built target test_fusion_nuclear_data
+[ 80%] Built target study_nuclear_windows
+[ 82%] Built target validate_nuclear_birth
+[ 84%] Built target test_fusion_thermal_burn
+[ 87%] Built target test_fusion_target_burn
+[ 89%] Built target test_fusion_products
+[ 91%] Built target test_fusion_laboratory
+[ 94%] Built target test_fusion_spectrum
+[ 96%] Built target test_fusion_alpha_grid
+[ 98%] Built target validate_alpha_grid
+[100%] Linking CXX executable test_fusion_pb_birth
+[100%] Built target test_fusion_pb_birth
