@@ -16,6 +16,8 @@ the S-factor, cross section, and thermal reactivity.
 - A C++17 compiler
 - CMake 3.16 or newer
 - Boost 1.70 or newer (Boost.Math headers)
+- Optional: a Fortran compiler with ISO_C_BINDING support (gfortran and Intel
+  Fortran are supported by the CMake build)
 - Optional: gnuplot for the comparison plots
 
 ## Build and test
@@ -25,6 +27,17 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 ctest --test-dir build --output-on-failure
 ```
+
+For an Intel oneAPI build, initialize the compiler and runtime environment in
+the same shell before configuring or running tests, for example:
+`source /opt/intel/oneapi/setvars.sh`.
+
+When a Fortran compiler is available, the same build also creates the
+`pb11::fortran` target and runs the cross-language binding test.  To build the
+C++ library without probing for Fortran, use
+`-DPB11_BUILD_FORTRAN=OFF`.  The generated module file is placed in
+`build/fortran-mod/pb11_fortran.mod` and is installed under
+`lib/fortran/modules` by `cmake --install`.
 
 To build only the library and comparison driver, disable CTest:
 
@@ -55,6 +68,57 @@ energy range.  The cross section returns exactly zero at zero energy.
 `pb11_reactivity_integral()` accepts positive finite temperatures, while the
 analytic approximation returns NaN outside 10–500 keV.  At 70 keV the fast
 function uses the high-temperature branch.
+
+## C ABI and Fortran binding
+
+Foreign-language callers should include `include/pb11_c.h` instead of relying
+on C++ name mangling.  The C ABI functions use output pointers and return an
+integer status code.  They catch C++ exceptions, reject non-finite inputs, and
+set the output to finite zero on every error path.  A successful call returns
+`PB11_STATUS_OK` and a finite result.  Status text is available through
+`pb11_c_status_message()`; the ABI revision is returned by
+`pb11_c_abi_version()`.
+
+The explicit C entry points are:
+
+```c
+int pb11_c_reactivity_integral(double T_keV, double *result);
+int pb11_c_reactivity_fast(double T_keV, double *result);
+int pb11_c_reactivity(double T_keV, int method, double *result);
+```
+
+`PB11_REACTIVITY_INTEGRAL` selects the direct quadrature reference path and
+accepts every positive finite temperature.  `PB11_REACTIVITY_FAST` selects the
+published analytic approximation and accepts 10–500 keV.  `pb11_c_sfactor`
+and `pb11_c_cross_section` accept 0–9.76 MeV.  Out-of-range, non-finite,
+unknown-method, null-output, and numerical errors are distinguishable through
+the constants in `pb11_c.h`.
+
+The source module `fortran/pb11_fortran.f90` wraps these functions with
+`ISO_C_BINDING` and is built as `pb11::fortran` when Fortran is available:
+
+```fortran
+program reaction_rate
+  use, intrinsic :: iso_c_binding, only : c_double, c_int
+  use pb11_fortran
+  implicit none
+  real(c_double) :: rate
+  integer(c_int) :: status
+
+  call pb11_reactivity(100.0_c_double, PB11_METHOD_INTEGRAL, &
+                       rate, status)
+  if (status /= PB11_STATUS_OK) error stop "pB11 reaction-rate failure"
+  print *, rate                 ! m^3/s
+end program reaction_rate
+```
+
+The module also exports `pb11_reactivity_integral`,
+`pb11_reactivity_fast`, `pb11_sfactor`, and `pb11_cross_section`, each with a
+final `status` argument.  For BALDUR, convert the returned SI reactivity once
+at the source-term boundary (`1 m^3/s = 1e6 cm^3/s`) and check the status
+before forming a density product.  The integral and fast methods are explicit
+so a caller cannot silently change the physics model by changing a global
+library setting.
 
 The two reactivity paths are intentionally independent:
 
