@@ -1,0 +1,3 @@
+PASS: 45 sequential events, mass shells, intermediate invariant and angle reflection
+Prescribed birth -> collisions 100-step number residual 4.7187e-17, energy residual -8.83158e-18
+PASS: conservative product birth mapping and sequential kinematics

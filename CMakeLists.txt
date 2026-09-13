@@ -30,7 +30,8 @@ find_package(Boost 1.70 REQUIRED)
 add_library(pb11 src/pb11.cpp src/pb11_c.cpp src/pb11_source.cpp
                    src/fusion_network.cpp src/fusion_rates.cpp
                    src/fusion_cross_sections.cpp src/fusion_kinetics.cpp
-                   src/fusion_coulomb.cpp src/fusion_beam.cpp)
+                   src/fusion_coulomb.cpp src/fusion_beam.cpp
+                   src/fusion_products.cpp)
 add_library(pb11::pb11 ALIAS pb11)
 
 target_compile_features(pb11 PUBLIC cxx_std_17)
@@ -123,6 +124,24 @@ if(PB11_FORTRAN_AVAILABLE)
             "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>"
     )
     target_link_libraries(fusion_beam_fortran PUBLIC pb11::pb11)
+
+    add_library(fusion_products_fortran STATIC
+                fortran/fusion_products_fortran.f90)
+    add_library(pb11::fusion_products_fortran ALIAS fusion_products_fortran)
+    set_target_properties(
+        fusion_products_fortran
+        PROPERTIES
+            Fortran_MODULE_DIRECTORY
+                "${CMAKE_CURRENT_BINARY_DIR}/fortran-mod"
+            EXPORT_NAME fusion_products_fortran
+    )
+    target_include_directories(
+        fusion_products_fortran
+        INTERFACE
+            "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>"
+            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>"
+    )
+    target_link_libraries(fusion_products_fortran PUBLIC pb11::pb11)
 endif()
 
 include(CTest)
@@ -173,6 +192,10 @@ if(BUILD_TESTING)
     target_link_libraries(test_fusion_beam PRIVATE pb11::pb11)
     add_test(NAME fusion_beam_tests COMMAND test_fusion_beam)
 
+    add_executable(test_fusion_products tests/test_fusion_products.cpp)
+    target_link_libraries(test_fusion_products PRIVATE pb11::pb11)
+    add_test(NAME fusion_products_tests COMMAND test_fusion_products)
+
     if(PB11_FORTRAN_AVAILABLE)
         add_executable(test_pb11_fortran tests/test_pb11_fortran.f90)
         set_target_properties(test_pb11_fortran PROPERTIES
@@ -207,6 +230,16 @@ if(BUILD_TESTING)
                               pb11::fusion_beam_fortran)
         add_test(NAME fusion_beam_fortran_binding_tests
                  COMMAND test_fusion_beam_fortran)
+
+        add_executable(test_fusion_products_fortran
+                       tests/test_fusion_products_fortran.f90)
+        set_target_properties(test_fusion_products_fortran PROPERTIES
+                              POSITION_INDEPENDENT_CODE ON
+                              LINKER_LANGUAGE Fortran)
+        target_link_libraries(test_fusion_products_fortran PRIVATE
+                              pb11::fusion_products_fortran)
+        add_test(NAME fusion_products_fortran_binding_tests
+                 COMMAND test_fusion_products_fortran)
     endif()
 endif()
 
@@ -220,7 +253,7 @@ install(
 if(PB11_FORTRAN_AVAILABLE)
     install(
         TARGETS pb11_fortran fusion_fortran fusion_kinetics_fortran
-                fusion_beam_fortran
+                fusion_beam_fortran fusion_products_fortran
         EXPORT pb11Targets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -237,6 +270,7 @@ install(
           include/fusion_network.h include/fusion_rates.h
           include/fusion_cross_sections.h include/fusion_kinetics.h
           include/fusion_coulomb.h include/fusion_beam.h
+          include/fusion_products.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(

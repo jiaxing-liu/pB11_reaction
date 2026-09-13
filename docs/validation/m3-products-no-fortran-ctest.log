@@ -1,0 +1,29 @@
+Test project /tmp/m3-no-fortran
+      Start  1: pb11_unit_tests
+ 1/12 Test  #1: pb11_unit_tests ..................   Passed    0.00 sec
+      Start  2: pb11_c_abi_tests
+ 2/12 Test  #2: pb11_c_abi_tests .................   Passed    0.00 sec
+      Start  3: pb11_instant_source_tests
+ 3/12 Test  #3: pb11_instant_source_tests ........   Passed    0.00 sec
+      Start  4: fusion_network_tests
+ 4/12 Test  #4: fusion_network_tests .............   Passed    0.00 sec
+      Start  5: fusion_rates_tests
+ 5/12 Test  #5: fusion_rates_tests ...............   Passed    0.00 sec
+      Start  6: fusion_cross_sections_tests
+ 6/12 Test  #6: fusion_cross_sections_tests ......   Passed    0.00 sec
+      Start  7: fusion_closed_box_tests
+ 7/12 Test  #7: fusion_closed_box_tests ..........   Passed    0.00 sec
+      Start  8: fusion_kinetics_tests
+ 8/12 Test  #8: fusion_kinetics_tests ............   Passed    0.00 sec
+      Start  9: fusion_coulomb_tests
+ 9/12 Test  #9: fusion_coulomb_tests .............   Passed    0.00 sec
+      Start 10: fusion_slowing_tests
+10/12 Test #10: fusion_slowing_tests .............   Passed    1.57 sec
+      Start 11: fusion_beam_tests
+11/12 Test #11: fusion_beam_tests ................   Passed    7.06 sec
+      Start 12: fusion_products_tests
+12/12 Test #12: fusion_products_tests ............   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 12
+
+Total Test time (real) =   8.66 sec
