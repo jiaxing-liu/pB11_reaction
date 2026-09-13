@@ -13,6 +13,7 @@ The public API uses `double` precision. Implemented modules include:
 - [Thermal network, cross sections and particle/nuclear ledgers](docs/THERMAL_NETWORK.md).
 - [Classical Coulomb coefficients and conservative energy kinetics](docs/KINETIC_PRIMITIVES.md).
 - [Finite-temperature two-component transfer and controlled thermal-handoff studies](docs/THERMAL_TRANSFER_DESIGN.md); internal kinetic transfer is separate from fluid ash.
+- [Finite thermal-fuel burn trial](docs/THERMAL_BURN.md), with simultaneous shared-fuel depletion and reaction-conditioned energy debits.
 - [Measured Maxwellian handoff API](docs/THERMAL_HANDOFF.md), with separate distribution/energy criteria and signed bath-energy correction.
 - [Beam/Maxwellian window rates and unequal-temperature reactant energy moments](docs/BEAM_AND_THERMAL_MOMENTS.md).
 - [Conservative birth mapping and sequential product kinematics](docs/PRODUCT_KINEMATICS_AND_MAPPING.md).

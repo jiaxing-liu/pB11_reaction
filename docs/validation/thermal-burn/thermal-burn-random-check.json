@@ -1,0 +1,8 @@
+{
+  "cases": 500,
+  "seed": 970314,
+  "mpmath_digits": 100,
+  "max_relative_BE_rate_residual": 2.820849859977735e-16,
+  "max_relative_species_balance": 1.0839904891113698e-16,
+  "max_relative_baryon_charge_residual": 9.320668069569096e-17
+}

@@ -1,0 +1,2 @@
+FAIL: small-dt event approaches instantaneous network rate
+test_fusion_thermal_burn: /tmp/test_fusion_thermal_burn.cpp:25: void {anonymous}::require(bool, const std::string&): Assertion `condition' failed.
