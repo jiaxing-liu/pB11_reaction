@@ -14,6 +14,7 @@ The public API uses `double` precision. Implemented modules include:
 - [Classical Coulomb coefficients and conservative energy kinetics](docs/KINETIC_PRIMITIVES.md).
 - [Beam/Maxwellian window rates and unequal-temperature reactant energy moments](docs/BEAM_AND_THERMAL_MOMENTS.md).
 - [Conservative birth mapping and sequential product kinematics](docs/PRODUCT_KINEMATICS_AND_MAPPING.md).
+- [Unequal-mass two-body kinematics and laboratory Lorentz transformation](docs/LABORATORY_PRODUCTS.md).
 
 The simplified pB instantaneous-thermalization source API remains available.
 These tested primitives do not yet constitute a complete pB fast-particle
