@@ -319,6 +319,10 @@ if(BUILD_TESTING)
     target_link_libraries(test_fusion_nuclear_data PRIVATE pb11::pb11)
     add_test(NAME fusion_nuclear_data_tests COMMAND test_fusion_nuclear_data)
 
+    add_executable(study_nuclear_windows tools/study_nuclear_windows.cpp)
+    target_include_directories(study_nuclear_windows PRIVATE ${Boost_INCLUDE_DIRS})
+    target_link_libraries(study_nuclear_windows PRIVATE pb11::pb11)
+
     add_executable(validate_nuclear_birth tools/validate_nuclear_birth.cpp)
     target_link_libraries(validate_nuclear_birth PRIVATE pb11::pb11)
     add_test(NAME fusion_nuclear_birth_four_momentum_tests COMMAND validate_nuclear_birth)

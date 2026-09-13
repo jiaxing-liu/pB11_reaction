@@ -1,0 +1,25 @@
+{
+  "rows": 65,
+  "quadrature_tolerances": [
+    1e-10,
+    1e-12
+  ],
+  "max_relative_change": {
+    "K_fit_m3_s": 4.234369739398007e-16,
+    "K_low_Sconst_m3_s": 2.1385875943925912e-15,
+    "K_high_Sconst_m3_s": 0.0,
+    "K_high_flat_m3_s": 0.0,
+    "relative_E_fit_keV": 1.542271379385538e-16,
+    "relative_E_low_keV": 9.250143813573944e-16,
+    "relative_E_high_keV": 0.0,
+    "pb_K_below_SW140": 0.0,
+    "pb_K_gap3480_5700": 1.488055461568777e-14,
+    "pb_K_below_Becker22": 0.0,
+    "pb_K_low400_TB": 4.2623565518237117e-16,
+    "pb_K_low400_NS": 1.0111752758044177e-15,
+    "pb_K_low400_C0plus12": 6.898814647935329e-16,
+    "pb_K_low400_C0minus12": 5.857288755033914e-16
+  },
+  "max_independent_window_K_error": 1.2154826157946623e-14,
+  "max_independent_window_relative_moment_error": 1.167328185425732e-14
+}
