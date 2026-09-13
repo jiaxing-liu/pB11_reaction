@@ -292,3 +292,8 @@ available through `fusion_pb_birth.h` and `fusion_pb_birth_fortran`; see
 and thermal/beam reaction-weighted rates and selected energy moments through
 `fusion_pb_population.h` and its Fortran module. Remainders are deliberately
 not relabeled as experimentally resolved alpha1 spectra.
+
+[Laboratory reaction-event bridge](docs/REACTION_EVENT.md) converts explicit
+reactant momenta into conservative five-channel events with a declared
+classical-budget or on-shell input energy convention, through
+`fusion_reaction_event.h` and its Fortran module.

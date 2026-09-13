@@ -1,0 +1,73 @@
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/m3-no-fortran
+[  1%] Building CXX object CMakeFiles/pb11.dir/src/fusion_reaction_event.cpp.o
+[  2%] Linking CXX static library libpb11.a
+[ 28%] Built target pb11
+[ 29%] Linking CXX executable thermal_network
+[ 30%] Linking CXX executable benchmark_pb11
+[ 31%] Built target thermal_network
+[ 32%] Built target benchmark_pb11
+[ 34%] Linking CXX executable test_pb11_c
+[ 34%] Linking CXX executable test_pb11
+[ 35%] Built target test_pb11_c
+[ 36%] Built target test_pb11
+[ 38%] Linking CXX executable test_pb11_source
+[ 39%] Linking CXX executable test_fusion_network
+[ 40%] Built target test_fusion_network
+[ 41%] Built target test_pb11_source
+[ 42%] Linking CXX executable test_fusion_rates
+[ 43%] Linking CXX executable test_fusion_cross_sections
+[ 45%] Built target test_fusion_cross_sections
+[ 45%] Built target test_fusion_rates
+[ 46%] Linking CXX executable test_fusion_closed_box
+[ 47%] Linking CXX executable test_fusion_kinetics
+[ 48%] Built target test_fusion_kinetics
+[ 50%] Built target test_fusion_closed_box
+[ 51%] Linking CXX executable test_fusion_coulomb
+[ 52%] Linking CXX executable test_fusion_slowing
+[ 53%] Built target test_fusion_coulomb
+[ 54%] Built target test_fusion_slowing
+[ 55%] Linking CXX executable test_fusion_rate_model
+[ 56%] Linking CXX executable test_fusion_beam
+[ 57%] Built target test_fusion_beam
+[ 58%] Linking CXX executable test_fusion_transfer_rate
+[ 59%] Built target test_fusion_rate_model
+[ 60%] Linking CXX executable test_fusion_two_component
+[ 61%] Built target test_fusion_transfer_rate
+[ 63%] Linking CXX executable test_fusion_two_component_slowing
+[ 64%] Built target test_fusion_two_component
+[ 65%] Linking CXX executable test_fusion_handoff
+[ 66%] Built target test_fusion_two_component_slowing
+[ 67%] Building CXX object CMakeFiles/test_fusion_reaction_event.dir/tests/test_fusion_reaction_event.cpp.o
+[ 68%] Built target test_fusion_handoff
+[ 69%] Linking CXX executable test_fusion_pb_population
+[ 70%] Built target test_fusion_pb_population
+[ 71%] Linking CXX executable test_fusion_pb_birth
+[ 72%] Built target test_fusion_pb_birth
+[ 73%] Linking CXX executable test_fusion_fsci
+[ 75%] Built target test_fusion_fsci
+[ 76%] Linking CXX executable test_fusion_source_state
+[ 77%] Built target test_fusion_source_state
+[ 78%] Linking CXX executable test_fusion_nuclear_data
+[ 79%] Built target test_fusion_nuclear_data
+[ 80%] Linking CXX executable study_nuclear_windows
+[ 81%] Built target study_nuclear_windows
+[ 82%] Linking CXX executable test_fusion_reaction_event
+[ 83%] Linking CXX executable validate_nuclear_birth
+[ 83%] Built target test_fusion_reaction_event
+[ 84%] Linking CXX executable test_fusion_thermal_burn
+[ 85%] Built target validate_nuclear_birth
+[ 86%] Linking CXX executable test_fusion_target_burn
+[ 88%] Built target test_fusion_target_burn
+[ 89%] Built target test_fusion_thermal_burn
+[ 90%] Linking CXX executable test_fusion_products
+[ 91%] Linking CXX executable test_fusion_laboratory
+[ 92%] Built target test_fusion_products
+[ 93%] Linking CXX executable test_fusion_spectrum
+[ 94%] Built target test_fusion_laboratory
+[ 95%] Linking CXX executable test_fusion_alpha_grid
+[ 96%] Built target test_fusion_spectrum
+[ 97%] Linking CXX executable validate_alpha_grid
+[ 98%] Built target test_fusion_alpha_grid
+[100%] Built target validate_alpha_grid

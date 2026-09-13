@@ -1,0 +1,4 @@
+#include "fusion_reaction_event.h"
+#include <iomanip>
+#include <iostream>
+int main(){int ch,mode;double pa[3],pb[3];std::cout<<std::setprecision(17);while(std::cin>>ch>>mode){for(auto&v:pa)std::cin>>v;for(auto&v:pb)std::cin>>v;fusion_reaction_parent_v1 r{};int s=fusion_c_reaction_parent(ch,mode,pa,pb,&r);fusion_nuclear_channel_v1 q{};fusion_c_nuclear_channel(ch,&q);std::cout<<s<<' '<<q.q_J;fusion_nuclear_mass_v1 m{};for(int i=0;i<2;++i){fusion_c_nuclear_mass(q.reactant_ids[i],&m);std::cout<<' '<<m.mass_kg;}for(int i=0;i<3;++i){if(i<q.product_count)fusion_c_nuclear_mass(q.product_ids[i],&m);else m.mass_kg=0;std::cout<<' '<<m.mass_kg;}std::cout<<' '<<r.available_cm_energy_J<<' '<<r.expected_product_lab_kinetic_J<<' '<<r.relative_classical_energy_J<<' '<<r.classical_minus_on_shell_J;for(auto v:r.reactant_kinetic_J)std::cout<<' '<<v;for(auto v:r.boost_velocity_m_s)std::cout<<' '<<v;std::cout<<'\n';}}

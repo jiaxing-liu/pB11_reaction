@@ -140,3 +140,9 @@ not automatically the low/broad alpha1 fractions of fusion_pb_birth.h.
 The ground-state ghost and continuum source shapes remain explicit source
 choices requiring sensitivity accounting. Do not silently equate the two
 interfaces just because each returns three fractions.
+
+The deterministic reaction-parent/laboratory-event bridge is now available
+(REACTION_EVENT.md). It derives the available CM energy and boost from the
+same aggregate input energy/momentum, with explicit classical/on-shell input
+conventions. This resolves single-event budget composition, not the missing
+reaction-selected joint distribution or source/ghost/angular probabilities.
