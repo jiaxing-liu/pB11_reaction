@@ -1,0 +1,952 @@
+{
+  "companion_runs": {
+    "files": [
+      "coupled-dd-s16-n800.csv",
+      "coupled-dhe3-s16-n800.csv",
+      "coupled-pb-s4-n800.csv"
+    ],
+    "interpretation": "DD, D-He3, and pB artifacts are retained as completed companion studies. They are not used to claim an EXL comparison or rank the fuels."
+  },
+  "constants": {
+    "MeV_J": 1.602176634e-13,
+    "keV_J": 1.602176634e-16
+  },
+  "dt_grid_convergence": {
+    "coarse": {
+      "cells": 800,
+      "file": "coupled-dt-s128-n800.csv",
+      "steps": 128
+    },
+    "coarse_to_fine_relative_change_fraction": {
+      "Q_J_m3": 0.00012012215601718604,
+      "Ue_J_m3": 0.0008470745661982662,
+      "Ui_J_m3": 0.00015269591849659465,
+      "fast_energy_J_m3": 0.001910133813000545
+    },
+    "coarse_to_fine_relative_change_percent": {
+      "Q_J_m3": 0.012012215601718603,
+      "Ue_J_m3": 0.08470745661982662,
+      "Ui_J_m3": 0.015269591849659465,
+      "fast_energy_J_m3": 0.1910133813000545
+    },
+    "fine": {
+      "cells": 1600,
+      "file": "coupled-dt-s128-n1600.csv",
+      "steps": 128
+    }
+  },
+  "dt_timestep_convergence": {
+    "adjacent": [
+      {
+        "from_steps": 16,
+        "relative_change_fraction": {
+          "Q_J_m3": 0.0022696948292989473,
+          "Ue_J_m3": 0.007347432361551136,
+          "Ui_J_m3": 0.0001286431307847548,
+          "fast_energy_J_m3": 0.02295186534370007
+        },
+        "relative_change_percent": {
+          "Q_J_m3": 0.22696948292989472,
+          "Ue_J_m3": 0.7347432361551136,
+          "Ui_J_m3": 0.01286431307847548,
+          "fast_energy_J_m3": 2.295186534370007
+        },
+        "to_steps": 32
+      },
+      {
+        "from_steps": 32,
+        "relative_change_fraction": {
+          "Q_J_m3": 0.0011014669129171747,
+          "Ue_J_m3": 0.003714979489600855,
+          "Ui_J_m3": 3.3084660298457964e-05,
+          "fast_energy_J_m3": 0.011390266301658887
+        },
+        "relative_change_percent": {
+          "Q_J_m3": 0.11014669129171747,
+          "Ue_J_m3": 0.3714979489600855,
+          "Ui_J_m3": 0.0033084660298457963,
+          "fast_energy_J_m3": 1.1390266301658887
+        },
+        "to_steps": 64
+      },
+      {
+        "from_steps": 64,
+        "relative_change_fraction": {
+          "Q_J_m3": 0.0005442577905967391,
+          "Ue_J_m3": 0.00186868463018955,
+          "Ui_J_m3": 1.0142681514446892e-05,
+          "fast_energy_J_m3": 0.0056776814445352085
+        },
+        "relative_change_percent": {
+          "Q_J_m3": 0.05442577905967391,
+          "Ue_J_m3": 0.18686846301895502,
+          "Ui_J_m3": 0.0010142681514446893,
+          "fast_energy_J_m3": 0.5677681444535209
+        },
+        "to_steps": 128
+      }
+    ],
+    "reference": {
+      "cells": 800,
+      "file": "coupled-dt-s128-n800.csv",
+      "steps": 128
+    },
+    "relative_to_128_step_fraction": {
+      "128": {
+        "Q_J_m3": 0.0,
+        "Ue_J_m3": 0.0,
+        "Ui_J_m3": 0.0,
+        "fast_energy_J_m3": 0.0
+      },
+      "16": {
+        "Q_J_m3": 0.003911086118655485,
+        "Ue_J_m3": 0.012979115207659432,
+        "Ui_J_m3": 0.00017186457617306933,
+        "fast_energy_J_m3": 0.0395648858520016
+      },
+      "32": {
+        "Q_J_m3": 0.001645125221565474,
+        "Ue_J_m3": 0.005590606244864091,
+        "Ui_J_m3": 4.322700624573243e-05,
+        "fast_energy_J_m3": 0.01700327744256485
+      },
+      "64": {
+        "Q_J_m3": 0.0005442577905967391,
+        "Ue_J_m3": 0.00186868463018955,
+        "Ui_J_m3": 1.0142681514446892e-05,
+        "fast_energy_J_m3": 0.0056776814445352085
+      }
+    },
+    "relative_to_128_step_percent": {
+      "128": {
+        "Q_J_m3": 0.0,
+        "Ue_J_m3": 0.0,
+        "Ui_J_m3": 0.0,
+        "fast_energy_J_m3": 0.0
+      },
+      "16": {
+        "Q_J_m3": 0.3911086118655485,
+        "Ue_J_m3": 1.2979115207659433,
+        "Ui_J_m3": 0.017186457617306933,
+        "fast_energy_J_m3": 3.95648858520016
+      },
+      "32": {
+        "Q_J_m3": 0.1645125221565474,
+        "Ue_J_m3": 0.5590606244864091,
+        "Ui_J_m3": 0.0043227006245732435,
+        "fast_energy_J_m3": 1.700327744256485
+      },
+      "64": {
+        "Q_J_m3": 0.05442577905967391,
+        "Ue_J_m3": 0.18686846301895502,
+        "Ui_J_m3": 0.0010142681514446893,
+        "fast_energy_J_m3": 0.5677681444535209
+      }
+    }
+  },
+  "dt_validation_gates": {
+    "actual_handoff_projections": 0,
+    "all_rows_finite": true,
+    "all_stable_dt_gates_pass": true,
+    "completion_logs_present": true,
+    "energy_relative_residual_limit": 1e-09,
+    "energy_relative_residual_pass": true,
+    "expected_accepted_rows": true,
+    "handoff_projection_pass": true,
+    "max_abs_energy_relative_residual": 1.24749642961e-16
+  },
+  "figures": [
+    "dt_coupled_thermal.png",
+    "dt_coupled_thermal.pdf"
+  ],
+  "generated_by": {
+    "script": "plot_coupled_thermal.py",
+    "source_sha256": "41bc2efeccf4e583365b7c490898673feed9a6e9f903cd6423dd80608d6caf5b",
+    "study_driver": {
+      "file": "tools/study_coupled_thermal.cpp",
+      "not_binary_build_provenance": true,
+      "purpose": "numeric-setting provenance for the archived CSV/log studies",
+      "role": "analysis-time source snapshot",
+      "sha256": "ade965242fe435c607572b0e014b940ca0dfc38342387cc64c49cef0e99c6f81"
+    }
+  },
+  "guard_fix_parity": {
+    "comparison": {
+      "all_common_numeric_values_exact": true,
+      "common_columns": [
+        "step",
+        "time_s",
+        "Te_keV",
+        "Ti_keV",
+        "Ue_J_m3",
+        "Ui_J_m3",
+        "fast_energy_J_m3",
+        "neutron_energy_J_m3",
+        "Q_J_m3",
+        "energy_relative_residual",
+        "inert_heat_J_m3",
+        "events_pb",
+        "events_dd_tp",
+        "events_dd_he3n",
+        "events_dt",
+        "events_dhe3",
+        "thermal_H",
+        "thermal_D",
+        "thermal_T",
+        "thermal_He3",
+        "thermal_He4",
+        "thermal_B11",
+        "fast_He4",
+        "thermalized_He4",
+        "projections"
+      ],
+      "guard_fix_added_columns": [
+        "electron_heat_J_m3",
+        "network_ion_heat_J_m3",
+        "removed_thermal_energy_J_m3"
+      ],
+      "guard_fix_csv": "coupled-dt-s32-n800-fixed-guard.csv",
+      "interpretation": "The original continuous study was linked against the pre-guard-fix library. The guard-fixed rerun has identical shared CSV values, so the successful trajectory numerical operator is unchanged; its added columns are retained only as guard-fix run output.",
+      "logs_byte_identical": true,
+      "max_absolute_difference": 0.0,
+      "max_relative_difference": 0.0,
+      "reference_csv": "coupled-dt-s32-n800.csv",
+      "rows_compared": 32
+    },
+    "guard_fix_run": {
+      "cells": 800,
+      "completed_steps": 32,
+      "csv": {
+        "bytes": 9974,
+        "file": "coupled-dt-s32-n800-fixed-guard.csv",
+        "sha256": "9d6e69fe10653ce068177b08dc9213576b8213f7f2f67aa2a98483090c16626c",
+        "source_name": "coupled-dt-s32-n800-fixed-guard.csv"
+      },
+      "dt_s": 0.0003125,
+      "duration_s": 0.01,
+      "final": {
+        "Q_J_m3": 311976435.63769,
+        "Te_keV": 20.1930876387,
+        "Ti_keV": 22.3116806505,
+        "Ue_J_m3": 48529339.774653,
+        "Ui_J_m3": 52165564.294488,
+        "energy_relative_residual": 2.41085321841e-17,
+        "events_dd_he3n": 0.0,
+        "events_dd_tp": 0.0,
+        "events_dhe3": 0.0,
+        "events_dt": 1.1070420774709e+20,
+        "events_pb": 0.0,
+        "fast_He4": 1.1070420774709e+20,
+        "fast_energy_J_m3": 21367730.730941,
+        "inert_heat_J_m3": 45401.131182403,
+        "neutron_energy_J_m3": 249755098.11751,
+        "projections": 0.0,
+        "thermal_B11": 0.0,
+        "thermal_D": 4.8592957922529e+21,
+        "thermal_H": 0.0,
+        "thermal_He3": 0.0,
+        "thermal_He4": 0.0,
+        "thermal_T": 4.8592957922529e+21,
+        "thermalized_He4": 0.0,
+        "time_s": 0.01
+      },
+      "fuel": "dt",
+      "initial_Te_keV": 5.0,
+      "initial_Ti_keV": 20.0,
+      "kind": "success",
+      "log": {
+        "cells": 800,
+        "duration_s": 0.01,
+        "fuel": "dt",
+        "max_total_energy_relative_residual": 6.48842671113e-17,
+        "neutron_number_m3": 1.10704207747e+20,
+        "raw": "fuel=dt steps=32 cells=800 duration=0.01 max_total_energy_relative_residual=6.48842671113e-17 projections=0 neutron_number=1.10704207747e+20",
+        "status": "completed",
+        "steps": 32,
+        "total_projections": 0
+      },
+      "log_file": {
+        "bytes": 141,
+        "file": "coupled-dt-s32-n800-fixed-guard.log",
+        "sha256": "e9535396910cb29e34d076875fee39ee016d28725cfdc6eed37251bb10f41fee",
+        "source_name": "coupled-dt-s32-n800-fixed-guard.log"
+      },
+      "max_abs_energy_relative_residual_csv": 6.48842671113e-17,
+      "rows": 32,
+      "steps": 32,
+      "total_projections_csv": 0
+    },
+    "reference_run": "coupled-dt-s32-n800.csv"
+  },
+  "numeric_settings": {
+    "DT": {
+      "cells": 800,
+      "duration_s": 0.01,
+      "initial_Te_keV": 5.0,
+      "initial_Ti_keV": 20.0,
+      "steps": [
+        16,
+        32,
+        64,
+        128
+      ]
+    },
+    "birth_options": {
+      "broad_mode": 13,
+      "cm_max_kT": 40.0,
+      "cm_order": 12,
+      "continuation": 1,
+      "continuum_peak_scale": 1.0,
+      "cutoff_J": 1.6021766340000001e-16,
+      "fsci_policy": 0,
+      "ground_state_q_J": 1.4714390206656e-14,
+      "l1_fraction": 0.76,
+      "narrow_peak_fraction": 0.051,
+      "ncos": 8,
+      "nq": 8,
+      "pb_low": 0,
+      "relative_max_J": 4.0054415850000003e-13,
+      "relative_order": 16,
+      "relative_phase": 0.0,
+      "remainder_policy": 0
+    },
+    "carbon_density_fraction_of_electron_density": 0.001,
+    "carbon_density_m3": 1e+19,
+    "carbon_mass_kg": 1.9926468827039998e-26,
+    "carbon_mass_u": 12.0,
+    "carbon_mean_charge_squared": 36.0,
+    "coulomb_log": 15.0,
+    "density_m3": 1e+22,
+    "electron_density_m3": 1e+22,
+    "external_birth_enabled": false,
+    "handoff_enabled": true,
+    "handoff_max_L1": 0.001,
+    "handoff_max_mean_error": 0.001,
+    "pB": {
+      "cells": 800,
+      "duration_s": 0.001,
+      "first_failure_first_edge_keV": 1e-10,
+      "initial_Te_keV": 5.0,
+      "initial_Ti_keV": 100.0,
+      "successful_first_edge_keV": 1e-18,
+      "successful_nq_ncos": 8
+    },
+    "physical_escape_enabled": false,
+    "source_debit_error_limit": 1e-05,
+    "source_rate_error_limit": 1e-05,
+    "thermal_charge_squared_network": [
+      1.0,
+      1.0,
+      1.0,
+      4.0,
+      4.0,
+      25.0
+    ]
+  },
+  "pB_grid_scope": {
+    "completed_steps": 1,
+    "dt_s": 0.00025,
+    "failed_step": 2,
+    "failure_csv": "coupled-pb-s4-n800-first-grid-failure.csv",
+    "failure_log": "coupled-pb-s4-n800-first-grid-failure.log",
+    "failure_reason": "charged lab source extended below the first cell center",
+    "grid_lower_edge_change": {
+      "description": "The successful pB study lowers the first edge from 1e-10 to 1e-18 keV to contain the declared source support. This is an explicit grid change, not clipping or silently thermalizing a spill, and is not a universal guarantee.",
+      "first_failure_first_edge_keV": 1e-10,
+      "successful_first_edge_keV": 1e-18
+    },
+    "preserved_first_failure": true,
+    "requested_steps": 4,
+    "return_status": 3
+  },
+  "runs": {
+    "coupled-dd-s16-n800": {
+      "cells": 800,
+      "completed_steps": 16,
+      "csv": {
+        "bytes": 4030,
+        "file": "coupled-dd-s16-n800.csv",
+        "sha256": "268533f1999be738284ba9806af1f5d602c11a0b386ed23425541a1135d76654",
+        "source_name": "coupled-dd-s16-n800.csv"
+      },
+      "dt_s": 0.000625,
+      "duration_s": 0.01,
+      "final": {
+        "Q_J_m3": 1461115.8019733,
+        "Te_keV": 5.3421590222,
+        "Ti_keV": 20.0119114233,
+        "Ue_J_m3": 12838623.540716,
+        "Ui_J_m3": 47829335.400819,
+        "energy_relative_residual": -1.25299105168e-16,
+        "events_dd_he3n": 1.299854991551e+18,
+        "events_dd_tp": 1.2077692649215e+18,
+        "events_dhe3": 0.0,
+        "events_dt": 0.0,
+        "events_pb": 0.0,
+        "fast_He4": 0.0,
+        "fast_energy_J_m3": 112433.70666634,
+        "inert_heat_J_m3": 59.8958349077,
+        "neutron_energy_J_m3": 522020.43367133,
+        "projections": 0.0,
+        "thermal_B11": 0.0,
+        "thermal_D": 9.9349847514871e+21,
+        "thermal_H": 0.0,
+        "thermal_He3": 0.0,
+        "thermal_He4": 0.0,
+        "thermal_T": 0.0,
+        "thermalized_He4": 0.0,
+        "time_s": 0.01
+      },
+      "fuel": "dd",
+      "initial_Te_keV": 5.0,
+      "initial_Ti_keV": 20.0,
+      "kind": "success",
+      "log": {
+        "cells": 800,
+        "duration_s": 0.01,
+        "fuel": "dd",
+        "max_total_energy_relative_residual": 1.56736664805e-16,
+        "neutron_number_m3": 1.29985499155e+18,
+        "raw": "fuel=dd steps=16 cells=800 duration=0.01 max_total_energy_relative_residual=1.56736664805e-16 projections=0 neutron_number=1.29985499155e+18",
+        "status": "completed",
+        "steps": 16,
+        "total_projections": 0
+      },
+      "log_file": {
+        "bytes": 141,
+        "file": "coupled-dd-s16-n800.log",
+        "sha256": "1c665f26e6ecf5e3882e63085083689793a363b679e12d6b864ee631630e7fe1",
+        "source_name": "coupled-dd-s16-n800.log"
+      },
+      "max_abs_energy_relative_residual_csv": 1.56736664805e-16,
+      "rows": 16,
+      "steps": 16,
+      "total_projections_csv": 0
+    },
+    "coupled-dhe3-s16-n800": {
+      "cells": 800,
+      "completed_steps": 16,
+      "csv": {
+        "bytes": 4082,
+        "file": "coupled-dhe3-s16-n800.csv",
+        "sha256": "35adc4ea6f28cdccffa8ffaf1c9c76c8aac753e813a61d2f75c56288073997f4",
+        "source_name": "coupled-dhe3-s16-n800.csv"
+      },
+      "dt_s": 0.000625,
+      "duration_s": 0.01,
+      "final": {
+        "Q_J_m3": 1120041.5236486,
+        "Te_keV": 5.40543751863,
+        "Ti_keV": 20.0086689851,
+        "Ue_J_m3": 12990698.533342,
+        "Ui_J_m3": 31909500.288104,
+        "energy_relative_residual": 1.06707700572e-16,
+        "events_dd_he3n": 0.0,
+        "events_dd_tp": 0.0,
+        "events_dhe3": 3.8090385443364e+17,
+        "events_dt": 0.0,
+        "events_pb": 0.0,
+        "fast_He4": 3.8090385443364e+17,
+        "fast_energy_J_m3": 135504.24014249,
+        "inert_heat_J_m3": 70.876068745739,
+        "neutron_energy_J_m3": 0.0,
+        "projections": 0.0,
+        "thermal_B11": 0.0,
+        "thermal_D": 3.3129524294789e+21,
+        "thermal_H": 0.0,
+        "thermal_He3": 3.3129524294789e+21,
+        "thermal_He4": 0.0,
+        "thermal_T": 0.0,
+        "thermalized_He4": 0.0,
+        "time_s": 0.01
+      },
+      "fuel": "dhe3",
+      "initial_Te_keV": 5.0,
+      "initial_Ti_keV": 20.0,
+      "kind": "success",
+      "log": {
+        "cells": 800,
+        "duration_s": 0.01,
+        "fuel": "dhe3",
+        "max_total_energy_relative_residual": 1.1108961226e-16,
+        "neutron_number_m3": 0.0,
+        "raw": "fuel=dhe3 steps=16 cells=800 duration=0.01 max_total_energy_relative_residual=1.1108961226e-16 projections=0 neutron_number=0",
+        "status": "completed",
+        "steps": 16,
+        "total_projections": 0
+      },
+      "log_file": {
+        "bytes": 126,
+        "file": "coupled-dhe3-s16-n800.log",
+        "sha256": "45382706de3ed173f7eb68fe7c666d99434d259f520e97cb21d691fe6cf63a38",
+        "source_name": "coupled-dhe3-s16-n800.log"
+      },
+      "max_abs_energy_relative_residual_csv": 1.1108961226e-16,
+      "rows": 16,
+      "steps": 16,
+      "total_projections_csv": 0
+    },
+    "coupled-dt-s128-n1600": {
+      "cells": 1600,
+      "completed_steps": 128,
+      "csv": {
+        "bytes": 32991,
+        "file": "coupled-dt-s128-n1600.csv",
+        "sha256": "a44c7793f67b650f8a6c94e3c1412a7c7791fed7f6942a84b13a409b4613e1aa",
+        "source_name": "coupled-dt-s128-n1600.csv"
+      },
+      "dt_s": 7.8125e-05,
+      "duration_s": 0.01,
+      "final": {
+        "Q_J_m3": 312528063.22117,
+        "Te_keV": 20.0978480365,
+        "Ti_keV": 22.316950785,
+        "Ue_J_m3": 48300453.776614,
+        "Ui_J_m3": 52175786.382766,
+        "energy_relative_residual": 2.26659648396e-18,
+        "events_dd_he3n": 0.0,
+        "events_dd_tp": 0.0,
+        "events_dhe3": 0.0,
+        "events_dt": 1.1089995168037e+20,
+        "events_pb": 0.0,
+        "fast_He4": 1.1089995168037e+20,
+        "fast_energy_J_m3": 21695894.635727,
+        "inert_heat_J_m3": 45524.997083245,
+        "neutron_energy_J_m3": 250197225.70596,
+        "projections": 0.0,
+        "thermal_B11": 0.0,
+        "thermal_D": 4.8591000483196e+21,
+        "thermal_H": 0.0,
+        "thermal_He3": 0.0,
+        "thermal_He4": 0.0,
+        "thermal_T": 4.8591000483196e+21,
+        "thermalized_He4": 0.0,
+        "time_s": 0.01
+      },
+      "fuel": "dt",
+      "initial_Te_keV": 5.0,
+      "initial_Ti_keV": 20.0,
+      "kind": "success",
+      "log": {
+        "cells": 1600,
+        "duration_s": 0.01,
+        "fuel": "dt",
+        "max_total_energy_relative_residual": 2.05622195102e-16,
+        "neutron_number_m3": 1.1089995168e+20,
+        "raw": "fuel=dt steps=128 cells=1600 duration=0.01 max_total_energy_relative_residual=2.05622195102e-16 projections=0 neutron_number=1.1089995168e+20",
+        "status": "completed",
+        "steps": 128,
+        "total_projections": 0
+      },
+      "log_file": {
+        "bytes": 142,
+        "file": "coupled-dt-s128-n1600.log",
+        "sha256": "3e999c5e90e8c838a73ba0c3d0e520aa96936e0950cb6981104bf90803d587b9",
+        "source_name": "coupled-dt-s128-n1600.log"
+      },
+      "max_abs_energy_relative_residual_csv": 2.05622195102e-16,
+      "rows": 128,
+      "steps": 128,
+      "total_projections_csv": 0
+    },
+    "coupled-dt-s128-n800": {
+      "cells": 800,
+      "completed_steps": 128,
+      "csv": {
+        "bytes": 33002,
+        "file": "coupled-dt-s128-n800.csv",
+        "sha256": "547c4b204549a69e2b93035009b372c4111be2c0d33858bb6fe4deb0419f44d5",
+        "source_name": "coupled-dt-s128-n800.csv"
+      },
+      "dt_s": 7.8125e-05,
+      "duration_s": 0.01,
+      "final": {
+        "Q_J_m3": 312490521.6764,
+        "Te_keV": 20.0808236606,
+        "Ti_keV": 22.3134819667,
+        "Ue_J_m3": 48259539.690684,
+        "Ui_J_m3": 52167819.353141,
+        "energy_relative_residual": -7.88698774474e-17,
+        "events_dd_he3n": 0.0,
+        "events_dd_tp": 0.0,
+        "events_dhe3": 0.0,
+        "events_dt": 1.1088663013907e+20,
+        "events_pb": 0.0,
+        "fast_He4": 1.1088663013907e+20,
+        "fast_energy_J_m3": 21737336.697674,
+        "inert_heat_J_m3": 45485.958365544,
+        "neutron_energy_J_m3": 250167123.2148,
+        "projections": 0.0,
+        "thermal_B11": 0.0,
+        "thermal_D": 4.8591133698609e+21,
+        "thermal_H": 0.0,
+        "thermal_He3": 0.0,
+        "thermal_He4": 0.0,
+        "thermal_T": 4.8591133698609e+21,
+        "thermalized_He4": 0.0,
+        "time_s": 0.01
+      },
+      "fuel": "dt",
+      "initial_Te_keV": 5.0,
+      "initial_Ti_keV": 20.0,
+      "kind": "success",
+      "log": {
+        "cells": 800,
+        "duration_s": 0.01,
+        "fuel": "dt",
+        "max_total_energy_relative_residual": 1.24749642961e-16,
+        "neutron_number_m3": 1.10886630139e+20,
+        "raw": "fuel=dt steps=128 cells=800 duration=0.01 max_total_energy_relative_residual=1.24749642961e-16 projections=0 neutron_number=1.10886630139e+20",
+        "status": "completed",
+        "steps": 128,
+        "total_projections": 0
+      },
+      "log_file": {
+        "bytes": 142,
+        "file": "coupled-dt-s128-n800.log",
+        "sha256": "45fef460215b3adbac3ebf4da4e4d3fbd0e7ad4fd81b7437dd2152065fcd508f",
+        "source_name": "coupled-dt-s128-n800.log"
+      },
+      "max_abs_energy_relative_residual_csv": 1.24749642961e-16,
+      "rows": 128,
+      "steps": 128,
+      "total_projections_csv": 0
+    },
+    "coupled-dt-s16-n800": {
+      "cells": 800,
+      "completed_steps": 16,
+      "csv": {
+        "bytes": 4330,
+        "file": "coupled-dt-s16-n800.csv",
+        "sha256": "f3536729598b285ba708f00ddd68ba929e1296a4e35ab2a32710ae0fbf2047f0",
+        "source_name": "coupled-dt-s16-n800.csv"
+      },
+      "dt_s": 0.000625,
+      "duration_s": 0.01,
+      "final": {
+        "Q_J_m3": 311268344.33486,
+        "Te_keV": 20.3414549843,
+        "Ti_keV": 22.3076581059,
+        "Ue_J_m3": 48885905.816198,
+        "Ui_J_m3": 52158853.552978,
+        "energy_relative_residual": -2.50171940435e-17,
+        "events_dd_he3n": 0.0,
+        "events_dd_tp": 0.0,
+        "events_dhe3": 0.0,
+        "events_dt": 1.1045294297919e+20,
+        "events_pb": 0.0,
+        "fast_He4": 1.1045294297919e+20,
+        "fast_energy_J_m3": 20877301.452504,
+        "inert_heat_J_m3": 45240.082590288,
+        "neutron_energy_J_m3": 249187580.79308,
+        "projections": 0.0,
+        "thermal_B11": 0.0,
+        "thermal_D": 4.8595470570208e+21,
+        "thermal_H": 0.0,
+        "thermal_He3": 0.0,
+        "thermal_He4": 0.0,
+        "thermal_T": 4.8595470570208e+21,
+        "thermalized_He4": 0.0,
+        "time_s": 0.01
+      },
+      "fuel": "dt",
+      "initial_Te_keV": 5.0,
+      "initial_Ti_keV": 20.0,
+      "kind": "success",
+      "log": {
+        "cells": 800,
+        "duration_s": 0.01,
+        "fuel": "dt",
+        "max_total_energy_relative_residual": 6.40909461661e-17,
+        "neutron_number_m3": 1.10452942979e+20,
+        "raw": "fuel=dt steps=16 cells=800 duration=0.01 max_total_energy_relative_residual=6.40909461661e-17 projections=0 neutron_number=1.10452942979e+20",
+        "status": "completed",
+        "steps": 16,
+        "total_projections": 0
+      },
+      "log_file": {
+        "bytes": 141,
+        "file": "coupled-dt-s16-n800.log",
+        "sha256": "1279f468a56c6f29d45c8bc1270042654871aa48cb3f0ae77e6b32582922a4b3",
+        "source_name": "coupled-dt-s16-n800.log"
+      },
+      "max_abs_energy_relative_residual_csv": 6.40909461661e-17,
+      "rows": 16,
+      "steps": 16,
+      "total_projections_csv": 0
+    },
+    "coupled-dt-s32-n800": {
+      "cells": 800,
+      "completed_steps": 32,
+      "csv": {
+        "bytes": 8382,
+        "file": "coupled-dt-s32-n800.csv",
+        "sha256": "861f40cf1dfbf006cdb83450efa92bdc7c2a557f2d2c4dd02eaa2002e20d5a54",
+        "source_name": "coupled-dt-s32-n800.csv"
+      },
+      "dt_s": 0.0003125,
+      "duration_s": 0.01,
+      "final": {
+        "Q_J_m3": 311976435.63769,
+        "Te_keV": 20.1930876387,
+        "Ti_keV": 22.3116806505,
+        "Ue_J_m3": 48529339.774653,
+        "Ui_J_m3": 52165564.294488,
+        "energy_relative_residual": 2.41085321841e-17,
+        "events_dd_he3n": 0.0,
+        "events_dd_tp": 0.0,
+        "events_dhe3": 0.0,
+        "events_dt": 1.1070420774709e+20,
+        "events_pb": 0.0,
+        "fast_He4": 1.1070420774709e+20,
+        "fast_energy_J_m3": 21367730.730941,
+        "inert_heat_J_m3": 45401.131182403,
+        "neutron_energy_J_m3": 249755098.11751,
+        "projections": 0.0,
+        "thermal_B11": 0.0,
+        "thermal_D": 4.8592957922529e+21,
+        "thermal_H": 0.0,
+        "thermal_He3": 0.0,
+        "thermal_He4": 0.0,
+        "thermal_T": 4.8592957922529e+21,
+        "thermalized_He4": 0.0,
+        "time_s": 0.01
+      },
+      "fuel": "dt",
+      "initial_Te_keV": 5.0,
+      "initial_Ti_keV": 20.0,
+      "kind": "success",
+      "log": {
+        "cells": 800,
+        "duration_s": 0.01,
+        "fuel": "dt",
+        "max_total_energy_relative_residual": 6.48842671113e-17,
+        "neutron_number_m3": 1.10704207747e+20,
+        "raw": "fuel=dt steps=32 cells=800 duration=0.01 max_total_energy_relative_residual=6.48842671113e-17 projections=0 neutron_number=1.10704207747e+20",
+        "status": "completed",
+        "steps": 32,
+        "total_projections": 0
+      },
+      "log_file": {
+        "bytes": 141,
+        "file": "coupled-dt-s32-n800.log",
+        "sha256": "e9535396910cb29e34d076875fee39ee016d28725cfdc6eed37251bb10f41fee",
+        "source_name": "coupled-dt-s32-n800.log"
+      },
+      "max_abs_energy_relative_residual_csv": 6.48842671113e-17,
+      "rows": 32,
+      "steps": 32,
+      "total_projections_csv": 0
+    },
+    "coupled-dt-s64-n800": {
+      "cells": 800,
+      "completed_steps": 64,
+      "csv": {
+        "bytes": 16554,
+        "file": "coupled-dt-s64-n800.csv",
+        "sha256": "fce1cedfbe0bfe2408db2e553b5d057e78e16898e9f82d2ef5bad7b2814435a3",
+        "source_name": "coupled-dt-s64-n800.csv"
+      },
+      "dt_s": 0.00015625,
+      "duration_s": 0.01,
+      "final": {
+        "Q_J_m3": 312320446.27549,
+        "Te_keV": 20.1183483871,
+        "Ti_keV": 22.3129788025,
+        "Ue_J_m3": 48349721.550764,
+        "Ui_J_m3": 52167290.231564,
+        "energy_relative_residual": -7.45266027623e-17,
+        "events_dd_he3n": 0.0,
+        "events_dd_tp": 0.0,
+        "events_dhe3": 0.0,
+        "events_dt": 1.1082627922674e+20,
+        "events_pb": 0.0,
+        "fast_He4": 1.1082627922674e+20,
+        "fast_energy_J_m3": 21613919.024452,
+        "inert_heat_J_m3": 45460.750316334,
+        "neutron_energy_J_m3": 250030812.74861,
+        "projections": 0.0,
+        "thermal_B11": 0.0,
+        "thermal_D": 4.8591737207733e+21,
+        "thermal_H": 0.0,
+        "thermal_He3": 0.0,
+        "thermal_He4": 0.0,
+        "thermal_T": 4.8591737207733e+21,
+        "thermalized_He4": 0.0,
+        "time_s": 0.01
+      },
+      "fuel": "dt",
+      "initial_Te_keV": 5.0,
+      "initial_Ti_keV": 20.0,
+      "kind": "success",
+      "log": {
+        "cells": 800,
+        "duration_s": 0.01,
+        "fuel": "dt",
+        "max_total_energy_relative_residual": 1.12947497351e-16,
+        "neutron_number_m3": 1.10826279227e+20,
+        "raw": "fuel=dt steps=64 cells=800 duration=0.01 max_total_energy_relative_residual=1.12947497351e-16 projections=0 neutron_number=1.10826279227e+20",
+        "status": "completed",
+        "steps": 64,
+        "total_projections": 0
+      },
+      "log_file": {
+        "bytes": 141,
+        "file": "coupled-dt-s64-n800.log",
+        "sha256": "f30129786eb649eb67e0f45cb9b58e6384b4412644824d3d1ea65f4620e3a840",
+        "source_name": "coupled-dt-s64-n800.log"
+      },
+      "max_abs_energy_relative_residual_csv": 1.12947497351e-16,
+      "rows": 64,
+      "steps": 64,
+      "total_projections_csv": 0
+    },
+    "coupled-pb-s4-n800": {
+      "cells": 800,
+      "completed_steps": 4,
+      "csv": {
+        "bytes": 1239,
+        "file": "coupled-pb-s4-n800.csv",
+        "sha256": "e17da4c8af7d860aeec951c3d4de85bfb9ddcf38be96c31a3c1061b4386774cc",
+        "source_name": "coupled-pb-s4-n800.csv"
+      },
+      "dt_s": 0.00025,
+      "duration_s": 0.001,
+      "final": {
+        "Q_J_m3": 268521.10535164,
+        "Te_keV": 5.05569060835,
+        "Ti_keV": 99.9952870454,
+        "Ue_J_m3": 12150164.042158,
+        "Ui_J_m3": 79855463.334617,
+        "energy_relative_residual": -1.19258275821e-16,
+        "events_dd_he3n": 0.0,
+        "events_dd_tp": 0.0,
+        "events_dhe3": 0.0,
+        "events_dt": 0.0,
+        "events_pb": 1.9303200837396e+17,
+        "fast_He4": 5.7909602512189e+17,
+        "fast_energy_J_m3": 147723.68847712,
+        "inert_heat_J_m3": 31.029494579673,
+        "neutron_energy_J_m3": 0.0,
+        "projections": 0.0,
+        "thermal_B11": 1.6564736346583e+21,
+        "thermal_D": 0.0,
+        "thermal_H": 1.6564736346583e+21,
+        "thermal_He3": 0.0,
+        "thermal_He4": 0.0,
+        "thermal_T": 0.0,
+        "thermalized_He4": 0.0,
+        "time_s": 0.001
+      },
+      "fuel": "pb",
+      "initial_Te_keV": 5.0,
+      "initial_Ti_keV": 100.0,
+      "kind": "success",
+      "log": {
+        "cells": 800,
+        "duration_s": 0.001,
+        "fuel": "pb",
+        "max_total_energy_relative_residual": 1.19258275821e-16,
+        "neutron_number_m3": 0.0,
+        "raw": "fuel=pb steps=4 cells=800 duration=0.001 max_total_energy_relative_residual=1.19258275821e-16 projections=0 neutron_number=0",
+        "status": "completed",
+        "steps": 4,
+        "total_projections": 0
+      },
+      "log_file": {
+        "bytes": 125,
+        "file": "coupled-pb-s4-n800.log",
+        "sha256": "88539e616cdbcd8277b7fa63c166fb37b3725ee13eb71991dbee1fb05606332e",
+        "source_name": "coupled-pb-s4-n800.log"
+      },
+      "max_abs_energy_relative_residual_csv": 1.19258275821e-16,
+      "rows": 4,
+      "steps": 4,
+      "total_projections_csv": 0
+    },
+    "coupled-pb-s4-n800-first-grid-failure": {
+      "cells": 800,
+      "completed_steps": 1,
+      "csv": {
+        "bytes": 528,
+        "file": "coupled-pb-s4-n800-first-grid-failure.csv",
+        "sha256": "0d2d6843a6da69e4cb930221ef837e1ed5c5cc4393a89e93cb80559bbca60ae4",
+        "source_name": "coupled-pb-s4-n800-first-grid-failure.csv"
+      },
+      "dt_s": 0.00025,
+      "duration_s": 0.001,
+      "final": {
+        "Q_J_m3": 67141.24328104,
+        "Te_keV": 5.00716090405,
+        "Ti_keV": 99.9978022393,
+        "Ue_J_m3": 12033534.304724,
+        "Ui_J_m3": 79864430.023011,
+        "energy_relative_residual": -3.22708532971e-17,
+        "events_dd_he3n": 0.0,
+        "events_dd_tp": 0.0,
+        "events_dhe3": 0.0,
+        "events_dt": 0.0,
+        "events_pb": 4.8265885909757e+16,
+        "fast_He4": 1.4479765772927e+17,
+        "fast_energy_J_m3": 54006.875446125,
+        "inert_heat_J_m3": 2.8167041844585,
+        "neutron_energy_J_m3": 0.0,
+        "projections": 0.0,
+        "thermal_B11": 1.6566184007808e+21,
+        "thermal_D": 0.0,
+        "thermal_H": 1.6566184007808e+21,
+        "thermal_He3": 0.0,
+        "thermal_He4": 0.0,
+        "thermal_T": 0.0,
+        "thermalized_He4": 0.0,
+        "time_s": 0.00025
+      },
+      "fuel": "pb",
+      "initial_Te_keV": 5.0,
+      "initial_Ti_keV": 100.0,
+      "kind": "failure",
+      "log": {
+        "Te_keV_at_failure": 5.0071609,
+        "Ti_keV_at_failure": 99.9978022,
+        "failed_step": 2,
+        "fuel": "pb",
+        "raw": "trial failed fuel=pb step=2 status=3 Ti=99.9978022keV Te=5.0071609keV",
+        "return_status": 3,
+        "status": "failed_trial"
+      },
+      "log_file": {
+        "bytes": 70,
+        "file": "coupled-pb-s4-n800-first-grid-failure.log",
+        "sha256": "589314e3c172efaf5ce542164d1db9ea9f57a0cf0fe0e3fafc5203e1150a11cb",
+        "source_name": "coupled-pb-s4-n800-first-grid-failure.log"
+      },
+      "max_abs_energy_relative_residual_csv": 3.22708532971e-17,
+      "rows": 1,
+      "steps": 4,
+      "total_projections_csv": 0
+    }
+  },
+  "schema": "coupled-thermal-validation-v1",
+  "scope": {
+    "device_prediction": false,
+    "excluded_pending_input_pattern": "coupled-pb-*-q*.csv",
+    "fair_four_fuel_ranking": false,
+    "handoff": {
+      "actual_projection_count": 0,
+      "all_dt_projection_counts_zero": true,
+      "enabled": true,
+      "interpretation": "The continuous hot-source runs recorded no handoff projections. A thermal-scale kinetic component is not automatically fluid ash."
+    },
+    "host_transport_or_BALDUR_acceptance": false,
+    "interpretation": "These artifacts measure the declared first-order local operator and its numerical sensitivity; they do not establish EXL performance or a fuel ranking.",
+    "purpose": "reproducible local coupled thermal/fast-particle laboratory study",
+    "stable_dt_gates_measured": true
+  },
+  "units": {
+    "energy_density": "J m^-3",
+    "number_density": "m^-3",
+    "relative_residual": "dimensionless",
+    "temperature": "keV (kT energy units)",
+    "time": "s"
+  }
+}

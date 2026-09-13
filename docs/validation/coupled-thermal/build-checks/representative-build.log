@@ -1,0 +1,6 @@
+[  5%] Building CXX object CMakeFiles/pb11.dir/src/fusion_coupled_thermal.cpp.o
+[ 11%] Linking CXX static library libpb11.a
+[ 94%] Built target pb11
+[ 94%] Building CXX object CMakeFiles/test_fusion_coupled_thermal.dir/tests/test_fusion_coupled_thermal.cpp.o
+[100%] Linking CXX executable test_fusion_coupled_thermal
+[100%] Built target test_fusion_coupled_thermal
