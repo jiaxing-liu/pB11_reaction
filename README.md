@@ -9,7 +9,9 @@ Maxwellian reactivity described by:
 > 086001. [doi:10.1088/1741-4326/acda4b](https://doi.org/10.1088/1741-4326/acda4b)
 
 The library uses `double` precision throughout and is intentionally limited to
-the S-factor, cross section, and thermal reactivity.
+the S-factor, cross section, thermal reactivity, and the explicitly simplified
+instantaneous-thermalization source API below. A kinetic fast-alpha model is
+not yet implemented.
 
 ## Requirements
 
@@ -132,6 +134,38 @@ The integral function evaluates equation (6) up to 9.76 MeV using Boost's
 adaptive 61-point Gauss–Kronrod quadrature.  It explicitly resolves the narrow
 148 keV resonance and performs all mass, energy, barn, and SI conversions from
 their physical definitions.
+
+## Instantaneous thermal source (SI)
+
+Include `pb11_source.h` to evaluate fuel consumption, thermal helium production
+and a specified electron/ion split in one stateless call:
+
+```c
+#include "pb11_source.h"
+
+pb11_instant_source_v1 source;
+int status = pb11_c_instant_thermal_source(
+    100.0 * 1.602176634e-16, /* kT in joules, not kelvin */
+    1.0e20, 2.0e19,         /* proton and B11 densities, m^-3 */
+    0.3, PB11_REACTIVITY_INTEGRAL, &source);
+/* Use source only when status == PB11_STATUS_OK. */
+```
+
+`reaction_rate_m3_s` is R = np*nB*<sigma v>. The proton, boron and
+helium-4 source fields are respectively -R, -R and 3R in m^-3 s^-1.
+`fusion_power_W_m3` uses Q=8.68 MeV per reaction. Electron and ion power
+fields sum to that released power. The electron fraction is prescribed by the
+caller; this interface assumes immediate local thermalization and does not
+calculate slowing, escape or reactant thermal-energy redistribution.
+
+The Fortran module exports the same `bind(C)` derived type and
+`pb11_instant_thermal_source(kt_j,np,nb,fe,method,source,status)` wrapper.
+Inputs must be finite with kT>0, densities>=0 and 0<=fe<=1; the selected
+reactivity method retains its temperature domain. All output fields are zero
+on failure. Unrepresentable nonzero results return a numerical error.
+For CGS hosts, multiply number densities by 1e6 before this call, multiply
+returned particle sources by 1e-6 and powers by 10 to obtain cm^-3 s^-1
+and erg cm^-3 s^-1. The original scalar interfaces remain compatible.
 
 ## Minimal example
 

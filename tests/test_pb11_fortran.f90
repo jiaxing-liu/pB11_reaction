@@ -4,6 +4,7 @@ program test_pb11_fortran
   use pb11_fortran
   implicit none
 
+  type(pb11_instant_source_v1) :: source
   integer :: failures
   integer(c_int) :: status
   real(c_double) :: value, value_integral, value_fast
@@ -45,6 +46,21 @@ program test_pb11_fortran
   call pb11_reactivity(100.0_c_double, 99_c_int, value, status)
   call check(status == PB11_STATUS_UNKNOWN_METHOD .and. value == 0.0_c_double, &
              "Fortran generic wrapper reports an unknown method")
+
+  call pb11_instant_thermal_source(100._c_double*1.602176634e-16_c_double, &
+       1.e20_c_double,2.e19_c_double,0.3_c_double,PB11_METHOD_INTEGRAL,source,status)
+  call check(status==PB11_STATUS_OK,'SI instant-source status')
+  call check(abs(source%reaction_rate_m3_s/(1.e20_c_double*2.e19_c_double*value_integral)-1)<1.e-12_c_double, &
+       'source uses SI density and thermal energy units')
+  call check(source%proton_source_m3_s==source%boron_source_m3_s,'equal fuel consumption')
+  call check(abs(source%helium4_source_m3_s/(-3*source%proton_source_m3_s)-1)<1.e-14_c_double, &
+       'C record layout and helium stoichiometry')
+  call check(abs((source%electron_power_W_m3+source%ion_power_W_m3)/source%fusion_power_W_m3-1)<1.e-14_c_double, &
+       'C record layout and deposited power closure')
+  call pb11_instant_thermal_source(-1._c_double,1.e20_c_double,2.e19_c_double, &
+       0.3_c_double,PB11_METHOD_INTEGRAL,source,status)
+  call check(status/=PB11_STATUS_OK.and.source%reaction_rate_m3_s==0.and.source%fusion_power_W_m3==0, &
+       'failed source resets outputs')
 
   if (failures /= 0) then
      write(*, '(I0, A)') failures, ' Fortran test(s) failed'

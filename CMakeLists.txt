@@ -27,7 +27,7 @@ if(POLICY CMP0167)
 endif()
 find_package(Boost 1.70 REQUIRED)
 
-add_library(pb11 src/pb11.cpp src/pb11_c.cpp)
+add_library(pb11 src/pb11.cpp src/pb11_c.cpp src/pb11_source.cpp)
 add_library(pb11::pb11 ALIAS pb11)
 
 target_compile_features(pb11 PUBLIC cxx_std_17)
@@ -78,6 +78,10 @@ if(BUILD_TESTING)
     target_link_libraries(test_pb11_c PRIVATE pb11::pb11)
     add_test(NAME pb11_c_abi_tests COMMAND test_pb11_c)
 
+    add_executable(test_pb11_source tests/test_pb11_source.cpp)
+    target_link_libraries(test_pb11_source PRIVATE pb11::pb11)
+    add_test(NAME pb11_instant_source_tests COMMAND test_pb11_source)
+
     if(PB11_FORTRAN_AVAILABLE)
         add_executable(test_pb11_fortran tests/test_pb11_fortran.f90)
         set_target_properties(test_pb11_fortran PROPERTIES
@@ -110,7 +114,7 @@ if(PB11_FORTRAN_AVAILABLE)
     )
 endif()
 install(
-    FILES include/pb11.hpp include/pb11_c.h
+    FILES include/pb11.hpp include/pb11_c.h include/pb11_source.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(

@@ -26,7 +26,26 @@ module pb11_fortran
   public :: pb11_reactivity_integral
   public :: pb11_reactivity_fast
 
+  type, bind(C), public :: pb11_instant_source_v1
+    real(c_double) :: reaction_rate_m3_s
+    real(c_double) :: proton_source_m3_s
+    real(c_double) :: boron_source_m3_s
+    real(c_double) :: helium4_source_m3_s
+    real(c_double) :: fusion_power_W_m3
+    real(c_double) :: electron_power_W_m3
+    real(c_double) :: ion_power_W_m3
+  end type
+  public :: pb11_instant_thermal_source
+
   interface
+     function c_pb11_instant_source(kt_j,np,nb,fe,method,source) &
+          bind(C, name="pb11_c_instant_thermal_source") result(status)
+       import :: c_double, c_int, pb11_instant_source_v1
+       real(c_double), value :: kt_j,np,nb,fe
+       integer(c_int), value :: method
+       type(pb11_instant_source_v1), intent(out) :: source
+       integer(c_int) :: status
+     end function
      function c_pb11_sfactor(energy_mev, value) bind(C, name="pb11_c_sfactor") &
           result(status)
        import :: c_double, c_int
@@ -70,6 +89,16 @@ module pb11_fortran
   end interface
 
 contains
+
+  subroutine pb11_instant_thermal_source(kt_j,np,nb,fe,method,source,status)
+    !! Explicit instant-thermalization approximation. SI inputs and outputs;
+    !! KT_J is thermal energy in joules, not kelvin or keV.
+    real(c_double), intent(in) :: kt_j,np,nb,fe
+    integer(c_int), intent(in) :: method
+    type(pb11_instant_source_v1), intent(out) :: source
+    integer(c_int), intent(out) :: status
+    status=c_pb11_instant_source(kt_j,np,nb,fe,method,source)
+  end subroutine
 
   subroutine pb11_sfactor(energy_mev, value, status)
     real(c_double), intent(in) :: energy_mev
