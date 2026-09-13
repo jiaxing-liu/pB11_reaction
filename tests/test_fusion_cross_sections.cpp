@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <vector>
 
@@ -31,8 +32,83 @@ double integrated_rate(int channel,double temperature) {
         integral+=boost::math::quadrature::gauss_kronrod<double,61>::integrate(f,points[i-1],points[i],15,1e-10);
     return std::sqrt(8*kev/(std::acos(-1.)*mu))*integral/std::pow(temperature,1.5)*1e-28;
 }
+double several_ulps_above(double value) {
+    for (int i=0;i<16;++i) value=std::nextafter(value,INFINITY);
+    return value;
+}
+double several_ulps_below(double value) {
+    for (int i=0;i<16;++i) value=std::nextafter(value,0.);
+    return value;
+}
+void test_domains() {
+    constexpr double expected_min_keV[]={0,.5,.5,.5,.3};
+    constexpr double expected_max_keV[]={9760,5000,4900,4700,4800};
+    for (int channel=0;channel<FUSION_CHANNEL_COUNT;++channel) {
+        double minimum=-1,maximum=-1;
+        check(fusion_c_cross_section_domain(channel,&minimum,&maximum)==
+                  PB11_STATUS_OK,"domain query returns OK");
+        check(close(minimum,expected_min_keV[channel]*kev,4e-15) &&
+                  close(maximum,expected_max_keV[channel]*kev,4e-15),
+              "domain query reuses published fit endpoints");
+        double sigma=-1;
+        check(fusion_c_cross_section(channel,minimum,&sigma)==PB11_STATUS_OK &&
+                  std::isfinite(sigma) && sigma>=0,
+              "lower domain endpoint is callable");
+        check(fusion_c_cross_section(channel,maximum,&sigma)==PB11_STATUS_OK &&
+                  std::isfinite(sigma) && sigma>=0,
+              "upper domain endpoint is callable");
+
+        // The SI-to-keV conversion admits one adjacent representable value
+        // at a fitted edge; this is the documented conversion-rounding ULP.
+        if (minimum>0) {
+            sigma=-1;
+            check(fusion_c_cross_section(channel,std::nextafter(minimum,0.),
+                                         &sigma)==PB11_STATUS_OK &&
+                      std::isfinite(sigma),
+                  "one-ULP lower conversion rounding is tolerated");
+        }
+        sigma=-1;
+        check(fusion_c_cross_section(channel,std::nextafter(maximum,INFINITY),
+                                     &sigma)==PB11_STATUS_OK &&
+                  std::isfinite(sigma),
+              "one-ULP upper conversion rounding is tolerated");
+
+        if (minimum>0) {
+            sigma=-1;
+            check(fusion_c_cross_section(channel,several_ulps_below(minimum),
+                                         &sigma)==PB11_STATUS_OUT_OF_RANGE &&
+                      sigma==0,
+                  "positive-energy lower exterior is rejected");
+        } else {
+            sigma=-1;
+            check(fusion_c_cross_section(channel,
+                      -std::numeric_limits<double>::denorm_min(),&sigma)==
+                      PB11_STATUS_OUT_OF_RANGE && sigma==0,
+                  "negative lower exterior is rejected");
+        }
+        sigma=-1;
+        check(fusion_c_cross_section(channel,several_ulps_above(maximum),
+                                     &sigma)==PB11_STATUS_OUT_OF_RANGE &&
+                  sigma==0,
+              "upper exterior is rejected");
+    }
+
+    double minimum=3,maximum=4;
+    check(fusion_c_cross_section_domain(-1,&minimum,&maximum)==
+              PB11_STATUS_INVALID_ARGUMENT && minimum==0 && maximum==0,
+          "invalid domain channel clears both outputs");
+    minimum=3; maximum=4;
+    check(fusion_c_cross_section_domain(0,nullptr,&maximum)==
+              PB11_STATUS_NULL_OUTPUT && maximum==0,
+          "null minimum domain output is reported and other output clears");
+    minimum=3; maximum=4;
+    check(fusion_c_cross_section_domain(0,&minimum,nullptr)==
+              PB11_STATUS_NULL_OUTPUT && minimum==0,
+          "null maximum domain output is reported and other output clears");
+}
 }
 int main() {
+    test_domains();
     // Table V p621: millibarn values, columns DT,DHe3,DD(Tp),DD(He3n).
     constexpr double energy[]={10,50,100};
     constexpr int channels[]={3,4,1,2};

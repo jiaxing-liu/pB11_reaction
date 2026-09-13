@@ -16,6 +16,16 @@ extern "C" {
  */
 int fusion_c_cross_section(int channel, double relative_energy_J,
                             double *cross_section_m2);
+
+/* Return the positive-data fit domain in joules (centre-of-mass relative
+ * energy) for one channel.  For p-11B the domain is 0..9.76 MeV; for the
+ * Bosch-Hale channels the lower endpoint is the published positive-energy
+ * data limit.  The isolated zero-energy sigma=0 limit is not folded into
+ * those Bosch-Hale lower endpoints.  Both outputs are required and all
+ * non-NULL outputs are zeroed on an error. */
+int fusion_c_cross_section_domain(int channel,
+                                  double *minimum_relative_energy_J,
+                                  double *maximum_relative_energy_J);
 #ifdef __cplusplus
 }
 #endif

@@ -4,6 +4,7 @@
 
 namespace {
 constexpr double keV_J=1.602176634e-16;
+constexpr double pB_max_keV=9760.0;
 struct CrossFit {
     double bg;
     double a[5],b[4];
@@ -21,6 +22,29 @@ constexpr CrossFit high[] = {
     {34.3827,{-1.4714e6,0,0,0,0},{-8.4127e-3,4.7983e-6,-1.0748e-9,8.5184e-14},530,4700},
     {68.7508,{-8.3993e5,0,0,0,0},{-2.6830e-3,1.1633e-6,-2.1332e-10,1.4250e-14},900,4800}
 };
+bool cross_section_domain_keV(int ch,double &minimum,double &maximum) {
+    if (ch==0) {
+        minimum=0.0;
+        maximum=pB_max_keV;
+        return true;
+    }
+    if (ch<0 || ch>=FUSION_CHANNEL_COUNT) return false;
+    minimum=low[ch-1].minimum;
+    maximum=low[ch-1].maximum;
+    return true;
+}
+}
+extern "C" int fusion_c_cross_section_domain(int ch,double *minimum_J,
+    double *maximum_J) {
+    if (minimum_J) *minimum_J=0;
+    if (maximum_J) *maximum_J=0;
+    if (!minimum_J || !maximum_J) return PB11_STATUS_NULL_OUTPUT;
+    double minimum_keV=0,maximum_keV=0;
+    if (!cross_section_domain_keV(ch,minimum_keV,maximum_keV))
+        return PB11_STATUS_INVALID_ARGUMENT;
+    *minimum_J=minimum_keV*keV_J;
+    *maximum_J=maximum_keV*keV_J;
+    return PB11_STATUS_OK;
 }
 extern "C" int fusion_c_cross_section(int ch,double energy_J,double *out) {
     if (!out) return PB11_STATUS_NULL_OUTPUT;
@@ -35,7 +59,9 @@ extern "C" int fusion_c_cross_section(int ch,double energy_J,double *out) {
         if (ch==0) {
             double barn=0;
             double mev=energy/1000.;
-            if (mev>9.76 && mev<=std::nextafter(9.76,INFINITY)) mev=9.76;
+            const double pB_max_mev=pB_max_keV/1000.;
+            if (mev>pB_max_mev &&
+                mev<=std::nextafter(pB_max_mev,INFINITY)) mev=pB_max_mev;
             const int status=pb11_c_cross_section(mev,&barn);
             if (status) return status;
             *out=barn*1e-28;

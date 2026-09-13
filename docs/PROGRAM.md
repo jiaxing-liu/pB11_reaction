@@ -20,3 +20,10 @@ and an isotropic energy-distribution implicit trial step with per-bath heat,
 particle/energy ledgers and no hidden accepted state. See KINETIC_PRIMITIVES.md.
 This is a primitive layer; product spectra, reaction/kinetic closure, physical
 ash transfer and BALDUR integration remain under development.
+
+M3 rate/energy increment: explicit fitted-domain query, monoenergetic beam
+against Maxwellian target, and unequal-temperature Maxwellian pair moments.
+Reaction-conditioned fuel-energy removal retains CM/relative correlation;
+unresolved nuclear-data windows are exposed. See BEAM_AND_THERMAL_MOMENTS.md.
+The domain policy, product spectra and reaction/kinetic/host closure remain
+required before declaring the full model complete.

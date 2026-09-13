@@ -1,0 +1,10 @@
+DT cold-limit T/keV 0.1 relative error 0.0140586
+DT cold-limit T/keV 0.01 relative error 0.00140831
+DT cold-limit T/keV 0.001 relative error 0.000140855
+DT cold-limit T/keV 0.0001 relative error 1.40858e-05
+channel 3 independent target-angle rate error 2.22045e-16, target-energy error 6.66134e-16
+channel 0 independent target-angle rate error 1.11022e-16, target-energy error 5.55112e-16
+channel 3 double-Maxwellian versus relative-Maxwellian error 4.44089e-14
+channel 0 double-Maxwellian versus relative-Maxwellian error 5.55112e-15
+unequal-temperature direct average rate error 1.71974e-13, a-energy error 0, b-energy error 2.66454e-13
+PASS: beam kinematics, explicit data gaps, reaction-conditioned energy and Maxwellian limits

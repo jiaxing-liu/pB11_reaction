@@ -1,0 +1,35 @@
+Test project /tmp/m3-ifx-r8
+      Start  1: pb11_unit_tests
+ 1/15 Test  #1: pb11_unit_tests .........................   Passed    0.00 sec
+      Start  2: pb11_c_abi_tests
+ 2/15 Test  #2: pb11_c_abi_tests ........................   Passed    0.00 sec
+      Start  3: pb11_instant_source_tests
+ 3/15 Test  #3: pb11_instant_source_tests ...............   Passed    0.00 sec
+      Start  4: fusion_network_tests
+ 4/15 Test  #4: fusion_network_tests ....................   Passed    0.00 sec
+      Start  5: fusion_rates_tests
+ 5/15 Test  #5: fusion_rates_tests ......................   Passed    0.00 sec
+      Start  6: fusion_cross_sections_tests
+ 6/15 Test  #6: fusion_cross_sections_tests .............   Passed    0.00 sec
+      Start  7: fusion_closed_box_tests
+ 7/15 Test  #7: fusion_closed_box_tests .................   Passed    0.00 sec
+      Start  8: fusion_kinetics_tests
+ 8/15 Test  #8: fusion_kinetics_tests ...................   Passed    0.00 sec
+      Start  9: fusion_coulomb_tests
+ 9/15 Test  #9: fusion_coulomb_tests ....................   Passed    0.00 sec
+      Start 10: fusion_slowing_tests
+10/15 Test #10: fusion_slowing_tests ....................   Passed    1.59 sec
+      Start 11: fusion_beam_tests
+11/15 Test #11: fusion_beam_tests .......................   Passed    7.32 sec
+      Start 12: pb11_fortran_binding_tests
+12/15 Test #12: pb11_fortran_binding_tests ..............   Passed    0.00 sec
+      Start 13: fusion_fortran_binding_tests
+13/15 Test #13: fusion_fortran_binding_tests ............   Passed    0.00 sec
+      Start 14: fusion_kinetics_fortran_binding_tests
+14/15 Test #14: fusion_kinetics_fortran_binding_tests ...   Passed    0.00 sec
+      Start 15: fusion_beam_fortran_binding_tests
+15/15 Test #15: fusion_beam_fortran_binding_tests .......   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 15
+
+Total Test time (real) =   8.94 sec

@@ -1,0 +1,3 @@
+DT resolved-window K = 5.824027721968e-23 m^3/s
+Reaction-conditioned Ea,Eb = 13.117622633, 39.571670909 keV
+Unresolved relative-pair probability = 1.174991078562e-02; incomplete flag = 1
