@@ -1,0 +1,575 @@
+{
+  "scope": "Numerical CM spectrum only; no experimental, branch, incident-energy or host validation. Histogram has 32 arithmetic-center cells on 0..8 MeV; explicit below/above spill retained. Mixture uses unit-normalized bases k=.76, delta=.67*2pi; this is a declared convention, not independently established fitted branching.",
+  "cases": [
+    {
+      "A_MeV": 8.829,
+      "mode": 1,
+      "refinement": [
+        {
+          "n_to_2n": [
+            32,
+            64
+          ],
+          "normalized_L1_including_spill": 0.08812023950617416,
+          "raw_normalization_relative_change": 0.0014792386920028378
+        },
+        {
+          "n_to_2n": [
+            64,
+            128
+          ],
+          "normalized_L1_including_spill": 0.018009818660329455,
+          "raw_normalization_relative_change": 2.9571302340158923e-06
+        },
+        {
+          "n_to_2n": [
+            128,
+            256
+          ],
+          "normalized_L1_including_spill": 0.005526633757219297,
+          "raw_normalization_relative_change": 7.146283564907208e-12
+        }
+      ],
+      "cutoff": [
+        {
+          "cutoff_MeV": 0.002,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.004,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.01,
+          "normalized_L1_including_spill": 2.2660828292508044e-21,
+          "raw_normalization_relative_change": 0.0
+        }
+      ]
+    },
+    {
+      "A_MeV": 8.829,
+      "mode": 2,
+      "refinement": [
+        {
+          "n_to_2n": [
+            32,
+            64
+          ],
+          "normalized_L1_including_spill": 0.10517534084221696,
+          "raw_normalization_relative_change": 0.0002647297569247087
+        },
+        {
+          "n_to_2n": [
+            64,
+            128
+          ],
+          "normalized_L1_including_spill": 0.014412260999736026,
+          "raw_normalization_relative_change": 3.556332254905925e-06
+        },
+        {
+          "n_to_2n": [
+            128,
+            256
+          ],
+          "normalized_L1_including_spill": 0.005556003264833361,
+          "raw_normalization_relative_change": 7.595812867577934e-12
+        }
+      ],
+      "cutoff": [
+        {
+          "cutoff_MeV": 0.002,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.004,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.01,
+          "normalized_L1_including_spill": 2.9324986494733255e-19,
+          "raw_normalization_relative_change": 0.0
+        }
+      ]
+    },
+    {
+      "A_MeV": 8.829,
+      "mode": 3,
+      "refinement": [
+        {
+          "n_to_2n": [
+            32,
+            64
+          ],
+          "normalized_L1_including_spill": 0.07303930219484231,
+          "raw_normalization_relative_change": 0.002085236072957075
+        },
+        {
+          "n_to_2n": [
+            64,
+            128
+          ],
+          "normalized_L1_including_spill": 0.01855032889967918,
+          "raw_normalization_relative_change": 2.014622356938389e-06
+        },
+        {
+          "n_to_2n": [
+            128,
+            256
+          ],
+          "normalized_L1_including_spill": 0.006120587997740992,
+          "raw_normalization_relative_change": 1.329314436304685e-11
+        }
+      ],
+      "cutoff": [
+        {
+          "cutoff_MeV": 0.002,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.004,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.01,
+          "normalized_L1_including_spill": 4.5614357891353865e-21,
+          "raw_normalization_relative_change": 0.0
+        }
+      ]
+    },
+    {
+      "A_MeV": 8.829,
+      "mode": 13,
+      "refinement": [
+        {
+          "n_to_2n": [
+            32,
+            64
+          ],
+          "normalized_L1_including_spill": 0.09046812946056688,
+          "raw_normalization_relative_change": 0.0011897443541177832
+        },
+        {
+          "n_to_2n": [
+            64,
+            128
+          ],
+          "normalized_L1_including_spill": 0.01806873652973571,
+          "raw_normalization_relative_change": 5.387817042068477e-06
+        },
+        {
+          "n_to_2n": [
+            128,
+            256
+          ],
+          "normalized_L1_including_spill": 0.006005289205826426,
+          "raw_normalization_relative_change": 1.2092549184217205e-12
+        }
+      ],
+      "cutoff": [
+        {
+          "cutoff_MeV": 0.002,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.004,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.01,
+          "normalized_L1_including_spill": 9.151305911827283e-21,
+          "raw_normalization_relative_change": 0.0
+        }
+      ]
+    },
+    {
+      "A_MeV": 9.3,
+      "mode": 1,
+      "refinement": [
+        {
+          "n_to_2n": [
+            32,
+            64
+          ],
+          "normalized_L1_including_spill": 0.0924555004144325,
+          "raw_normalization_relative_change": 0.002906211936710701
+        },
+        {
+          "n_to_2n": [
+            64,
+            128
+          ],
+          "normalized_L1_including_spill": 0.012558117601793477,
+          "raw_normalization_relative_change": 6.047774689599272e-06
+        },
+        {
+          "n_to_2n": [
+            128,
+            256
+          ],
+          "normalized_L1_including_spill": 0.0034842574500390197,
+          "raw_normalization_relative_change": 1.0340950318266096e-11
+        }
+      ],
+      "cutoff": [
+        {
+          "cutoff_MeV": 0.002,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.004,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.01,
+          "normalized_L1_including_spill": 3.970466940254533e-22,
+          "raw_normalization_relative_change": 0.0
+        }
+      ]
+    },
+    {
+      "A_MeV": 9.3,
+      "mode": 2,
+      "refinement": [
+        {
+          "n_to_2n": [
+            32,
+            64
+          ],
+          "normalized_L1_including_spill": 0.11324767218475813,
+          "raw_normalization_relative_change": 0.001847193096241595
+        },
+        {
+          "n_to_2n": [
+            64,
+            128
+          ],
+          "normalized_L1_including_spill": 0.00980968637759875,
+          "raw_normalization_relative_change": 4.829482839197041e-06
+        },
+        {
+          "n_to_2n": [
+            128,
+            256
+          ],
+          "normalized_L1_including_spill": 0.003521028616922536,
+          "raw_normalization_relative_change": 2.3136714766280875e-11
+        }
+      ],
+      "cutoff": [
+        {
+          "cutoff_MeV": 0.002,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.004,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.01,
+          "normalized_L1_including_spill": 3.9302328752599536e-19,
+          "raw_normalization_relative_change": 0.0
+        }
+      ]
+    },
+    {
+      "A_MeV": 9.3,
+      "mode": 3,
+      "refinement": [
+        {
+          "n_to_2n": [
+            32,
+            64
+          ],
+          "normalized_L1_including_spill": 0.06852295595462475,
+          "raw_normalization_relative_change": 0.0031310737263932076
+        },
+        {
+          "n_to_2n": [
+            64,
+            128
+          ],
+          "normalized_L1_including_spill": 0.013874470507439743,
+          "raw_normalization_relative_change": 6.055037111152295e-06
+        },
+        {
+          "n_to_2n": [
+            128,
+            256
+          ],
+          "normalized_L1_including_spill": 0.003714758303865015,
+          "raw_normalization_relative_change": 3.008038262919399e-12
+        }
+      ],
+      "cutoff": [
+        {
+          "cutoff_MeV": 0.002,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.004,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.01,
+          "normalized_L1_including_spill": 1.072908399855447e-20,
+          "raw_normalization_relative_change": 0.0
+        }
+      ]
+    },
+    {
+      "A_MeV": 9.3,
+      "mode": 13,
+      "refinement": [
+        {
+          "n_to_2n": [
+            32,
+            64
+          ],
+          "normalized_L1_including_spill": 0.06301829305796004,
+          "raw_normalization_relative_change": 0.004087693912013579
+        },
+        {
+          "n_to_2n": [
+            64,
+            128
+          ],
+          "normalized_L1_including_spill": 0.01391554691416306,
+          "raw_normalization_relative_change": 9.522565471375977e-06
+        },
+        {
+          "n_to_2n": [
+            128,
+            256
+          ],
+          "normalized_L1_including_spill": 0.0038018827485906746,
+          "raw_normalization_relative_change": 3.2017499762559964e-11
+        }
+      ],
+      "cutoff": [
+        {
+          "cutoff_MeV": 0.002,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.004,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.01,
+          "normalized_L1_including_spill": 1.3014308304167636e-20,
+          "raw_normalization_relative_change": 0.0
+        }
+      ]
+    },
+    {
+      "A_MeV": 12.0,
+      "mode": 1,
+      "refinement": [
+        {
+          "n_to_2n": [
+            32,
+            64
+          ],
+          "normalized_L1_including_spill": 0.1429683624485031,
+          "raw_normalization_relative_change": 0.004007243027535523
+        },
+        {
+          "n_to_2n": [
+            64,
+            128
+          ],
+          "normalized_L1_including_spill": 0.01682787250617056,
+          "raw_normalization_relative_change": 9.579139181647989e-06
+        },
+        {
+          "n_to_2n": [
+            128,
+            256
+          ],
+          "normalized_L1_including_spill": 0.008143168268955909,
+          "raw_normalization_relative_change": 7.115175115757211e-10
+        }
+      ],
+      "cutoff": [
+        {
+          "cutoff_MeV": 0.002,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.004,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.01,
+          "normalized_L1_including_spill": 1.4117215787571673e-21,
+          "raw_normalization_relative_change": 0.0
+        }
+      ]
+    },
+    {
+      "A_MeV": 12.0,
+      "mode": 2,
+      "refinement": [
+        {
+          "n_to_2n": [
+            32,
+            64
+          ],
+          "normalized_L1_including_spill": 0.15898378572011715,
+          "raw_normalization_relative_change": 0.00440493616121862
+        },
+        {
+          "n_to_2n": [
+            64,
+            128
+          ],
+          "normalized_L1_including_spill": 0.02016667700357153,
+          "raw_normalization_relative_change": 1.8426941460258917e-05
+        },
+        {
+          "n_to_2n": [
+            128,
+            256
+          ],
+          "normalized_L1_including_spill": 0.009244460810389156,
+          "raw_normalization_relative_change": 2.1701174190980055e-10
+        }
+      ],
+      "cutoff": [
+        {
+          "cutoff_MeV": 0.002,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.004,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.01,
+          "normalized_L1_including_spill": 9.902379842034273e-18,
+          "raw_normalization_relative_change": 0.0
+        }
+      ]
+    },
+    {
+      "A_MeV": 12.0,
+      "mode": 3,
+      "refinement": [
+        {
+          "n_to_2n": [
+            32,
+            64
+          ],
+          "normalized_L1_including_spill": 0.12631789958659884,
+          "raw_normalization_relative_change": 0.0042374265502658215
+        },
+        {
+          "n_to_2n": [
+            64,
+            128
+          ],
+          "normalized_L1_including_spill": 0.017024812512128108,
+          "raw_normalization_relative_change": 1.4612112131162647e-05
+        },
+        {
+          "n_to_2n": [
+            128,
+            256
+          ],
+          "normalized_L1_including_spill": 0.006660747918249284,
+          "raw_normalization_relative_change": 5.356222132490984e-10
+        }
+      ],
+      "cutoff": [
+        {
+          "cutoff_MeV": 0.002,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.004,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.01,
+          "normalized_L1_including_spill": 6.2115749465315356e-21,
+          "raw_normalization_relative_change": 0.0
+        }
+      ]
+    },
+    {
+      "A_MeV": 12.0,
+      "mode": 13,
+      "refinement": [
+        {
+          "n_to_2n": [
+            32,
+            64
+          ],
+          "normalized_L1_including_spill": 0.14015551028482384,
+          "raw_normalization_relative_change": 0.004661270747990942
+        },
+        {
+          "n_to_2n": [
+            64,
+            128
+          ],
+          "normalized_L1_including_spill": 0.017556419409097766,
+          "raw_normalization_relative_change": 1.9382317727245635e-05
+        },
+        {
+          "n_to_2n": [
+            128,
+            256
+          ],
+          "normalized_L1_including_spill": 0.007399103805481221,
+          "raw_normalization_relative_change": 4.36422897820421e-10
+        }
+      ],
+      "cutoff": [
+        {
+          "cutoff_MeV": 0.002,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.004,
+          "normalized_L1_including_spill": 0.0,
+          "raw_normalization_relative_change": 0.0
+        },
+        {
+          "cutoff_MeV": 0.01,
+          "normalized_L1_including_spill": 6.776263578034403e-21,
+          "raw_normalization_relative_change": 0.0
+        }
+      ]
+    }
+  ],
+  "rows": 84,
+  "max_number_residual": 0.0,
+  "max_energy_residual_MeV": 0.0,
+  "max_128_to_256_L1": 0.009244460810389156,
+  "max_cutoff_L1": 9.902379842034273e-18,
+  "numerical_checks_pass": true
+}

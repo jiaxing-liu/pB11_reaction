@@ -1,0 +1,4 @@
+cc -std=c11 -Wall -Wextra -Wpedantic -I/tmp/m3-alpha-grid-installed/include -c docs/validation/m3-alpha-grid-c11.c -o /tmp/m3-alpha-grid-c11.o
+c++ /tmp/m3-alpha-grid-c11.o -L/tmp/m3-alpha-grid-installed/lib -Wl,--start-group -l:libpb11.a -Wl,--end-group -o /tmp/m3-alpha-grid-c11
+/tmp/m3-alpha-grid-c11
+PASS status=0 N=3 E=1.4900242696199999e-12 below=0.73941320592914228 above=1.5826953781345166

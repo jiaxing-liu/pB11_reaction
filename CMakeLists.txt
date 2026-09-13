@@ -33,7 +33,8 @@ add_library(pb11 src/pb11.cpp src/pb11_c.cpp src/pb11_source.cpp
                    src/fusion_coulomb.cpp src/fusion_beam.cpp
                    src/fusion_products.cpp src/fusion_laboratory.cpp
                    src/fusion_nuclear_coulomb.cpp
-                   src/fusion_alpha_amplitudes.cpp)
+                   src/fusion_alpha_amplitudes.cpp
+                   src/fusion_alpha_spectrum.cpp)
 add_library(pb11::pb11 ALIAS pb11)
 
 target_compile_features(pb11 PUBLIC cxx_std_17)
@@ -242,6 +243,13 @@ if(BUILD_TESTING)
     target_link_libraries(test_fusion_spectrum PRIVATE pb11::pb11)
     add_test(NAME fusion_spectrum_tests COMMAND test_fusion_spectrum)
 
+    add_executable(test_fusion_alpha_grid tests/test_fusion_alpha_grid.cpp)
+    target_link_libraries(test_fusion_alpha_grid PRIVATE pb11::pb11)
+    add_test(NAME fusion_alpha_grid_tests COMMAND test_fusion_alpha_grid)
+
+    add_executable(validate_alpha_grid tools/validate_alpha_grid.cpp)
+    target_link_libraries(validate_alpha_grid PRIVATE pb11::pb11)
+
     if(PB11_FORTRAN_AVAILABLE)
         add_executable(test_pb11_fortran tests/test_pb11_fortran.f90)
         set_target_properties(test_pb11_fortran PROPERTIES
@@ -306,6 +314,16 @@ if(BUILD_TESTING)
                               pb11::fusion_spectrum_fortran)
         add_test(NAME fusion_spectrum_fortran_binding_tests
                  COMMAND test_fusion_spectrum_fortran)
+
+        add_executable(test_fusion_alpha_grid_fortran
+                       tests/test_fusion_alpha_grid_fortran.f90)
+        set_target_properties(test_fusion_alpha_grid_fortran PROPERTIES
+                              POSITION_INDEPENDENT_CODE ON
+                              LINKER_LANGUAGE Fortran)
+        target_link_libraries(test_fusion_alpha_grid_fortran PRIVATE
+                              pb11::fusion_spectrum_fortran)
+        add_test(NAME fusion_alpha_grid_fortran_binding_tests
+                 COMMAND test_fusion_alpha_grid_fortran)
     endif()
 endif()
 
@@ -339,6 +357,7 @@ install(
           include/fusion_coulomb.h include/fusion_beam.h
           include/fusion_products.h include/fusion_laboratory.h
           include/fusion_nuclear_coulomb.h include/fusion_alpha_amplitudes.h
+          include/fusion_alpha_spectrum.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(

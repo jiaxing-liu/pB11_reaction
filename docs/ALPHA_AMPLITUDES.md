@@ -50,10 +50,11 @@ caller/model; these are not normalized probabilities. Averaging over initial
 spin gives a constant1/5 for this rotationally averaged quantity and does not
 supply beam-aligned laboratory angular distributions.
 
-No permutation is silently omitted if a Coulomb evaluation is out of range.
-Thus the present finite numerical window does not yet cover every endpoint
-of three-body phase space. A full spectrum integrator must resolve this
-endpoint policy and demonstrate normalization/convergence before production.
+The strict API never silently omits a permutation if a Coulomb evaluation
+is out of range. A separate explicit-cutoff API now permits endpoint
+integration while retaining other permutations. Its normalized source grid
+and numerical sensitivity evidence are documented in ALPHA_SPECTRUM.md.
+This does not establish the complete physical spectrum model.
 Nor does this API choose the broad-resonance l1/l3 mixing coefficients or the
 low-resonance ground-state branch.
 

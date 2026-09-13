@@ -1,0 +1,43 @@
+[  3%] Building CXX object CMakeFiles/pb11.dir/src/fusion_alpha_spectrum.cpp.o
+[  3%] Building CXX object CMakeFiles/pb11.dir/src/fusion_alpha_amplitudes.cpp.o
+[  5%] Linking CXX static library libpb11.a
+[ 29%] Built target pb11
+[ 33%] Linking CXX executable thermal_network
+[ 33%] Linking CXX executable benchmark_pb11
+[ 37%] Built target thermal_network
+[ 37%] Built target benchmark_pb11
+[ 41%] Linking CXX executable test_pb11
+[ 41%] Linking CXX executable test_pb11_c
+[ 45%] Built target test_pb11_c
+[ 45%] Built target test_pb11
+[ 49%] Linking CXX executable test_pb11_source
+[ 49%] Linking CXX executable test_fusion_network
+[ 50%] Built target test_fusion_network
+[ 52%] Built target test_pb11_source
+[ 54%] Linking CXX executable test_fusion_rates
+[ 56%] Linking CXX executable test_fusion_cross_sections
+[ 58%] Built target test_fusion_rates
+[ 60%] Built target test_fusion_cross_sections
+[ 62%] Linking CXX executable test_fusion_closed_box
+[ 64%] Linking CXX executable test_fusion_kinetics
+[ 66%] Built target test_fusion_closed_box
+[ 68%] Built target test_fusion_kinetics
+[ 70%] Linking CXX executable test_fusion_coulomb
+[ 72%] Linking CXX executable test_fusion_slowing
+[ 76%] Built target test_fusion_coulomb
+[ 76%] Built target test_fusion_slowing
+[ 78%] Linking CXX executable test_fusion_products
+[ 80%] Linking CXX executable test_fusion_beam
+[ 82%] Built target test_fusion_products
+[ 84%] Built target test_fusion_beam
+[ 88%] Building CXX object CMakeFiles/test_fusion_spectrum.dir/tests/test_fusion_spectrum.cpp.o
+[ 88%] Linking CXX executable test_fusion_laboratory
+[ 90%] Built target test_fusion_laboratory
+[ 92%] Building CXX object CMakeFiles/test_fusion_alpha_grid.dir/tests/test_fusion_alpha_grid.cpp.o
+[ 94%] Linking CXX executable test_fusion_spectrum
+[ 94%] Built target test_fusion_spectrum
+[ 96%] Building CXX object CMakeFiles/validate_alpha_grid.dir/tools/validate_alpha_grid.cpp.o
+[ 98%] Linking CXX executable test_fusion_alpha_grid
+[ 98%] Built target test_fusion_alpha_grid
+[100%] Linking CXX executable validate_alpha_grid
+[100%] Built target validate_alpha_grid

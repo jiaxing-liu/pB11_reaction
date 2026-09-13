@@ -27,22 +27,26 @@ C spherical(int l,int m,const double *p){
  return m<0?(a%2?-1.:1.)*std::conj(y):y;
 }
 }
-extern "C" int fusion_c_alpha_amplitudes(int l,double A_in,double q_in,double cosine,
- fusion_alpha_amplitudes_v1 *out){
+static int alpha_impl(int l,double A_in,double q_in,double cosine,
+ fusion_alpha_amplitudes_v1 *out,double cutoff_MeV,int *pruned){
+ if(pruned)*pruned=0;
  if(!out)return PB11_STATUS_NULL_OUTPUT;
  *out={};
  if(l<1 || l>3 || !std::isfinite(A_in) || !std::isfinite(q_in) || !std::isfinite(cosine))return PB11_STATUS_INVALID_ARGUMENT;
- if(A_in<=0 || q_in<=0 || q_in>=A_in || std::abs(cosine)>1)return PB11_STATUS_OUT_OF_RANGE;
+ if(A_in<=0 || q_in<0 || q_in>A_in || (cutoff_MeV==0 && (q_in==0 || q_in==A_in)) || std::abs(cosine)>1)return PB11_STATUS_OUT_OF_RANGE;
  const double A=A_in/mev,q=q_in/mev,m=3727.3794118;
  // Momenta are MeV/c in the declared nonrelativistic convention.
  const double p0=std::sqrt(4*m*(A-q)/3),star=std::sqrt(m*q),px=star*std::sqrt((1-cosine)*(1+cosine));
  const double p[3][3]={{0,0,p0},{px,0,-p0/2-star*cosine},{-px,0,-p0/2+star*cosine}};
  fusion_nuclear_coulomb_v1 at_level{};
  int status=fusion_c_nuclear_coulomb(4,3.129*mev,&at_level);if(status)return status;
- C amplitudes[3][5]{};
+ C amplitudes[3][5]{}; int skipped=0;
  const C ipow[4]={{1,0},{0,1},{-1,0},{0,-1}};
  for(int i=0;i<3;++i){int j=(i+1)%3,k=(i+2)%3;double relative[3],e23=0,ep=0;
   for(int d=0;d<3;++d){relative[d]=(p[j][d]-p[k][d])/2;e23+=relative[d]*relative[d]/m;ep+=3*p[i][d]*p[i][d]/(4*m);}
+  // Explicit caller-selected numerical approximation: retain the event and
+  // all other permutations. Never discard a whole event for one small channel.
+  if(cutoff_MeV>0 && (ep<cutoff_MeV || e23<cutoff_MeV)){++skipped;continue;}
   fusion_nuclear_coulomb_v1 primary{},secondary{};
   status=fusion_c_nuclear_coulomb(l-1,ep*mev,&primary);if(status)return status;
   status=fusion_c_nuclear_coulomb(4,e23*mev,&secondary);if(status)return status;
@@ -59,5 +63,18 @@ extern "C" int fusion_c_alpha_amplitudes(int l,double A_in,double q_in,double co
   result.unsym_real[M]=amplitudes[0][M].real();result.unsym_imag[M]=amplitudes[0][M].imag();
   result.sym_real[M]=s.real();result.sym_imag[M]=s.imag();}
  result.phase_space_J=std::sqrt(q_in)*std::sqrt(A_in-q_in);
- *out=result;return PB11_STATUS_OK;
+ *out=result;if(pruned)*pruned=skipped;return PB11_STATUS_OK;
+}
+
+extern "C" int fusion_c_alpha_amplitudes(int l,double A,double q,double cosine,
+ fusion_alpha_amplitudes_v1 *out){return alpha_impl(l,A,q,cosine,out,0,nullptr);}
+extern "C" int fusion_c_alpha_amplitudes_cutoff(int l,double A,double q,double cosine,
+ double cutoff_J,fusion_alpha_amplitudes_v1 *out,int *pruned){
+ if(out)*out={};
+ if(pruned)*pruned=0;
+ if(!out || !pruned)return PB11_STATUS_NULL_OUTPUT;
+ constexpr double minimum=.001*mev,maximum=.01*mev;
+ if(!std::isfinite(cutoff_J))return PB11_STATUS_INVALID_ARGUMENT;
+ if(cutoff_J<minimum || cutoff_J>maximum)return PB11_STATUS_OUT_OF_RANGE;
+ return alpha_impl(l,A,q,cosine,out,cutoff_J/mev,pruned);
 }

@@ -26,6 +26,16 @@ typedef struct fusion_alpha_amplitudes_v1 {
  * Outputs zero on error; no hidden state or random sampling. */
 int fusion_c_alpha_amplitudes(int primary_l,double available_energy_J,
     double intermediate_energy_J,double cos_theta,fusion_alpha_amplitudes_v1 *out);
+/* Explicit small-energy numerical cutoff variant. Same amplitude convention,
+ * but each permutation with primary or pair energy < cutoff_J is set to zero.
+ * Other permutations remain. cutoff_J in[0.001,0.01]MeV; q endpoints allowed.
+ * Returns number of suppressed permutations (0..3), never hides suppression.
+ * This approximation requires cutoff-sensitivity/reference validation for the
+ * intended spectrum; it is not a physical branching or nuclear-data cutoff.
+ * Both outputs required; cleared on error. No spectrum normalization occurs. */
+int fusion_c_alpha_amplitudes_cutoff(int primary_l,double available_energy_J,
+    double intermediate_energy_J,double cos_theta,double cutoff_J,
+    fusion_alpha_amplitudes_v1 *out,int *pruned_permutations);
 #ifdef __cplusplus
 }
 #endif

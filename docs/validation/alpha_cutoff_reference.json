@@ -1,0 +1,2556 @@
+{
+  "generator": "tools/check_alpha_cutoff.py",
+  "mpmath_dps": 50,
+  "parameters": {
+    "alpha_inverse": 137.035999084,
+    "hbarc_MeV_fm": 197.3269804,
+    "alpha_mass_MeV_c2": 3727.3794118,
+    "primary": {
+      "Zproduct": 8.0,
+      "mu_MeV_c2": 2484.919607866667,
+      "radius_fm": 5.1,
+      "l_values": [
+        1,
+        2,
+        3
+      ]
+    },
+    "secondary": {
+      "Zproduct": 4.0,
+      "mu_MeV_c2": 1863.6897059,
+      "radius_fm": 4.5,
+      "l_values": [
+        2
+      ]
+    },
+    "resonance_energy_MeV": 3.129,
+    "gamma_squared_MeV": 1.075
+  },
+  "formula": {
+    "P": "rho/(F^2+G^2)",
+    "U": "sqrt(P/rho)",
+    "radial_abs": "2*sqrt(1.075)*Up(Ep)*Us(q)/abs(3.129-q-1.075*(S(q)-S(3.129))-i*1.075*P(q))",
+    "orientations": {
+      "primary_at_E": "Ep=E, q=A-E",
+      "secondary_at_E": "q=E, Ep=A-E"
+    }
+  },
+  "cuts_MeV": [
+    0.001,
+    0.002,
+    0.004,
+    0.01
+  ],
+  "A_values_MeV": [
+    8.68,
+    8.829,
+    9.3,
+    12.0
+  ],
+  "wronskian_tolerance": 1e-30,
+  "wronskian_checks": 181,
+  "cache_entries": {
+    "primary": 45,
+    "secondary": 46
+  },
+  "elapsed_seconds": 25.040196245001425,
+  "sampled_maximum_warning": "These are maxima over the listed finite E, A, and l samples. They are not strict mathematical upper bounds and do not validate a complete alpha spectrum.",
+  "cuts": [
+    {
+      "cut_MeV": 0.001,
+      "sample_energies_MeV": [
+        0.001,
+        0.0005,
+        0.0001
+      ],
+      "primary_at_E": [
+        {
+          "E_MeV": 0.001,
+          "orientation": "primary_at_E",
+          "max_radial_abs": 3.3352998151551685e-87,
+          "argmax": {
+            "A_MeV": 8.68,
+            "l_primary": 1,
+            "primary_energy_MeV": 0.001,
+            "q_energy_MeV": 8.679,
+            "radial_abs": 3.3352998151551685e-87
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.679,
+              "radial_abs": 3.3352998151551685e-87
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.679,
+              "radial_abs": 9.352098881346559e-88
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.679,
+              "radial_abs": 1.539822867680711e-88
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.828,
+              "radial_abs": 3.270947060681532e-87
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.828,
+              "radial_abs": 9.171655336094701e-88
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.828,
+              "radial_abs": 1.510112842067275e-88
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 9.299,
+              "radial_abs": 3.0839156209987633e-87
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 9.299,
+              "radial_abs": 8.64722376628919e-88
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 9.299,
+              "radial_abs": 1.4237651960505185e-88
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 11.999,
+              "radial_abs": 2.334285506959885e-87
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 11.999,
+              "radial_abs": 6.545279311679333e-88
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 11.999,
+              "radial_abs": 1.0776800895020198e-88
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.0005,
+          "orientation": "primary_at_E",
+          "max_radial_abs": 6.6563151322973535e-124,
+          "argmax": {
+            "A_MeV": 8.68,
+            "l_primary": 1,
+            "primary_energy_MeV": 0.0005,
+            "q_energy_MeV": 8.6795,
+            "radial_abs": 6.6563151322973535e-124
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0005,
+              "q_energy_MeV": 8.6795,
+              "radial_abs": 6.6563151322973535e-124
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0005,
+              "q_energy_MeV": 8.6795,
+              "radial_abs": 1.8658835819909113e-124
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0005,
+              "q_energy_MeV": 8.6795,
+              "radial_abs": 3.070436916274743e-125
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0005,
+              "q_energy_MeV": 8.8285,
+              "radial_abs": 6.527894785900097e-124
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0005,
+              "q_energy_MeV": 8.8285,
+              "radial_abs": 1.8298850736309975e-124
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0005,
+              "q_energy_MeV": 8.8285,
+              "radial_abs": 3.011198949841078e-125
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0005,
+              "q_energy_MeV": 9.2995,
+              "radial_abs": 6.1546582024447005e-124
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0005,
+              "q_energy_MeV": 9.2995,
+              "radial_abs": 1.725260217471664e-124
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0005,
+              "q_energy_MeV": 9.2995,
+              "radial_abs": 2.839031712928696e-125
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0005,
+              "q_energy_MeV": 11.9995,
+              "radial_abs": 4.65867460605455e-124
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0005,
+              "q_energy_MeV": 11.9995,
+              "radial_abs": 1.3059093940876902e-124
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0005,
+              "q_energy_MeV": 11.9995,
+              "radial_abs": 2.1489617313843525e-125
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.0001,
+          "orientation": "primary_at_E",
+          "max_radial_abs": 6.2997649307250334e-279,
+          "argmax": {
+            "A_MeV": 8.68,
+            "l_primary": 1,
+            "primary_energy_MeV": 0.0001,
+            "q_energy_MeV": 8.6799,
+            "radial_abs": 6.2997649307250334e-279
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0001,
+              "q_energy_MeV": 8.6799,
+              "radial_abs": 6.2997649307250334e-279
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0001,
+              "q_energy_MeV": 8.6799,
+              "radial_abs": 1.765534253018764e-279
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0001,
+              "q_energy_MeV": 8.6799,
+              "radial_abs": 2.9039877326695137e-280
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0001,
+              "q_energy_MeV": 8.8289,
+              "radial_abs": 6.178230741043171e-279
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0001,
+              "q_energy_MeV": 8.8289,
+              "radial_abs": 1.7314738115331304e-279
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0001,
+              "q_energy_MeV": 8.8289,
+              "radial_abs": 2.847964404844258e-280
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0001,
+              "q_energy_MeV": 9.2999,
+              "radial_abs": 5.8250059708288206e-279
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0001,
+              "q_energy_MeV": 9.2999,
+              "radial_abs": 1.6324811605872886e-279
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0001,
+              "q_energy_MeV": 9.2999,
+              "radial_abs": 2.685139218371875e-280
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0001,
+              "q_energy_MeV": 11.9999,
+              "radial_abs": 4.4092058303313255e-279
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0001,
+              "q_energy_MeV": 11.9999,
+              "radial_abs": 1.2356975232668046e-279
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0001,
+              "q_energy_MeV": 11.9999,
+              "radial_abs": 2.0325011778849714e-280
+            }
+          ]
+        }
+      ],
+      "secondary_at_E": [
+        {
+          "E_MeV": 0.001,
+          "orientation": "secondary_at_E",
+          "max_radial_abs": 8.70827722895503e-39,
+          "argmax": {
+            "A_MeV": 12.0,
+            "l_primary": 1,
+            "primary_energy_MeV": 11.999,
+            "q_energy_MeV": 0.001,
+            "radial_abs": 8.70827722895503e-39
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.679,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.456969574028255e-39
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.679,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.047819538986547e-39
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.679,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 7.355804202907931e-39
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.828,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.472677870498942e-39
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.828,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.071864530272633e-39
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.828,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 7.394768135352055e-39
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 9.299,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.518735073451884e-39
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 9.299,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.142254170683384e-39
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 9.299,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 7.50870668369391e-39
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 11.999,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.70827722895503e-39
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 11.999,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.429880389136664e-39
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 11.999,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 7.970846771300173e-39
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.0005,
+          "orientation": "secondary_at_E",
+          "max_radial_abs": 1.2313185100603093e-54,
+          "argmax": {
+            "A_MeV": 12.0,
+            "l_primary": 1,
+            "primary_energy_MeV": 11.9995,
+            "q_energy_MeV": 0.0005,
+            "radial_abs": 1.2313185100603093e-54
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.6795,
+              "q_energy_MeV": 0.0005,
+              "radial_abs": 1.1957884601745203e-54
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.6795,
+              "q_energy_MeV": 0.0005,
+              "radial_abs": 1.1379403546556202e-54
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.6795,
+              "q_energy_MeV": 0.0005,
+              "radial_abs": 1.0400994379677756e-54
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.8285,
+              "q_energy_MeV": 0.0005,
+              "radial_abs": 1.1980092718499276e-54
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.8285,
+              "q_energy_MeV": 0.0005,
+              "radial_abs": 1.1413397849925083e-54
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.8285,
+              "q_energy_MeV": 0.0005,
+              "radial_abs": 1.0456080683033598e-54
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 9.2995,
+              "q_energy_MeV": 0.0005,
+              "radial_abs": 1.2045207883500052e-54
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 9.2995,
+              "q_energy_MeV": 0.0005,
+              "radial_abs": 1.1512913690666802e-54
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 9.2995,
+              "q_energy_MeV": 0.0005,
+              "radial_abs": 1.0617165017410703e-54
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 11.9995,
+              "q_energy_MeV": 0.0005,
+              "radial_abs": 1.2313185100603093e-54
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 11.9995,
+              "q_energy_MeV": 0.0005,
+              "radial_abs": 1.1919562501314615e-54
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 11.9995,
+              "q_energy_MeV": 0.0005,
+              "radial_abs": 1.1270541480120914e-54
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.0001,
+          "orientation": "secondary_at_E",
+          "max_radial_abs": 1.1522782140470582e-121,
+          "argmax": {
+            "A_MeV": 12.0,
+            "l_primary": 1,
+            "primary_energy_MeV": 11.9999,
+            "q_energy_MeV": 0.0001,
+            "radial_abs": 1.1522782140470582e-121
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.6799,
+              "q_energy_MeV": 0.0001,
+              "radial_abs": 1.1190318380480678e-121
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.6799,
+              "q_energy_MeV": 0.0001,
+              "radial_abs": 1.0649002467875146e-121
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.6799,
+              "q_energy_MeV": 0.0001,
+              "radial_abs": 9.733455217173272e-122
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.8289,
+              "q_energy_MeV": 0.0001,
+              "radial_abs": 1.1211098797651519e-121
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.8289,
+              "q_energy_MeV": 0.0001,
+              "radial_abs": 1.0680811304017987e-121
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.8289,
+              "q_energy_MeV": 0.0001,
+              "radial_abs": 9.785000001061178e-122
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 9.2999,
+              "q_energy_MeV": 0.0001,
+              "radial_abs": 1.1272028103375213e-121
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 9.2999,
+              "q_energy_MeV": 0.0001,
+              "radial_abs": 1.0773929683163477e-121
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 9.2999,
+              "q_energy_MeV": 0.0001,
+              "radial_abs": 9.93572865551486e-122
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 11.9999,
+              "q_energy_MeV": 0.0001,
+              "radial_abs": 1.1522782140470582e-121
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 11.9999,
+              "q_energy_MeV": 0.0001,
+              "radial_abs": 1.11544420266581e-121
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 11.9999,
+              "q_energy_MeV": 0.0001,
+              "radial_abs": 1.0547109425842153e-121
+            }
+          ]
+        }
+      ],
+      "trend": {
+        "primary_at_E": {
+          "sampled_maximum": 3.3352998151551685e-87,
+          "sampled_maximum_E_MeV": 0.001,
+          "values_in_decreasing_E_order": [
+            3.3352998151551685e-87,
+            6.6563151322973535e-124,
+            6.2997649307250334e-279
+          ],
+          "decreases_at_every_sample": true,
+          "last_over_first": 1.888815183000857e-192
+        },
+        "secondary_at_E": {
+          "sampled_maximum": 8.70827722895503e-39,
+          "sampled_maximum_E_MeV": 0.001,
+          "values_in_decreasing_E_order": [
+            8.70827722895503e-39,
+            1.2313185100603093e-54,
+            1.1522782140470582e-121
+          ],
+          "decreases_at_every_sample": true,
+          "last_over_first": 1.3231988184938946e-83
+        }
+      }
+    },
+    {
+      "cut_MeV": 0.002,
+      "sample_energies_MeV": [
+        0.002,
+        0.001,
+        0.0002
+      ],
+      "primary_at_E": [
+        {
+          "E_MeV": 0.002,
+          "orientation": "primary_at_E",
+          "max_radial_abs": 2.8300467878386944e-61,
+          "argmax": {
+            "A_MeV": 8.68,
+            "l_primary": 1,
+            "primary_energy_MeV": 0.002,
+            "q_energy_MeV": 8.678,
+            "radial_abs": 2.8300467878386944e-61
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 8.678,
+              "radial_abs": 2.8300467878386944e-61
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 8.678,
+              "radial_abs": 7.939895345565485e-62
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 8.678,
+              "radial_abs": 1.3087834856567572e-62
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 8.827,
+              "radial_abs": 2.775434485837055e-61
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 8.827,
+              "radial_abs": 7.786676690546505e-62
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 8.827,
+              "radial_abs": 1.2835274795438578e-62
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 9.298,
+              "radial_abs": 2.616714296127561e-61
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 9.298,
+              "radial_abs": 7.341376032996557e-62
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 9.298,
+              "radial_abs": 1.2101257379102018e-62
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 11.998,
+              "radial_abs": 1.980586840255086e-61
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 11.998,
+              "radial_abs": 5.5566757065664215e-62
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 11.998,
+              "radial_abs": 9.159422238437921e-63
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.001,
+          "orientation": "primary_at_E",
+          "max_radial_abs": 3.3352998151551685e-87,
+          "argmax": {
+            "A_MeV": 8.68,
+            "l_primary": 1,
+            "primary_energy_MeV": 0.001,
+            "q_energy_MeV": 8.679,
+            "radial_abs": 3.3352998151551685e-87
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.679,
+              "radial_abs": 3.3352998151551685e-87
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.679,
+              "radial_abs": 9.352098881346559e-88
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.679,
+              "radial_abs": 1.539822867680711e-88
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.828,
+              "radial_abs": 3.270947060681532e-87
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.828,
+              "radial_abs": 9.171655336094701e-88
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.828,
+              "radial_abs": 1.510112842067275e-88
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 9.299,
+              "radial_abs": 3.0839156209987633e-87
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 9.299,
+              "radial_abs": 8.64722376628919e-88
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 9.299,
+              "radial_abs": 1.4237651960505185e-88
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 11.999,
+              "radial_abs": 2.334285506959885e-87
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 11.999,
+              "radial_abs": 6.545279311679333e-88
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 11.999,
+              "radial_abs": 1.0776800895020198e-88
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.0002,
+          "orientation": "primary_at_E",
+          "max_radial_abs": 9.034336293951823e-197,
+          "argmax": {
+            "A_MeV": 8.68,
+            "l_primary": 1,
+            "primary_energy_MeV": 0.0002,
+            "q_energy_MeV": 8.6798,
+            "radial_abs": 9.034336293951823e-197
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0002,
+              "q_energy_MeV": 8.6798,
+              "radial_abs": 9.034336293951823e-197
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0002,
+              "q_energy_MeV": 8.6798,
+              "radial_abs": 2.53205290066976e-197
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0002,
+              "q_energy_MeV": 8.6798,
+              "radial_abs": 4.165246140834667e-198
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0002,
+              "q_energy_MeV": 8.8288,
+              "radial_abs": 8.860044541345069e-197
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0002,
+              "q_energy_MeV": 8.8288,
+              "radial_abs": 2.4832041614385014e-197
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0002,
+              "q_energy_MeV": 8.8288,
+              "radial_abs": 4.084889595948177e-198
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0002,
+              "q_energy_MeV": 9.2998,
+              "radial_abs": 8.353486819198364e-197
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0002,
+              "q_energy_MeV": 9.2998,
+              "radial_abs": 2.3412312585062844e-197
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0002,
+              "q_energy_MeV": 9.2998,
+              "radial_abs": 3.851343098604029e-198
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0002,
+              "q_energy_MeV": 11.9998,
+              "radial_abs": 6.323105089593415e-197
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0002,
+              "q_energy_MeV": 11.9998,
+              "radial_abs": 1.7721762908098926e-197
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0002,
+              "q_energy_MeV": 11.9998,
+              "radial_abs": 2.915243379876497e-198
+            }
+          ]
+        }
+      ],
+      "secondary_at_E": [
+        {
+          "E_MeV": 0.002,
+          "orientation": "secondary_at_E",
+          "max_radial_abs": 1.336945345245005e-27,
+          "argmax": {
+            "A_MeV": 12.0,
+            "l_primary": 1,
+            "primary_energy_MeV": 11.998,
+            "q_energy_MeV": 0.002,
+            "radial_abs": 1.336945345245005e-27
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.678,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.2983545918880309e-27
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.678,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.2355303533439865e-27
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.678,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.1292718075495455e-27
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.827,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.300766837610489e-27
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.827,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.2392228432893978e-27
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.827,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.1352553561958976e-27
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 9.298,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.3078395521315638e-27
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 9.298,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.2500321924923287e-27
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 9.298,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.152752339265816e-27
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 11.998,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.336945345245005e-27
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 11.998,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.2941998269259804e-27
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 11.998,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.2237185626856656e-27
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.001,
+          "orientation": "secondary_at_E",
+          "max_radial_abs": 8.70827722895503e-39,
+          "argmax": {
+            "A_MeV": 12.0,
+            "l_primary": 1,
+            "primary_energy_MeV": 11.999,
+            "q_energy_MeV": 0.001,
+            "radial_abs": 8.70827722895503e-39
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.679,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.456969574028255e-39
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.679,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.047819538986547e-39
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.679,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 7.355804202907931e-39
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.828,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.472677870498942e-39
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.828,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.071864530272633e-39
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.828,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 7.394768135352055e-39
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 9.299,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.518735073451884e-39
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 9.299,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.142254170683384e-39
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 9.299,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 7.50870668369391e-39
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 11.999,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.70827722895503e-39
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 11.999,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.429880389136664e-39
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 11.999,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 7.970846771300173e-39
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.0002,
+          "orientation": "secondary_at_E",
+          "max_radial_abs": 3.925261095985085e-86,
+          "argmax": {
+            "A_MeV": 12.0,
+            "l_primary": 1,
+            "primary_energy_MeV": 11.9998,
+            "q_energy_MeV": 0.0002,
+            "radial_abs": 3.925261095985085e-86
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.6798,
+              "q_energy_MeV": 0.0002,
+              "radial_abs": 3.812004077876669e-86
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.6798,
+              "q_energy_MeV": 0.0002,
+              "radial_abs": 3.627600936460797e-86
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.6798,
+              "q_energy_MeV": 0.0002,
+              "radial_abs": 3.315712958293789e-86
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.8288,
+              "q_energy_MeV": 0.0002,
+              "radial_abs": 3.819083153698802e-86
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.8288,
+              "q_energy_MeV": 0.0002,
+              "radial_abs": 3.638436969118421e-86
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.8288,
+              "q_energy_MeV": 0.0002,
+              "radial_abs": 3.333272265792784e-86
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 9.2998,
+              "q_energy_MeV": 0.0002,
+              "radial_abs": 3.839839367858688e-86
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 9.2998,
+              "q_energy_MeV": 0.0002,
+              "radial_abs": 3.670158748809236e-86
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 9.2998,
+              "q_energy_MeV": 0.0002,
+              "radial_abs": 3.3846196268032356e-86
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 11.9998,
+              "q_energy_MeV": 0.0002,
+              "radial_abs": 3.925261095985085e-86
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 11.9998,
+              "q_energy_MeV": 0.0002,
+              "radial_abs": 3.799783929073877e-86
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 11.9998,
+              "q_energy_MeV": 0.0002,
+              "radial_abs": 3.592892465840424e-86
+            }
+          ]
+        }
+      ],
+      "trend": {
+        "primary_at_E": {
+          "sampled_maximum": 2.8300467878386944e-61,
+          "sampled_maximum_E_MeV": 0.002,
+          "values_in_decreasing_E_order": [
+            2.8300467878386944e-61,
+            3.3352998151551685e-87,
+            9.034336293951823e-197
+          ],
+          "decreases_at_every_sample": true,
+          "last_over_first": 3.1922922026498867e-136
+        },
+        "secondary_at_E": {
+          "sampled_maximum": 1.336945345245005e-27,
+          "sampled_maximum_E_MeV": 0.002,
+          "values_in_decreasing_E_order": [
+            1.336945345245005e-27,
+            8.70827722895503e-39,
+            3.925261095985085e-86
+          ],
+          "decreases_at_every_sample": true,
+          "last_over_first": 2.9359921929087927e-59
+        }
+      }
+    },
+    {
+      "cut_MeV": 0.004,
+      "sample_energies_MeV": [
+        0.004,
+        0.002,
+        0.0004
+      ],
+      "primary_at_E": [
+        {
+          "E_MeV": 0.004,
+          "orientation": "primary_at_E",
+          "max_radial_abs": 5.807458082686079e-43,
+          "argmax": {
+            "A_MeV": 8.68,
+            "l_primary": 1,
+            "primary_energy_MeV": 0.004,
+            "q_energy_MeV": 8.676,
+            "radial_abs": 5.807458082686079e-43
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.004,
+              "q_energy_MeV": 8.676,
+              "radial_abs": 5.807458082686079e-43
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.004,
+              "q_energy_MeV": 8.676,
+              "radial_abs": 1.631175247702118e-43
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.004,
+              "q_energy_MeV": 8.676,
+              "radial_abs": 2.694843017731509e-44
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.004,
+              "q_energy_MeV": 8.825,
+              "radial_abs": 5.695356382780446e-43
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.004,
+              "q_energy_MeV": 8.825,
+              "radial_abs": 1.5996885773709871e-43
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.004,
+              "q_energy_MeV": 8.825,
+              "radial_abs": 2.642824306797172e-44
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.004,
+              "q_energy_MeV": 9.296,
+              "radial_abs": 5.369562960182725e-43
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.004,
+              "q_energy_MeV": 9.296,
+              "radial_abs": 1.5081810435689072e-43
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.004,
+              "q_energy_MeV": 9.296,
+              "radial_abs": 2.4916459224489817e-44
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.004,
+              "q_energy_MeV": 11.996,
+              "radial_abs": 4.063953226886514e-43
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.004,
+              "q_energy_MeV": 11.996,
+              "radial_abs": 1.1414666825197924e-43
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.004,
+              "q_energy_MeV": 11.996,
+              "radial_abs": 1.8858019846089267e-44
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.002,
+          "orientation": "primary_at_E",
+          "max_radial_abs": 2.8300467878386944e-61,
+          "argmax": {
+            "A_MeV": 8.68,
+            "l_primary": 1,
+            "primary_energy_MeV": 0.002,
+            "q_energy_MeV": 8.678,
+            "radial_abs": 2.8300467878386944e-61
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 8.678,
+              "radial_abs": 2.8300467878386944e-61
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 8.678,
+              "radial_abs": 7.939895345565485e-62
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 8.678,
+              "radial_abs": 1.3087834856567572e-62
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 8.827,
+              "radial_abs": 2.775434485837055e-61
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 8.827,
+              "radial_abs": 7.786676690546505e-62
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 8.827,
+              "radial_abs": 1.2835274795438578e-62
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 9.298,
+              "radial_abs": 2.616714296127561e-61
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 9.298,
+              "radial_abs": 7.341376032996557e-62
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 9.298,
+              "radial_abs": 1.2101257379102018e-62
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 11.998,
+              "radial_abs": 1.980586840255086e-61
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 11.998,
+              "radial_abs": 5.5566757065664215e-62
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.002,
+              "q_energy_MeV": 11.998,
+              "radial_abs": 9.159422238437921e-63
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.0004,
+          "orientation": "primary_at_E",
+          "max_radial_abs": 1.0649112626024476e-138,
+          "argmax": {
+            "A_MeV": 8.68,
+            "l_primary": 1,
+            "primary_energy_MeV": 0.0004,
+            "q_energy_MeV": 8.6796,
+            "radial_abs": 1.0649112626024476e-138
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0004,
+              "q_energy_MeV": 8.6796,
+              "radial_abs": 1.0649112626024476e-138
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0004,
+              "q_energy_MeV": 8.6796,
+              "radial_abs": 2.9849659065555708e-139
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0004,
+              "q_energy_MeV": 8.6796,
+              "radial_abs": 4.911405292038228e-140
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0004,
+              "q_energy_MeV": 8.8286,
+              "radial_abs": 1.044366225823176e-138
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0004,
+              "q_energy_MeV": 8.8286,
+              "radial_abs": 2.9273777896028158e-139
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0004,
+              "q_energy_MeV": 8.8286,
+              "radial_abs": 4.816650915869606e-140
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0004,
+              "q_energy_MeV": 9.2996,
+              "radial_abs": 9.84654741145989e-139
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0004,
+              "q_energy_MeV": 9.2996,
+              "radial_abs": 2.760005396943881e-139
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0004,
+              "q_energy_MeV": 9.2996,
+              "radial_abs": 4.541259611318742e-140
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.0004,
+              "q_energy_MeV": 11.9996,
+              "radial_abs": 7.45321766112695e-139
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.0004,
+              "q_energy_MeV": 11.9996,
+              "radial_abs": 2.0891506545092545e-139
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.0004,
+              "q_energy_MeV": 11.9996,
+              "radial_abs": 3.4374481657855606e-140
+            }
+          ]
+        }
+      ],
+      "secondary_at_E": [
+        {
+          "E_MeV": 0.004,
+          "orientation": "secondary_at_E",
+          "max_radial_abs": 1.0367266763161177e-19,
+          "argmax": {
+            "A_MeV": 12.0,
+            "l_primary": 1,
+            "primary_energy_MeV": 11.996,
+            "q_energy_MeV": 0.004,
+            "radial_abs": 1.0367266763161177e-19
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.676,
+              "q_energy_MeV": 0.004,
+              "radial_abs": 1.0067884426819555e-19
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.676,
+              "q_energy_MeV": 0.004,
+              "radial_abs": 9.580575524327241e-20
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.676,
+              "q_energy_MeV": 0.004,
+              "radial_abs": 8.756346325403974e-20
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.825,
+              "q_energy_MeV": 0.004,
+              "radial_abs": 1.0086599619524095e-19
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.825,
+              "q_energy_MeV": 0.004,
+              "radial_abs": 9.609223673093979e-20
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.825,
+              "q_energy_MeV": 0.004,
+              "radial_abs": 8.802769919291888e-20
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 9.296,
+              "q_energy_MeV": 0.004,
+              "radial_abs": 1.0141471660134082e-19
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 9.296,
+              "q_energy_MeV": 0.004,
+              "radial_abs": 9.693086402529378e-20
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 9.296,
+              "q_energy_MeV": 0.004,
+              "radial_abs": 8.938518717198137e-20
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 11.996,
+              "q_energy_MeV": 0.004,
+              "radial_abs": 1.0367266763161177e-19
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 11.996,
+              "q_energy_MeV": 0.004,
+              "radial_abs": 1.0035730544692749e-19
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 11.996,
+              "q_energy_MeV": 0.004,
+              "radial_abs": 9.489067279411033e-20
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.002,
+          "orientation": "secondary_at_E",
+          "max_radial_abs": 1.336945345245005e-27,
+          "argmax": {
+            "A_MeV": 12.0,
+            "l_primary": 1,
+            "primary_energy_MeV": 11.998,
+            "q_energy_MeV": 0.002,
+            "radial_abs": 1.336945345245005e-27
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.678,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.2983545918880309e-27
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.678,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.2355303533439865e-27
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.678,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.1292718075495455e-27
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.827,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.300766837610489e-27
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.827,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.2392228432893978e-27
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.827,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.1352553561958976e-27
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 9.298,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.3078395521315638e-27
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 9.298,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.2500321924923287e-27
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 9.298,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.152752339265816e-27
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 11.998,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.336945345245005e-27
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 11.998,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.2941998269259804e-27
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 11.998,
+              "q_energy_MeV": 0.002,
+              "radial_abs": 1.2237185626856656e-27
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.0004,
+          "orientation": "secondary_at_E",
+          "max_radial_abs": 4.9790181621869904e-61,
+          "argmax": {
+            "A_MeV": 12.0,
+            "l_primary": 1,
+            "primary_energy_MeV": 11.9996,
+            "q_energy_MeV": 0.0004,
+            "radial_abs": 4.9790181621869904e-61
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.6796,
+              "q_energy_MeV": 0.0004,
+              "radial_abs": 4.835350340327408e-61
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.6796,
+              "q_energy_MeV": 0.0004,
+              "radial_abs": 4.601436391514481e-61
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.6796,
+              "q_energy_MeV": 0.0004,
+              "radial_abs": 4.205808280889396e-61
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.8286,
+              "q_energy_MeV": 0.0004,
+              "radial_abs": 4.8443302905830726e-61
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.8286,
+              "q_energy_MeV": 0.0004,
+              "radial_abs": 4.615182131373219e-61
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.8286,
+              "q_energy_MeV": 0.0004,
+              "radial_abs": 4.2280826529328634e-61
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 9.2996,
+              "q_energy_MeV": 0.0004,
+              "radial_abs": 4.870659919170273e-61
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 9.2996,
+              "q_energy_MeV": 0.0004,
+              "radial_abs": 4.655421817149877e-61
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 9.2996,
+              "q_energy_MeV": 0.0004,
+              "radial_abs": 4.293217815617324e-61
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 11.9996,
+              "q_energy_MeV": 0.0004,
+              "radial_abs": 4.9790181621869904e-61
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 11.9996,
+              "q_energy_MeV": 0.0004,
+              "radial_abs": 4.8198526981525546e-61
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 11.9996,
+              "q_energy_MeV": 0.0004,
+              "radial_abs": 4.557414354749524e-61
+            }
+          ]
+        }
+      ],
+      "trend": {
+        "primary_at_E": {
+          "sampled_maximum": 5.807458082686079e-43,
+          "sampled_maximum_E_MeV": 0.004,
+          "values_in_decreasing_E_order": [
+            5.807458082686079e-43,
+            2.8300467878386944e-61,
+            1.0649112626024476e-138
+          ],
+          "decreases_at_every_sample": true,
+          "last_over_first": 1.8336959947714378e-96
+        },
+        "secondary_at_E": {
+          "sampled_maximum": 1.0367266763161177e-19,
+          "sampled_maximum_E_MeV": 0.004,
+          "values_in_decreasing_E_order": [
+            1.0367266763161177e-19,
+            1.336945345245005e-27,
+            4.9790181621869904e-61
+          ],
+          "decreases_at_every_sample": true,
+          "last_over_first": 4.802633399845875e-42
+        }
+      }
+    },
+    {
+      "cut_MeV": 0.01,
+      "sample_energies_MeV": [
+        0.01,
+        0.005,
+        0.001
+      ],
+      "primary_at_E": [
+        {
+          "E_MeV": 0.01,
+          "orientation": "primary_at_E",
+          "max_radial_abs": 9.548594641871217e-27,
+          "argmax": {
+            "A_MeV": 8.68,
+            "l_primary": 1,
+            "primary_energy_MeV": 0.01,
+            "q_energy_MeV": 8.67,
+            "radial_abs": 9.548594641871217e-27
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.01,
+              "q_energy_MeV": 8.67,
+              "radial_abs": 9.548594641871217e-27
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.01,
+              "q_energy_MeV": 8.67,
+              "radial_abs": 2.6911005940137642e-27
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.01,
+              "q_energy_MeV": 8.67,
+              "radial_abs": 4.475890415812076e-28
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.01,
+              "q_energy_MeV": 8.819,
+              "radial_abs": 9.364112817335324e-27
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.01,
+              "q_energy_MeV": 8.819,
+              "radial_abs": 2.639107691789569e-27
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.01,
+              "q_energy_MeV": 8.819,
+              "radial_abs": 4.389414817956985e-28
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.01,
+              "q_energy_MeV": 9.29,
+              "radial_abs": 8.828008972420633e-27
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.01,
+              "q_energy_MeV": 9.29,
+              "radial_abs": 2.4880164129560733e-27
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.01,
+              "q_energy_MeV": 9.29,
+              "radial_abs": 4.138116888645846e-28
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.01,
+              "q_energy_MeV": 11.99,
+              "radial_abs": 6.68019259371992e-27
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.01,
+              "q_energy_MeV": 11.99,
+              "radial_abs": 1.8826927868793788e-27
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.01,
+              "q_energy_MeV": 11.99,
+              "radial_abs": 3.1313309578455834e-28
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.005,
+          "orientation": "primary_at_E",
+          "max_radial_abs": 2.66826691434796e-38,
+          "argmax": {
+            "A_MeV": 8.68,
+            "l_primary": 1,
+            "primary_energy_MeV": 0.005,
+            "q_energy_MeV": 8.675,
+            "radial_abs": 2.66826691434796e-38
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.005,
+              "q_energy_MeV": 8.675,
+              "radial_abs": 2.66826691434796e-38
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.005,
+              "q_energy_MeV": 8.675,
+              "radial_abs": 7.498773484811901e-39
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.005,
+              "q_energy_MeV": 8.675,
+              "radial_abs": 1.2402566352442305e-39
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.005,
+              "q_energy_MeV": 8.824,
+              "radial_abs": 2.616753536785272e-38
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.005,
+              "q_energy_MeV": 8.824,
+              "radial_abs": 7.354002679573853e-39
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.005,
+              "q_energy_MeV": 8.824,
+              "radial_abs": 1.2163123259315402e-39
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.005,
+              "q_energy_MeV": 9.295,
+              "radial_abs": 2.467045764260099e-38
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.005,
+              "q_energy_MeV": 9.295,
+              "radial_abs": 6.933270904560877e-39
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.005,
+              "q_energy_MeV": 9.295,
+              "radial_abs": 1.1467255626195375e-39
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.005,
+              "q_energy_MeV": 11.995,
+              "radial_abs": 1.8671235314578047e-38
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.005,
+              "q_energy_MeV": 11.995,
+              "radial_abs": 5.2472773077072675e-39
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.005,
+              "q_energy_MeV": 11.995,
+              "radial_abs": 8.678713273619662e-40
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.001,
+          "orientation": "primary_at_E",
+          "max_radial_abs": 3.3352998151551685e-87,
+          "argmax": {
+            "A_MeV": 8.68,
+            "l_primary": 1,
+            "primary_energy_MeV": 0.001,
+            "q_energy_MeV": 8.679,
+            "radial_abs": 3.3352998151551685e-87
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.679,
+              "radial_abs": 3.3352998151551685e-87
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.679,
+              "radial_abs": 9.352098881346559e-88
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.679,
+              "radial_abs": 1.539822867680711e-88
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.828,
+              "radial_abs": 3.270947060681532e-87
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.828,
+              "radial_abs": 9.171655336094701e-88
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 8.828,
+              "radial_abs": 1.510112842067275e-88
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 9.299,
+              "radial_abs": 3.0839156209987633e-87
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 9.299,
+              "radial_abs": 8.64722376628919e-88
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 9.299,
+              "radial_abs": 1.4237651960505185e-88
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 11.999,
+              "radial_abs": 2.334285506959885e-87
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 11.999,
+              "radial_abs": 6.545279311679333e-88
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 0.001,
+              "q_energy_MeV": 11.999,
+              "radial_abs": 1.0776800895020198e-88
+            }
+          ]
+        }
+      ],
+      "secondary_at_E": [
+        {
+          "E_MeV": 0.01,
+          "orientation": "secondary_at_E",
+          "max_radial_abs": 9.755849966480511e-13,
+          "argmax": {
+            "A_MeV": 12.0,
+            "l_primary": 1,
+            "primary_energy_MeV": 11.99,
+            "q_energy_MeV": 0.01,
+            "radial_abs": 9.755849966480511e-13
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.67,
+              "q_energy_MeV": 0.01,
+              "radial_abs": 9.473749270260838e-13
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.67,
+              "q_energy_MeV": 0.01,
+              "radial_abs": 9.014778680832809e-13
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.67,
+              "q_energy_MeV": 0.01,
+              "radial_abs": 8.238442996457872e-13
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.819,
+              "q_energy_MeV": 0.01,
+              "radial_abs": 9.491387779906792e-13
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.819,
+              "q_energy_MeV": 0.01,
+              "radial_abs": 9.041779540861576e-13
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.819,
+              "q_energy_MeV": 0.01,
+              "radial_abs": 8.282198010972212e-13
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 9.29,
+              "q_energy_MeV": 0.01,
+              "radial_abs": 9.543100257488566e-13
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 9.29,
+              "q_energy_MeV": 0.01,
+              "radial_abs": 9.120815844128155e-13
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 9.29,
+              "q_energy_MeV": 0.01,
+              "radial_abs": 8.41013723714453e-13
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 11.99,
+              "q_energy_MeV": 0.01,
+              "radial_abs": 9.755849966480511e-13
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 11.99,
+              "q_energy_MeV": 0.01,
+              "radial_abs": 9.443672723710078e-13
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 11.99,
+              "q_energy_MeV": 0.01,
+              "radial_abs": 8.928909395554848e-13
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.005,
+          "orientation": "secondary_at_E",
+          "max_radial_abs": 1.0522866603983461e-17,
+          "argmax": {
+            "A_MeV": 12.0,
+            "l_primary": 1,
+            "primary_energy_MeV": 11.995,
+            "q_energy_MeV": 0.005,
+            "radial_abs": 1.0522866603983461e-17
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.675,
+              "q_energy_MeV": 0.005,
+              "radial_abs": 1.021892361586653e-17
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.675,
+              "q_energy_MeV": 0.005,
+              "radial_abs": 9.724228759216416e-18
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.675,
+              "q_energy_MeV": 0.005,
+              "radial_abs": 8.88750027676575e-18
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.824,
+              "q_energy_MeV": 0.005,
+              "radial_abs": 1.0237924560143476e-17
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.824,
+              "q_energy_MeV": 0.005,
+              "radial_abs": 9.753314470315941e-18
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.824,
+              "q_energy_MeV": 0.005,
+              "radial_abs": 8.934633075020582e-18
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 9.295,
+              "q_energy_MeV": 0.005,
+              "radial_abs": 1.0293633911652009e-17
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 9.295,
+              "q_energy_MeV": 0.005,
+              "radial_abs": 9.838457326844517e-18
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 9.295,
+              "q_energy_MeV": 0.005,
+              "radial_abs": 9.072454552725993e-18
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 11.995,
+              "q_energy_MeV": 0.005,
+              "radial_abs": 1.0522866603983461e-17
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 11.995,
+              "q_energy_MeV": 0.005,
+              "radial_abs": 1.0186319650558259e-17
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 11.995,
+              "q_energy_MeV": 0.005,
+              "radial_abs": 9.631390572466422e-18
+            }
+          ]
+        },
+        {
+          "E_MeV": 0.001,
+          "orientation": "secondary_at_E",
+          "max_radial_abs": 8.70827722895503e-39,
+          "argmax": {
+            "A_MeV": 12.0,
+            "l_primary": 1,
+            "primary_energy_MeV": 11.999,
+            "q_energy_MeV": 0.001,
+            "radial_abs": 8.70827722895503e-39
+          },
+          "samples": [
+            {
+              "A_MeV": 8.68,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.679,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.456969574028255e-39
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.679,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.047819538986547e-39
+            },
+            {
+              "A_MeV": 8.68,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.679,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 7.355804202907931e-39
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 1,
+              "primary_energy_MeV": 8.828,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.472677870498942e-39
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 2,
+              "primary_energy_MeV": 8.828,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.071864530272633e-39
+            },
+            {
+              "A_MeV": 8.829,
+              "l_primary": 3,
+              "primary_energy_MeV": 8.828,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 7.394768135352055e-39
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 1,
+              "primary_energy_MeV": 9.299,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.518735073451884e-39
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 2,
+              "primary_energy_MeV": 9.299,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.142254170683384e-39
+            },
+            {
+              "A_MeV": 9.3,
+              "l_primary": 3,
+              "primary_energy_MeV": 9.299,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 7.50870668369391e-39
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 1,
+              "primary_energy_MeV": 11.999,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.70827722895503e-39
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 2,
+              "primary_energy_MeV": 11.999,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 8.429880389136664e-39
+            },
+            {
+              "A_MeV": 12.0,
+              "l_primary": 3,
+              "primary_energy_MeV": 11.999,
+              "q_energy_MeV": 0.001,
+              "radial_abs": 7.970846771300173e-39
+            }
+          ]
+        }
+      ],
+      "trend": {
+        "primary_at_E": {
+          "sampled_maximum": 9.548594641871217e-27,
+          "sampled_maximum_E_MeV": 0.01,
+          "values_in_decreasing_E_order": [
+            9.548594641871217e-27,
+            2.66826691434796e-38,
+            3.3352998151551685e-87
+          ],
+          "decreases_at_every_sample": true,
+          "last_over_first": 3.4929745582974686e-61
+        },
+        "secondary_at_E": {
+          "sampled_maximum": 9.755849966480511e-13,
+          "sampled_maximum_E_MeV": 0.01,
+          "values_in_decreasing_E_order": [
+            9.755849966480511e-13,
+            1.0522866603983461e-17,
+            8.70827722895503e-39
+          ],
+          "decreases_at_every_sample": true,
+          "last_over_first": 8.926210692943446e-27
+        }
+      }
+    }
+  ]
+}
