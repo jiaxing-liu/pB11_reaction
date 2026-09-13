@@ -18,7 +18,9 @@ int fusion_c_thermal_reactivity(int channel, double kT_J, int pb_method,
                                 double *reactivity_m3_s);
 
 /* Nuclear rest-energy release per event in joules; not product kinetic
- * energy including reactant motion, and not deposited heat. */
+ * energy including reactant motion, and not deposited heat. Compatibility
+ * convention: pB retains rounded8.68MeV. For the coherent new mass set use
+ * fusion_c_nuclear_channel in fusion_nuclear_data.h; do not mix Q sets. */
 int fusion_c_channel_q(int channel, double *q_J);
 
 typedef struct fusion_thermal_rates_v1 {
@@ -33,6 +35,7 @@ typedef struct fusion_thermal_rates_v1 {
  * Every selected channel's temperature domain is checked even at zero fuel.
  * Disabled channel outputs are zero. All six densities must be finite >=0.
  * DD event rates include 1/2. Product births are NOT thermalization sources.
+ * Nuclear powers retain the fusion_c_channel_q compatibility convention.
  * This stateless evaluation performs no integration in time or energy
  * deposition, and does not model non-Maxwellian reactants.
  */
