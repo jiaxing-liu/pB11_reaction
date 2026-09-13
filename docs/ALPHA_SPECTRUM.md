@@ -100,3 +100,12 @@ provide the beam-axis angular correlations required for general boosted
 laboratory spectra. Those choices and experimental comparisons are required
 before it becomes the full pB production source. No complete BALDUR/EXL run
 is validated by these numerical tests.
+
+## Published-shape and resolution check
+
+See PUBLISHED_SPECTRUM_CHECK.md and validation/published-spectrum/. For60keV
+output bins,128x128 quadrature produces visible shape aliasing despite exact
+particle/energy closure;256 to512 changes normalized bin shape by about0.4%.
+Do not infer spectral convergence from moment closure. The published l3 and
+mixture curves are not yet reproduced to the same accuracy as pure l1; the
+paper's fitted coefficient is not certified in this API's unit-basis convention.

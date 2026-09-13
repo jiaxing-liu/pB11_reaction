@@ -1,0 +1,44 @@
+[
+  {
+    "mode": 1,
+    "reference": "data",
+    "half_L1": 0.13165860910032626,
+    "mean_keV_library": 3100.1580478645533,
+    "mean_keV_reference": 3102.9483110919946
+  },
+  {
+    "mode": 1,
+    "reference": "model",
+    "half_L1": 0.008061554093761926,
+    "mean_keV_library": 3100.1580478645533,
+    "mean_keV_reference": 3098.0685811964936
+  },
+  {
+    "mode": 3,
+    "reference": "data",
+    "half_L1": 0.09015647014665332,
+    "mean_keV_library": 3100.7091908370758,
+    "mean_keV_reference": 3102.9425376573336
+  },
+  {
+    "mode": 3,
+    "reference": "model",
+    "half_L1": 0.04605589308957168,
+    "mean_keV_library": 3100.7091908370758,
+    "mean_keV_reference": 3099.041907278197
+  },
+  {
+    "mode": 13,
+    "reference": "data",
+    "half_L1": 0.05472682770567113,
+    "mean_keV_library": 3100.517837973045,
+    "mean_keV_reference": 3102.9539114229565
+  },
+  {
+    "mode": 13,
+    "reference": "model",
+    "half_L1": 0.06563757747026401,
+    "mean_keV_library": 3100.517837973045,
+    "mean_keV_reference": 3098.630554796823
+  }
+]

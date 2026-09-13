@@ -63,3 +63,15 @@ percentages were obtained after separately normalizing the two full
 three-body amplitudes, after a common simulation normalization, or under
 another scale convention. Selecting one of those conventions would go beyond
 the paper text.
+
+## Quantitative follow-up
+
+PUBLISHED_SPECTRUM_CHECK.md now compares original vector curves with the
+library at128/256/512 quadrature. With declared Laursen radial parameters,
+the refined pure-l1/pure-l3/unit-k=.76 mixture differ from the paper's model
+curves by half-L1 distances0.0081/0.0461/0.0656 respectively. Reinterpreting
+.76 as a raw-amplitude coefficient maps to unit k~.81916 and gives0.0500
+for the mixture. Thus basis rescaling alone does not reproduce the plotted
+model. The source's missing numeric radial settings must not be conflated
+with the normalization ambiguity. These comparisons do not fit selected
+detector data or establish an experimental uncertainty interval.
