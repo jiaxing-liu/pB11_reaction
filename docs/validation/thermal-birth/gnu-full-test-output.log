@@ -1,0 +1,896 @@
+Start testing: Sep 14 06:54 CST
+----------------------------------------------------------
+18/51 Testing: fusion_thermal_birth_width_tests
+18/51 Test: fusion_thermal_birth_width_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_thermal_birth_width"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_thermal_birth_width_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+1 2 relative second-moment difference 3.67612e-06 bound 5.52138e-06
+1 0 relative second-moment difference 4.38103e-07 bound 6.64348e-07
+2 3 relative second-moment difference 5.45197e-06 bound 8.18462e-06
+2 6 relative second-moment difference 6.60476e-07 bound 9.97378e-07
+3 4 relative second-moment difference 3.19325e-07 bound 4.82582e-07
+3 6 relative second-moment difference 2.10052e-08 bound 3.51012e-08
+4 4 relative second-moment difference 2.92681e-07 bound 4.41021e-07
+4 0 relative second-moment difference 1.91952e-08 bound 3.0793e-08
+<end of output>
+Test time =  10.06 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_thermal_birth_width_tests" end time: Sep 14 06:54 CST
+"fusion_thermal_birth_width_tests" time elapsed: 00:00:10
+----------------------------------------------------------
+
+39/51 Testing: fusion_thermal_birth_fortran_binding_tests
+39/51 Test: fusion_thermal_birth_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_thermal_birth_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_thermal_birth_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran thermal-birth tests passed
+<end of output>
+Test time =   1.31 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_thermal_birth_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_thermal_birth_fortran_binding_tests" time elapsed: 00:00:01
+----------------------------------------------------------
+
+12/51 Testing: fusion_beam_tests
+12/51 Test: fusion_beam_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_beam"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_beam_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+DT cold-limit T/keV 0.1 relative error 0.0140586
+DT cold-limit T/keV 0.01 relative error 0.00140831
+DT cold-limit T/keV 0.001 relative error 0.000140855
+DT cold-limit T/keV 0.0001 relative error 1.40858e-05
+channel 3 independent target-angle rate error 2.22045e-16, target-energy error 6.66134e-16
+channel 0 independent target-angle rate error 1.11022e-16, target-energy error 5.55112e-16
+channel 3 double-Maxwellian versus relative-Maxwellian error 4.44089e-14
+channel 0 double-Maxwellian versus relative-Maxwellian error 5.55112e-15
+unequal-temperature direct average rate error 1.71974e-13, a-energy error 0, b-energy error 2.66454e-13
+PASS: beam kinematics, explicit data gaps, reaction-conditioned energy and Maxwellian limits
+<end of output>
+Test time =  14.55 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_beam_tests" end time: Sep 14 06:54 CST
+"fusion_beam_tests" time elapsed: 00:00:14
+----------------------------------------------------------
+
+20/51 Testing: fusion_pb_population_tests
+20/51 Test: fusion_pb_population_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_pb_population"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_pb_population_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+Population weighting tests passed
+<end of output>
+Test time =   0.80 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_pb_population_tests" end time: Sep 14 06:54 CST
+"fusion_pb_population_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/51 Testing: fusion_two_component_slowing_tests
+15/51 Test: fusion_two_component_slowing_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_two_component_slowing" "1000" "1000" "/tmp/m3-target-burn-gnu/two-component-slowing.csv" "/tmp/m3-target-burn-gnu/two-component-slowing.log"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_two_component_slowing_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   4.92 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_two_component_slowing_tests" end time: Sep 14 06:54 CST
+"fusion_two_component_slowing_tests" time elapsed: 00:00:04
+----------------------------------------------------------
+
+31/51 Testing: fusion_alpha_grid_tests
+31/51 Test: fusion_alpha_grid_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_alpha_grid"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_alpha_grid_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+64/128 per-event histogram normalized L1 difference 0.0138133
+PASS: explicit cutoff, normalized spectrum, coherent mixture, spill and refinement
+<end of output>
+Test time =   2.06 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_alpha_grid_tests" end time: Sep 14 06:54 CST
+"fusion_alpha_grid_tests" time elapsed: 00:00:02
+----------------------------------------------------------
+
+22/51 Testing: fusion_fsci_tests
+22/51 Test: fusion_fsci_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_fsci"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_fsci_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All finite-radius FSCI tests passed
+<end of output>
+Test time =   0.26 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_fsci_tests" end time: Sep 14 06:54 CST
+"fusion_fsci_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/51 Testing: fusion_slowing_tests
+10/51 Test: fusion_slowing_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_slowing"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_slowing_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+cells,steps,mean_energy_keV,electron_fraction,ion_fraction,particle_residual,energy_residual,maxwellian_L1,max_step_energy_residual
+200,250,15.000813966,0.806209348783,0.188790379895,-4.4408920985e-16,-4.61964472192e-16,1.40016765794e-05,4.52265022824e-17
+200,500,15.0002951519,0.806209372606,0.18879052901,-3.33066907388e-16,-6.92946708287e-16,5.15949255236e-06,3.78673270357e-17
+200,1000,15.0001675903,0.806209378225,0.188790565912,-5.55111512313e-16,1.15491118048e-16,2.9018742419e-06,5.74354022128e-17
+400,250,15.0000132591,0.806316494521,0.188683501059,-2.99760216649e-15,-5.77455590239e-16,4.95156070876e-08,3.0395367494e-17
+400,500,15.0000114511,0.806316494574,0.188683501609,-2.88657986403e-15,5.77455590239e-16,4.45245723138e-09,4.33655614154e-17
+400,1000,15.0000113208,0.806316494578,0.188683501649,-3.33066907388e-15,-5.77455590239e-16,1.0029373363e-09,4.79897175092e-17
+800,250,15.0000113342,0.806343267202,0.18865672902,-2.77555756156e-15,-6.92946708287e-16,1.47274434882e-09,1.92861144396e-17
+800,500,15.0000112849,0.806343267203,0.188656729036,-2.55351295664e-15,2.30982236096e-16,5.47502480035e-11,3.90797582066e-17
+800,1000,15.0000112833,0.806343267203,0.188656729036,-2.22044604925e-16,-2.30982236096e-16,7.30677866779e-12,6.18057936428e-17
+<end of output>
+Test time =   3.28 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_slowing_tests" end time: Sep 14 06:54 CST
+"fusion_slowing_tests" time elapsed: 00:00:03
+----------------------------------------------------------
+
+41/51 Testing: fusion_pb_population_fortran_binding_tests
+41/51 Test: fusion_pb_population_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_pb_population_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_pb_population_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran pB-population tests passed
+<end of output>
+Test time =   0.05 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_pb_population_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_pb_population_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/51 Testing: fusion_pb_birth_tests
+21/51 Test: fusion_pb_birth_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_pb_birth"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_pb_birth_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+PASS: alpha0 analytic source, dense box projection, mixture parity and validation
+<end of output>
+Test time =   0.07 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_pb_birth_tests" end time: Sep 14 06:54 CST
+"fusion_pb_birth_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+42/51 Testing: fusion_pb_birth_fortran_binding_tests
+42/51 Test: fusion_pb_birth_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_pb_birth_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_pb_birth_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran pB birth tests passed
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_pb_birth_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_pb_birth_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/51 Testing: fusion_rate_model_tests
+11/51 Test: fusion_rate_model_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_rate_model"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_rate_model_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All fusion rate-model tests passed
+<end of output>
+Test time =   0.08 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_rate_model_tests" end time: Sep 14 06:54 CST
+"fusion_rate_model_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+43/51 Testing: fusion_fsci_fortran_binding_tests
+43/51 Test: fusion_fsci_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_fsci_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_fsci_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran FSCI tests passed
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_fsci_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_fsci_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/51 Testing: fusion_reaction_event_tests
+19/51 Test: fusion_reaction_event_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_reaction_event"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_reaction_event_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+400 laboratory events preserve energy momentum and product mass shells
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_reaction_event_tests" end time: Sep 14 06:54 CST
+"fusion_reaction_event_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+28/51 Testing: fusion_products_tests
+28/51 Test: fusion_products_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_products"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_products_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+PASS: 45 sequential events, mass shells, intermediate invariant and angle reflection
+Prescribed birth -> collisions 100-step number residual 4.7187e-17, energy residual -8.83158e-18
+PASS: conservative product birth mapping and sequential kinematics
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_products_tests" end time: Sep 14 06:54 CST
+"fusion_products_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+40/51 Testing: fusion_reaction_event_fortran_binding_tests
+40/51 Test: fusion_reaction_event_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_reaction_event_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_reaction_event_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran reaction-event tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_reaction_event_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_reaction_event_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+51/51 Testing: fusion_alpha_grid_fortran_binding_tests
+51/51 Test: fusion_alpha_grid_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_alpha_grid_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_alpha_grid_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran alpha-grid tests passed
+<end of output>
+Test time =   0.06 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_alpha_grid_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_alpha_grid_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/51 Testing: fusion_handoff_tests
+16/51 Test: fusion_handoff_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_handoff"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_handoff_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All fusion-handoff tests passed
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_handoff_tests" end time: Sep 14 06:54 CST
+"fusion_handoff_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/51 Testing: fusion_transfer_rate_tests
+13/51 Test: fusion_transfer_rate_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_transfer_rate"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_transfer_rate_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+max friction-divergence relative error 1.2055412224e-09; radial integral and ABI/domain checks pass
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_transfer_rate_tests" end time: Sep 14 06:54 CST
+"fusion_transfer_rate_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+35/51 Testing: fusion_rate_model_fortran_binding_tests
+35/51 Test: fusion_rate_model_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_rate_model_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_rate_model_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran fusion-rate-model tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_rate_model_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_rate_model_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/51 Testing: fusion_closed_box_tests
+7/51 Test: fusion_closed_box_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_closed_box"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_closed_box_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+DD secondary network scaled refinement errors 1.27021e-11 -> 7.78527e-13
+PASS: analytic channel burn, DD secondary network, particle and nuclear-Q ledgers
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_closed_box_tests" end time: Sep 14 06:54 CST
+"fusion_closed_box_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+36/51 Testing: fusion_beam_fortran_binding_tests
+36/51 Test: fusion_beam_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_beam_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_beam_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran fusion-beam tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_beam_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_beam_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+23/51 Testing: fusion_source_state_tests
+23/51 Test: fusion_source_state_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_source_state"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_source_state_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All fusion source-state tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_source_state_tests" end time: Sep 14 06:54 CST
+"fusion_source_state_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+30/51 Testing: fusion_spectrum_tests
+30/51 Test: fusion_spectrum_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_spectrum"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_spectrum_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+PASS: 27 coherent events, cyclic/secondary/rotation checks and independent angular polynomial
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_spectrum_tests" end time: Sep 14 06:54 CST
+"fusion_spectrum_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+44/51 Testing: fusion_source_state_fortran_binding_tests
+44/51 Test: fusion_source_state_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_source_state_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_source_state_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran source-state binding tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_source_state_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_source_state_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+27/51 Testing: fusion_target_burn_tests
+27/51 Test: fusion_target_burn_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_target_burn"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_target_burn_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+target ODE errors 0.0067541 0.00339717 0.00170368
+PASS: target burn, conservation, rollback and physical-window composition
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_target_burn_tests" end time: Sep 14 06:54 CST
+"fusion_target_burn_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/51 Testing: fusion_cross_sections_tests
+6/51 Test: fusion_cross_sections_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_cross_sections"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_cross_sections_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+channel 1 maximum integral/fit relative difference 0.0190878
+channel 2 maximum integral/fit relative difference 0.0109297
+channel 3 maximum integral/fit relative difference 0.007483
+channel 4 maximum integral/fit relative difference 0.031454
+PASS: published cross sections, thermal quadrature, fit transitions and domains
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_cross_sections_tests" end time: Sep 14 06:54 CST
+"fusion_cross_sections_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/51 Testing: fusion_thermal_burn_tests
+26/51 Test: fusion_thermal_burn_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_thermal_burn"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_thermal_burn_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+DD refinement errors 0.0164939 0.00844893 ratio 1.95219
+All fusion thermal-burn tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_thermal_burn_tests" end time: Sep 14 06:54 CST
+"fusion_thermal_burn_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/51 Testing: fusion_nuclear_data_tests
+24/51 Test: fusion_nuclear_data_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_nuclear_data"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_nuclear_data_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All nuclear-data tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_nuclear_data_tests" end time: Sep 14 06:54 CST
+"fusion_nuclear_data_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+1/51 Testing: pb11_unit_tests
+1/51 Test: pb11_unit_tests
+Command: "/tmp/m3-target-burn-gnu/test_pb11"
+Directory: /tmp/m3-target-burn-gnu
+"pb11_unit_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All p-11B tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"pb11_unit_tests" end time: Sep 14 06:54 CST
+"pb11_unit_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+25/51 Testing: fusion_nuclear_birth_four_momentum_tests
+25/51 Test: fusion_nuclear_birth_four_momentum_tests
+Command: "/tmp/m3-target-burn-gnu/validate_nuclear_birth"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_nuclear_birth_four_momentum_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+channel,Ecm_MeV,boosted,Q_MeV,lab_kinetic_gain_MeV,relative_Q_residual,relative_momentum_residual
+1,0,0,4.0326638987390382,4.0326638987390373,1.56281647968573e-16,0
+1,0,1,4.0326638987390382,4.03266389873904,4.6884494390571901e-16,6.588352796010353e-18
+1,0.01,0,4.0326638987390382,4.0326638987390382,5.8605617988214877e-17,0
+1,0.01,1,4.0326638987390382,4.0326638987390364,3.1256329593714599e-16,7.5335022507359934e-18
+1,1,0,4.0326638987390382,4.0326638987390373,1.56281647968573e-16,0
+1,1,1,4.0326638987390382,4.0326638987390391,3.9070411992143248e-16,8.1139637476014026e-18
+2,0,0,3.2688569508269825,3.2688569508269825,0,0
+2,0,1,3.2688569508269825,3.2688569508269834,1.9279869669392116e-16,4.5952129061767418e-18
+2,0.01,0,3.2688569508269825,3.2688569508269825,2.4099837086740144e-17,0
+2,0.01,1,3.2688569508269825,3.2688569508269838,3.8559739338784231e-16,7.4089365981013484e-18
+2,1,0,3.2688569508269825,3.2688569508269829,4.8199674173480289e-17,0
+2,1,1,3.2688569508269825,3.2688569508269829,9.6399348346960578e-17,1.0942574278499538e-17
+3,0,0,17.589247903738269,17.589247903738269,3.5830489356191485e-17,0
+3,0,1,17.589247903738269,17.589247903738269,1.0749146806857445e-16,7.6132540927482659e-18
+3,0.01,0,17.589247903738269,17.589247903738269,4.9196941440239476e-17,0
+3,0.01,1,17.589247903738269,17.589247903738272,7.1660978712382969e-17,1.2036846431467267e-17
+3,1,0,17.589247903738269,17.589247903738269,4.4788111695239354e-17,0
+3,1,1,17.589247903738269,17.589247903738272,2.149829361371489e-16,8.02473415910201e-18
+4,0,0,18.353054851650327,18.353054851650327,0,0
+4,0,1,18.353054851650327,18.353054851650331,3.0905384874794981e-16,1.6076183021807263e-17
+4,0.01,0,18.353054851650327,18.353054851650324,9.0207774862411562e-17,0
+4,0.01,1,18.353054851650327,18.353054851650317,5.8376838096834965e-16,2.0049280675618663e-17
+4,1,0,18.353054851650327,18.353054851650327,4.7216560225381224e-17,0
+4,1,1,18.353054851650327,18.353054851650331,2.0603589916529988e-16,1.4341082488845055e-17
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_nuclear_birth_four_momentum_tests" end time: Sep 14 06:54 CST
+"fusion_nuclear_birth_four_momentum_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/51 Testing: fusion_coulomb_tests
+9/51 Test: fusion_coulomb_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_coulomb"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_coulomb_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+Coulomb first-moment relative error at 101 cells: 0.000329629
+Coulomb first-moment relative error at 201 cells: 9.85657e-05
+Coulomb first-moment relative error at 401 cells: 4.00203e-05
+PASS: Coulomb normalization, limits, drift-diffusion identity and kinetic energy exchange
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_coulomb_tests" end time: Sep 14 06:54 CST
+"fusion_coulomb_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/51 Testing: fusion_rates_tests
+5/51 Test: fusion_rates_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_rates"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_rates_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+PASS: published thermal rates, domains, SI, DD symmetry, secondary channels and ABI errors
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_rates_tests" end time: Sep 14 06:54 CST
+"fusion_rates_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+45/51 Testing: fusion_nuclear_data_fortran_binding_tests
+45/51 Test: fusion_nuclear_data_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_nuclear_data_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_nuclear_data_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran nuclear-data tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_nuclear_data_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_nuclear_data_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/51 Testing: pb11_instant_source_tests
+3/51 Test: pb11_instant_source_tests
+Command: "/tmp/m3-target-burn-gnu/test_pb11_source"
+Directory: /tmp/m3-target-burn-gnu
+"pb11_instant_source_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All p-11B instant-source tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"pb11_instant_source_tests" end time: Sep 14 06:54 CST
+"pb11_instant_source_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+32/51 Testing: pb11_fortran_binding_tests
+32/51 Test: pb11_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_pb11_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"pb11_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All p-11B Fortran bindings tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"pb11_fortran_binding_tests" end time: Sep 14 06:54 CST
+"pb11_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+46/51 Testing: fusion_thermal_burn_fortran_binding_tests
+46/51 Test: fusion_thermal_burn_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_thermal_burn_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_thermal_burn_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran thermal-burn tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_thermal_burn_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_thermal_burn_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+38/51 Testing: fusion_handoff_fortran_binding_tests
+38/51 Test: fusion_handoff_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_handoff_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_handoff_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran handoff tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_handoff_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_handoff_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/51 Testing: fusion_kinetics_tests
+8/51 Test: fusion_kinetics_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_kinetics"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_kinetics_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All fusion-kinetics tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_kinetics_tests" end time: Sep 14 06:54 CST
+"fusion_kinetics_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/51 Testing: pb11_c_abi_tests
+2/51 Test: pb11_c_abi_tests
+Command: "/tmp/m3-target-burn-gnu/test_pb11_c"
+Directory: /tmp/m3-target-burn-gnu
+"pb11_c_abi_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All p-11B C ABI tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"pb11_c_abi_tests" end time: Sep 14 06:54 CST
+"pb11_c_abi_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/51 Testing: fusion_network_tests
+4/51 Test: fusion_network_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_network"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_network_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All fusion-network tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_network_tests" end time: Sep 14 06:54 CST
+"fusion_network_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+33/51 Testing: fusion_fortran_binding_tests
+33/51 Test: fusion_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran fusion-network tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+50/51 Testing: fusion_spectrum_fortran_binding_tests
+50/51 Test: fusion_spectrum_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_spectrum_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_spectrum_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran fusion-spectrum tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_spectrum_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_spectrum_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/51 Testing: fusion_two_component_tests
+14/51 Test: fusion_two_component_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_two_component"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_two_component_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All two-component fusion tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_two_component_tests" end time: Sep 14 06:54 CST
+"fusion_two_component_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+34/51 Testing: fusion_kinetics_fortran_binding_tests
+34/51 Test: fusion_kinetics_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_kinetics_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_kinetics_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran fusion-kinetics tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_kinetics_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_kinetics_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+48/51 Testing: fusion_products_fortran_binding_tests
+48/51 Test: fusion_products_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_products_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_products_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran fusion-products tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_products_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_products_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+49/51 Testing: fusion_laboratory_fortran_binding_tests
+49/51 Test: fusion_laboratory_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_laboratory_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_laboratory_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran fusion-laboratory tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_laboratory_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_laboratory_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+37/51 Testing: fusion_two_component_fortran_binding_tests
+37/51 Test: fusion_two_component_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_two_component_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_two_component_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran two-component binding tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_two_component_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_two_component_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+47/51 Testing: fusion_target_burn_fortran_binding_tests
+47/51 Test: fusion_target_burn_fortran_binding_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_target_burn_fortran"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_target_burn_fortran_binding_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+All Fortran target-burn tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_target_burn_fortran_binding_tests" end time: Sep 14 06:54 CST
+"fusion_target_burn_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+29/51 Testing: fusion_laboratory_tests
+29/51 Test: fusion_laboratory_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_laboratory"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_laboratory_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+PASS: 15 pair boosts, inverse and total invariants; rotated three-alpha boost; stopped limit
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_laboratory_tests" end time: Sep 14 06:54 CST
+"fusion_laboratory_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/51 Testing: fusion_thermal_birth_tests
+17/51 Test: fusion_thermal_birth_tests
+Command: "/tmp/m3-target-burn-gnu/test_fusion_thermal_birth"
+Directory: /tmp/m3-target-burn-gnu
+"fusion_thermal_birth_tests" start time: Sep 14 06:54 CST
+Output:
+----------------------------------------------------------
+channel 1 T/keV 0.1 rate=1.67161e-37 rate/reference=1 debit discrepancy=1.07941e-08
+channel 1 T/keV 1 rate=1.0015e-28 rate/reference=1 debit discrepancy=7.8036e-11
+channel 1 T/keV 20 rate=2.44476e-24 rate/reference=1 debit discrepancy=1.12232e-11
+channel 2 T/keV 0.1 rate=1.62065e-37 rate/reference=1 debit discrepancy=1.08375e-08
+channel 2 T/keV 1 rate=9.83441e-29 rate/reference=1 debit discrepancy=6.90066e-11
+channel 2 T/keV 20 rate=2.63111e-24 rate/reference=1 debit discrepancy=1.05129e-11
+channel 3 T/keV 0.1 rate=2.66534e-36 rate/reference=1 debit discrepancy=2.93805e-08
+channel 3 T/keV 1 rate=6.89725e-27 rate/reference=1 debit discrepancy=2.79847e-10
+channel 3 T/keV 20 rate=4.36262e-22 rate/reference=1 debit discrepancy=1.5655e-10
+channel 4 T/keV 0.1 rate=1.71502e-47 rate/reference=1 debit discrepancy=1.81636e-07
+channel 4 T/keV 1 rate=3.07403e-32 rate/reference=1 debit discrepancy=3.22219e-09
+channel 4 T/keV 20 rate=3.46774e-24 rate/reference=1 debit discrepancy=5.63869e-10
+channel 0 T/keV 1 rate=5.73675e-40 rate/reference=1 debit discrepancy=9.75582e-08
+channel 0 T/keV 20 rate=7.81295e-26 rate/reference=1 debit discrepancy=8.91187e-12
+channel 3 T/keV 20 rate=4.35767e-22 rate/reference=0.998866 debit discrepancy=0.0036432
+channel 3 T/keV 20 rate=4.36262e-22 rate/reference=1 debit discrepancy=1.5655e-10
+PASS: thermal-birth five-channel conservation, finite-cutoff diagnostics, reference parity, relative refinement and input clearing
+<end of output>
+Test time =  25.13 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_thermal_birth_tests" end time: Sep 14 06:55 CST
+"fusion_thermal_birth_tests" time elapsed: 00:00:25
+----------------------------------------------------------
+
+End testing: Sep 14 06:55 CST

@@ -1,0 +1,77 @@
+[  1%] Building CXX object CMakeFiles/pb11.dir/src/fusion_alpha_spectrum.cpp.o
+[  2%] Building CXX object CMakeFiles/pb11.dir/src/fusion_alpha_events.cpp.o
+[  3%] Building CXX object CMakeFiles/pb11.dir/src/fusion_thermal_birth.cpp.o
+[  4%] Linking CXX static library libpb11.a
+[ 28%] Built target pb11
+[ 30%] Linking CXX executable benchmark_pb11
+[ 30%] Linking CXX executable thermal_network
+[ 31%] Built target benchmark_pb11
+[ 32%] Linking CXX executable test_pb11
+[ 33%] Built target thermal_network
+[ 34%] Linking CXX executable test_pb11_c
+[ 35%] Built target test_pb11
+[ 36%] Built target test_pb11_c
+[ 37%] Linking CXX executable test_pb11_source
+[ 38%] Linking CXX executable test_fusion_network
+[ 39%] Built target test_pb11_source
+[ 40%] Built target test_fusion_network
+[ 41%] Linking CXX executable test_fusion_rates
+[ 42%] Linking CXX executable test_fusion_cross_sections
+[ 43%] Built target test_fusion_rates
+[ 44%] Built target test_fusion_cross_sections
+[ 45%] Linking CXX executable test_fusion_closed_box
+[ 46%] Linking CXX executable test_fusion_kinetics
+[ 47%] Built target test_fusion_closed_box
+[ 48%] Built target test_fusion_kinetics
+[ 50%] Linking CXX executable test_fusion_coulomb
+[ 51%] Linking CXX executable test_fusion_slowing
+[ 52%] Built target test_fusion_slowing
+[ 53%] Built target test_fusion_coulomb
+[ 54%] Linking CXX executable test_fusion_rate_model
+[ 55%] Linking CXX executable test_fusion_beam
+[ 56%] Built target test_fusion_rate_model
+[ 57%] Built target test_fusion_beam
+[ 58%] Linking CXX executable test_fusion_transfer_rate
+[ 59%] Linking CXX executable test_fusion_two_component
+[ 60%] Built target test_fusion_transfer_rate
+[ 61%] Built target test_fusion_two_component
+[ 62%] Linking CXX executable test_fusion_two_component_slowing
+[ 63%] Linking CXX executable test_fusion_handoff
+[ 64%] Built target test_fusion_two_component_slowing
+[ 65%] Built target test_fusion_handoff
+[ 66%] Building CXX object CMakeFiles/test_fusion_thermal_birth.dir/tests/test_fusion_thermal_birth.cpp.o
+[ 67%] Building CXX object CMakeFiles/test_fusion_thermal_birth_width.dir/tests/test_fusion_thermal_birth_width.cpp.o
+[ 68%] Linking CXX executable test_fusion_thermal_birth_width
+[ 68%] Built target test_fusion_thermal_birth_width
+[ 69%] Linking CXX executable test_fusion_reaction_event
+[ 70%] Linking CXX executable test_fusion_thermal_birth
+[ 71%] Built target test_fusion_reaction_event
+[ 72%] Linking CXX executable test_fusion_pb_population
+[ 72%] Built target test_fusion_thermal_birth
+[ 73%] Linking CXX executable test_fusion_pb_birth
+[ 74%] Built target test_fusion_pb_population
+[ 75%] Linking CXX executable test_fusion_fsci
+[ 76%] Built target test_fusion_pb_birth
+[ 77%] Linking CXX executable test_fusion_source_state
+[ 78%] Built target test_fusion_fsci
+[ 79%] Linking CXX executable test_fusion_nuclear_data
+[ 80%] Built target test_fusion_source_state
+[ 81%] Linking CXX executable study_nuclear_windows
+[ 82%] Built target test_fusion_nuclear_data
+[ 83%] Linking CXX executable validate_nuclear_birth
+[ 84%] Built target study_nuclear_windows
+[ 85%] Linking CXX executable test_fusion_thermal_burn
+[ 86%] Built target validate_nuclear_birth
+[ 87%] Linking CXX executable test_fusion_target_burn
+[ 88%] Built target test_fusion_thermal_burn
+[ 89%] Linking CXX executable test_fusion_products
+[ 90%] Built target test_fusion_target_burn
+[ 91%] Linking CXX executable test_fusion_laboratory
+[ 92%] Built target test_fusion_products
+[ 93%] Linking CXX executable test_fusion_spectrum
+[ 94%] Built target test_fusion_laboratory
+[ 95%] Linking CXX executable test_fusion_alpha_grid
+[ 96%] Built target test_fusion_spectrum
+[ 97%] Linking CXX executable validate_alpha_grid
+[ 98%] Built target test_fusion_alpha_grid
+[100%] Built target validate_alpha_grid

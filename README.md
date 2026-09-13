@@ -10,6 +10,8 @@ cross section and Maxwellian reactivity are described by:
 
 The public API uses `double` precision. Implemented modules include:
 
+- [Distribution-integrated thermal laboratory births](docs/THERMAL_BIRTH.md), with explicit common-temperature/isotropic closure, finite tails, pB remainder proxies and Fortran bindings.
+
 - [Thermal network, cross sections and particle/nuclear ledgers](docs/THERMAL_NETWORK.md).
 - [Classical Coulomb coefficients and conservative energy kinetics](docs/KINETIC_PRIMITIVES.md).
 - [Finite-temperature two-component transfer and controlled thermal-handoff studies](docs/THERMAL_TRANSFER_DESIGN.md); internal kinetic transfer is separate from fluid ash.
