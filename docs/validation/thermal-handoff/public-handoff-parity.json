@@ -1,0 +1,17 @@
+{
+  "time_s": 0.0,
+  "fluid_N_fraction": 0.0,
+  "ST_N_fraction": 0.0,
+  "TH_N_fraction": 0.0,
+  "half_L1_vs_full": 2.0003530082357557e-17,
+  "projection_shape_bound": 3.0005295123536335e-17,
+  "electron_heat_fraction": 0.0,
+  "ion_heat_fraction": 0.0,
+  "fluid_U_fraction": 0.0,
+  "kinetic_U_fraction": 0.0,
+  "number_residual": 1.355252715610036e-17,
+  "energy_residual": 2.168404345000098e-19,
+  "projection_heat_correction_fraction": 1.9989977555201488e-19,
+  "fluid_grid_energy_bias_fraction": 3.0027317980164947e-19,
+  "events": 0.0
+}

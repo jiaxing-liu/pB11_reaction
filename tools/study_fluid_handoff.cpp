@@ -1,3 +1,4 @@
+#include "fusion_handoff.h"
 // Root research prototype: fixed equal-temperature baths, explicit Maxwellian
 // projection tolerance. Not yet a general evolving-background ash interface.
 #include "fusion_two_component.h"
@@ -24,6 +25,12 @@ int main(int argc,char** argv){try{
   R qi=a>=1.5L?boost::math::gamma_q(1.5L,a)-boost::math::gamma_q(1.5L,b):boost::math::gamma_p(1.5L,b)-boost::math::gamma_p(1.5L,a);ok(qi>=0);q[i]=qi;qsum+=qi;qU+=qi*c[i];
   for(int j=1;j<3;j++){double rate;ok(!fusion_c_coulomb_transfer_rate(c[i],ma,2,&baths[j],&rate));lam[i]+=rate;}
  }
+#ifdef FUSION_STUDY_PUBLIC_HANDOFF
+ fusion_maxwellian_grid_v1 grid{};
+ ok(!fusion_c_maxwellian_energy_grid(n,temp,edges.data(),q.data(),&grid));
+ qsum=1-R(grid.below_probability)-grid.above_probability;
+ qU=grid.represented_mean_energy_J;
+#endif
  for(int j=0;j<3;j++)for(int i=0;i<n-1;i++){fusion_coulomb_energy_v1 out{};ok(!fusion_c_coulomb_energy(edges[i+1],ma,2,&baths[j],&out));D[j*(n-1)+i]=out.diffusion_J2_s;}
  auto r=std::upper_bound(c.begin(),c.end(),E0)-c.begin();double w=(E0-c[r-1])/(c[r]-c[r-1]);s[r]=w*N0;s[r-1]=(1-w)*N0;f=s;
  R fluid=0,projectionU=0,shapeBudget=0,maxL1=0,maxE=0,maxN=0;std::array<R,3> heat{},fullheat{};int events=0;double first=-1;
@@ -38,12 +45,25 @@ int main(int argc,char** argv){try{
   R Nt=sum(tn),Ut=0,shape=1-qsum;for(int i=0;i<n;i++){Ut+=R(tn[i])*c[i];if(Nt>0)shape+=fabsl(R(tn[i])/Nt-q[i]);}
   // Full bin-probability L1 includes the exact Maxwellian tail outside grid.
   // A separate energy bound prevents number-norm proximity hiding a hot tail.
-  R energyError=Nt>0?fabsl(Ut/(1.5L*temp*Nt)-1):0;
+  [[maybe_unused]] R energyError=Nt>0?fabsl(Ut/(1.5L*temp*Nt)-1):0;
+#ifdef FUSION_STUDY_PUBLIC_HANDOFF
+  std::vector<double> after(n);fusion_handoff_ledger_v1 handoff{};int projected=0;
+  ok(!fusion_c_maxwellian_handoff_trial(n,temp,tol,tol,edges.data(),tn.data(),
+      after.data(),&projected,&handoff));
+  if(projected){
+   fluid+=handoff.fluid_number_m3;R dU=handoff.bath_energy_correction_J_m3;
+   projectionU+=dU;heat[1]+=.5L*dU;heat[2]+=.5L*dU;
+   shapeBudget+=.5L*handoff.fluid_number_m3*handoff.distribution_L1;
+   events++;if(first<0)first=step*dt;
+  }
+  tn.swap(after);
+#else
   if(Nt>0 && shape<=tol && energyError<=tol){
    fluid+=Nt;R dU=Ut-1.5L*temp*Nt;projectionU+=dU;heat[1]+=dU*.5L;heat[2]+=dU*.5L;
    // D/T have common Ti, so a declared equal-number heat capacity split.
    shapeBudget+=.5L*Nt*shape;events++;if(first<0)first=step*dt;std::fill(tn.begin(),tn.end(),0.);
   }
+#endif
   s.swap(sn);t.swap(tn);f.swap(fn);R kinU=0,l1=0;
   for(int i=0;i<n;i++){kinU+=(R(s[i])+t[i])*c[i];l1+=fabsl(R(s[i])+t[i]+fluid*q[i]-f[i]);}
   l1=.5L*(l1+fluid*(1-qsum))/N0;maxL1=std::max(maxL1,l1);
@@ -52,4 +72,7 @@ int main(int argc,char** argv){try{
  }
  fprintf(stderr,"n=%d steps=%d tol=%.6g first_projection_s=%.9g events=%d final_fluid_N=%.12Lg max_half_L1=%.12Lg max_N=%.12Lg max_E=%.12Lg exact_bin_grid_mean_error=%.12Lg heat_delta_e=%.12Lg heat_delta_ions=%.12Lg\n",n,steps,tol,first,events,fluid/N0,maxL1,maxN,maxE,qU/(1.5L*temp)-1,(heat[0]-fullheat[0])/(N0*E0),(heat[1]+heat[2]-fullheat[1]-fullheat[2])/(N0*E0));
  ok(maxN<1e-10&&maxE<1e-10);
+#ifdef FUSION_STUDY_PUBLIC_HANDOFF
+ ok(2*maxL1<tol); // Independent full-grid trajectory error, complete L1.
+#endif
  }catch(const std::exception&e){fprintf(stderr,"ERROR %s\n",e.what());return 1;}}

@@ -245,14 +245,13 @@ fact that exact bin-integrated Maxwellians are not precisely stationary under
 the sampled-Maxwellian FP discretization. The full reference comparison
 includes that discretization effect.
 
-This prototype is NOT yet a public fluid-handoff API or a BALDUR thermal-He
-source. Its equal, fixed temperatures make the projected Maxwellian
+This prototype now also exercises the measured public handoff API described
+in THERMAL_HANDOFF.md. It is not a BALDUR thermal-He source. Its equal, fixed temperatures make the projected Maxwellian
 stationary in the continuous collision problem. Different/evolving bath
 conditions, ongoing births, host bath-energy acceptance and spatial transport
-must be checked before coupled production use. Next implementation should
-factor the measured Maxwellian projection into a reusable old/trial library
-operation, keeping its tolerance, actual energy, grid tails and eligibility
-explicit. It must not turn failure to meet the criterion into forced ash.
+must be checked before coupled production use. The measured projection is now a reusable old/trial library operation,
+keeping its tolerance, actual energy, grid tails and eligibility explicit.
+Changing-background and host acceptance remain subsequent requirements. It must not turn failure to meet the criterion into forced ash.
 
 ## Public API end-to-end regression
 
