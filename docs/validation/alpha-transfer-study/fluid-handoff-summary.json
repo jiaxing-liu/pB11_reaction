@@ -1,0 +1,42 @@
+[
+  {
+    "cells": 2000,
+    "steps": 2000,
+    "tolerance": 0.001,
+    "samples": 200,
+    "log": "n=2000 steps=2000 tol=0.001 first_projection_s=-1 events=0 final_fluid_N=0 max_half_L1=2.37561590104e-16 max_N=4.92211523276e-15 max_E=1.13624387676e-16 exact_bin_grid_mean_error=0.00191535664572 heat_delta_e=-5.47003830598e-18 heat_delta_ions=-8.21915549584e-18",
+    "first_sample_with_fluid_s": null
+  },
+  {
+    "cells": 4000,
+    "steps": 2000,
+    "tolerance": 0.001,
+    "samples": 200,
+    "log": "n=4000 steps=2000 tol=0.001 first_projection_s=0.629 events=4 final_fluid_N=0.999999999979 max_half_L1=0.000198141219737 max_N=7.35869698509e-15 max_E=1.7612864292e-16 exact_bin_grid_mean_error=0.000479251012745 heat_delta_e=-1.97724911726e-07 heat_delta_ions=9.51094193085e-07",
+    "first_sample_with_fluid_s": 0.63
+  },
+  {
+    "cells": 4000,
+    "steps": 4000,
+    "tolerance": 0.001,
+    "samples": 200,
+    "log": "n=4000 steps=4000 tol=0.001 first_projection_s=0.6255 events=4 final_fluid_N=0.99999999998 max_half_L1=0.000198141219741 max_N=7.33571189904e-15 max_E=6.60279123044e-17 exact_bin_grid_mean_error=0.000479251012745 heat_delta_e=-1.99422696845e-07 heat_delta_ions=9.52791978135e-07",
+    "first_sample_with_fluid_s": 0.63
+  },
+  {
+    "cells": 8000,
+    "steps": 2000,
+    "tolerance": 0.001,
+    "samples": 200,
+    "log": "n=8000 steps=2000 tol=0.001 first_projection_s=0.626 events=4 final_fluid_N=0.999999999965 max_half_L1=0.000270194596642 max_N=4.17520835613e-15 max_E=6.14742631799e-17 exact_bin_grid_mean_error=0.000119838031956 heat_delta_e=-2.25036233364e-07 heat_delta_ions=4.13505616257e-07",
+    "first_sample_with_fluid_s": 0.63
+  },
+  {
+    "cells": 8000,
+    "steps": 2000,
+    "tolerance": 0.00025,
+    "samples": 200,
+    "log": "n=8000 steps=2000 tol=0.00025 first_projection_s=0.6575 events=3 final_fluid_N=0.999999999861 max_half_L1=4.953531386e-05 max_N=5.09504547927e-15 max_E=6.14742631799e-17 exact_bin_grid_mean_error=0.000119838031956 heat_delta_e=-5.00882468844e-08 heat_delta_ions=2.38557629739e-07",
+    "first_sample_with_fluid_s": 0.66
+  }
+]

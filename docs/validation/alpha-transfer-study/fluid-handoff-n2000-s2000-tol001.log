@@ -1,0 +1,1 @@
+n=2000 steps=2000 tol=0.001 first_projection_s=-1 events=0 final_fluid_N=0 max_half_L1=2.37561590104e-16 max_N=4.92211523276e-15 max_E=1.13624387676e-16 exact_bin_grid_mean_error=0.00191535664572 heat_delta_e=-5.47003830598e-18 heat_delta_ions=-8.21915549584e-18

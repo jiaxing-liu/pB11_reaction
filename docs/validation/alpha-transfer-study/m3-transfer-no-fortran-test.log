@@ -1,0 +1,43 @@
+Test project /tmp/m3-no-fortran
+      Start 11: fusion_beam_tests
+      Start 19: fusion_alpha_grid_tests
+      Start 10: fusion_slowing_tests
+ 1/19 Test #19: fusion_alpha_grid_tests ..............   Passed    0.92 sec
+      Start 12: fusion_transfer_rate_tests
+ 2/19 Test #12: fusion_transfer_rate_tests ...........   Passed    0.01 sec
+      Start 16: fusion_products_tests
+ 3/19 Test #16: fusion_products_tests ................   Passed    0.01 sec
+      Start 15: fusion_target_burn_tests
+ 4/19 Test #15: fusion_target_burn_tests .............   Passed    0.00 sec
+      Start 13: fusion_two_component_tests
+ 5/19 Test #13: fusion_two_component_tests ...........   Passed    0.00 sec
+      Start 18: fusion_spectrum_tests
+ 6/19 Test #18: fusion_spectrum_tests ................   Passed    0.00 sec
+      Start  7: fusion_closed_box_tests
+ 7/19 Test  #7: fusion_closed_box_tests ..............   Passed    0.00 sec
+      Start 17: fusion_laboratory_tests
+ 8/19 Test #17: fusion_laboratory_tests ..............   Passed    0.00 sec
+      Start  1: pb11_unit_tests
+ 9/19 Test  #1: pb11_unit_tests ......................   Passed    0.00 sec
+      Start  6: fusion_cross_sections_tests
+10/19 Test  #6: fusion_cross_sections_tests ..........   Passed    0.00 sec
+      Start  5: fusion_rates_tests
+11/19 Test  #5: fusion_rates_tests ...................   Passed    0.00 sec
+      Start  3: pb11_instant_source_tests
+12/19 Test  #3: pb11_instant_source_tests ............   Passed    0.00 sec
+      Start  9: fusion_coulomb_tests
+13/19 Test  #9: fusion_coulomb_tests .................   Passed    0.00 sec
+      Start  4: fusion_network_tests
+14/19 Test  #4: fusion_network_tests .................   Passed    0.00 sec
+      Start  8: fusion_kinetics_tests
+15/19 Test  #8: fusion_kinetics_tests ................   Passed    0.00 sec
+      Start  2: pb11_c_abi_tests
+16/19 Test  #2: pb11_c_abi_tests .....................   Passed    0.00 sec
+      Start 14: fusion_two_component_slowing_tests
+17/19 Test #10: fusion_slowing_tests .................   Passed    1.93 sec
+18/19 Test #14: fusion_two_component_slowing_tests ...   Passed    2.01 sec
+19/19 Test #11: fusion_beam_tests ....................   Passed    7.81 sec
+
+100% tests passed, 0 tests failed out of 19
+
+Total Test time (real) =   7.82 sec
