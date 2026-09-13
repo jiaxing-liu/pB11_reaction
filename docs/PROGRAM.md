@@ -14,3 +14,9 @@ sections and common-temperature Maxwellian fits, particle birth/loss and
 nuclear-Q ledgers, and C/Fortran interfaces. See THERMAL_NETWORK.md and
 validation/m2-*.txt. GNU and Intel r4/r8 tests cover this stateless increment;
 full finite-time product kinetics and BALDUR coupling are still outstanding.
+
+M3 first kinetic increment: independent Maxwellian-bath Coulomb coefficients
+and an isotropic energy-distribution implicit trial step with per-bath heat,
+particle/energy ledgers and no hidden accepted state. See KINETIC_PRIMITIVES.md.
+This is a primitive layer; product spectra, reaction/kinetic closure, physical
+ash transfer and BALDUR integration remain under development.
