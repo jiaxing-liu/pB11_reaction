@@ -1,0 +1,6 @@
+[ 50%] Building C object CMakeFiles/consumer.dir/main.c.o
+[ 50%] Building Fortran object CMakeFiles/fortran_consumer.dir/main.f90.o
+[ 75%] Linking CXX executable consumer
+[100%] Linking Fortran executable fortran_consumer
+[100%] Built target consumer
+[100%] Built target fortran_consumer

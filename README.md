@@ -268,3 +268,5 @@ from the direct integral by about 2% below 70 keV and less than 1% from 70 to
 
 This project is licensed under the BSD 3-Clause License. See [LICENSE](LICENSE)
 for the complete terms.
+
+Explicit continuation and per-segment thermal/beam rate/energy APIs: [RATE_MODEL.md](docs/RATE_MODEL.md).

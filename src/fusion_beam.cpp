@@ -1,4 +1,4 @@
-#include "fusion_beam.h"
+#include "fusion_rate_model.h"
 #include <boost/math/quadrature/gauss_kronrod.hpp>
 #include <algorithm>
 #include <cmath>
@@ -32,6 +32,7 @@ Real one_minus_langevin(Real a) {
 
 struct Kernel {
     int channel;
+    int policy=0,pb_low=0;
     Real ma,mb,mu,ea,temp,v,u,energy_scale;
     double s;
     double probability(double x) const {
@@ -47,7 +48,8 @@ struct Kernel {
         if(p==0) return 0;
         const Real w=u*x,er=mu*w*w/2;
         double sigma=0;
-        const int status=fusion_c_cross_section(channel,static_cast<double>(er),&sigma);
+        const int status=policy?fusion_c_cross_section_model(channel,policy,pb_low,static_cast<double>(er),&sigma):
+            fusion_c_cross_section(channel,static_cast<double>(er),&sigma);
         if(status!=PB11_STATUS_OK) throw status;
         Real weight=1;
         const Real angular=one_minus_langevin(2*static_cast<Real>(x)*s);
@@ -109,8 +111,9 @@ double integrate(const Kernel &k,double lo,double hi,bool nuclear,
 }
 }
 
-extern "C" int fusion_c_beam_maxwellian_window(int ch,double ma_in,double mb_in,
-    double ea_in,double temp_in,fusion_beam_window_v1 *out) {
+static int beam_segment(int ch,double ma_in,double mb_in,
+    double ea_in,double temp_in,fusion_beam_window_v1 *out,
+    int policy=0,int pb_low=0,int segment=0) {
     if(!out) return PB11_STATUS_NULL_OUTPUT;
     *out={};
     if(!std::isfinite(ma_in) || !std::isfinite(mb_in) ||
@@ -119,6 +122,14 @@ extern "C" int fusion_c_beam_maxwellian_window(int ch,double ma_in,double mb_in,
     double emin=0,emax=0;
     const int domain_status=fusion_c_cross_section_domain(ch,&emin,&emax);
     if(domain_status) return domain_status;
+    const double fit_min=emin,fit_max=emax;
+    if(policy) {
+        double dummy=0;
+        const int model_status=fusion_c_cross_section_model(ch,policy,pb_low,0,&dummy);
+        if(model_status)return model_status;
+        if(segment==1){emin=0;emax=fit_min;}
+        else if(segment==2){emin=fit_max;emax=std::numeric_limits<double>::infinity();}
+    }
     try {
         const Real ma=ma_in,mb=mb_in,ea=ea_in,temp=temp_in,mu=ma/(1+ma/mb);
         const Real v=std::sqrt(2*ea/ma);
@@ -127,7 +138,12 @@ extern "C" int fusion_c_beam_maxwellian_window(int ch,double ma_in,double mb_in,
             const Real er=mu*v*v/2;
             double er_double=0,sigma=0;
             if(!put(er,er_double)) return PB11_STATUS_NUMERICAL_FAILURE;
-            const int status=fusion_c_cross_section(ch,er_double,&sigma);
+            const bool inside=segment==1?(er_double>0 && er_double<fit_min):
+                segment==2?er_double>fit_max:
+                (er_double==0 || (er_double>=fit_min && er_double<=fit_max));
+            const int status=!inside?PB11_STATUS_OUT_OF_RANGE:
+                policy?fusion_c_cross_section_model(ch,policy,pb_low,er_double,&sigma):
+                fusion_c_cross_section(ch,er_double,&sigma);
             if(status==PB11_STATUS_OUT_OF_RANGE) {
                 result.domain_incomplete=1;
                 result.unresolved_pair_probability=1;
@@ -148,7 +164,7 @@ extern "C" int fusion_c_beam_maxwellian_window(int ch,double ma_in,double mb_in,
         // Beyond this ratio subtracting neighboring speeds loses useful
         // quadrature resolution. The exact cold target remains available.
         if(!std::isfinite(s) || s>1e6) return PB11_STATUS_NUMERICAL_FAILURE;
-        Kernel k{ch,ma,mb,mu,ea,temp,v,u,std::max({ea,temp,static_cast<Real>(emax)}),s};
+        Kernel k{ch,policy,pb_low,ma,mb,mu,ea,temp,v,u,std::max({ea,temp,static_cast<Real>(fit_max)}),s};
         const double lower=std::max(0.,s-gaussian_extent),upper=s+gaussian_extent;
         const double data_lower=static_cast<double>(std::sqrt(2*emin/mu)/u);
         const double data_upper=static_cast<double>(std::sqrt(2*emax/mu)/u);
@@ -192,8 +208,14 @@ extern "C" int fusion_c_beam_maxwellian_window(int ch,double ma_in,double mb_in,
       catch(...) {return PB11_STATUS_EXCEPTION;}
 }
 
-extern "C" int fusion_c_thermal_pair_maxwellian_window(int ch,double ma_in,
-    double mb_in,double ta_in,double tb_in,fusion_beam_window_v1 *out) {
+extern "C" int fusion_c_beam_maxwellian_window(int ch,double ma,double mb,
+    double ea,double temp,fusion_beam_window_v1 *out) {
+    return beam_segment(ch,ma,mb,ea,temp,out);
+}
+
+static int thermal_segment(int ch,double ma_in,
+    double mb_in,double ta_in,double tb_in,fusion_beam_window_v1 *out,
+    int policy=0,int pb_low=0,int segment=0) {
     if(!out) return PB11_STATUS_NULL_OUTPUT;
     *out={};
     if(!std::isfinite(ma_in) || !std::isfinite(mb_in) ||
@@ -207,7 +229,7 @@ extern "C" int fusion_c_thermal_pair_maxwellian_window(int ch,double ma_in,
     if(!put(tb+(mb/ma)*ta,effective_target) ||
        (effective_target==0 && (ta>0 || tb>0))) return PB11_STATUS_NUMERICAL_FAILURE;
     fusion_beam_window_v1 result{};
-    const int status=fusion_c_beam_maxwellian_window(ch,ma_in,mb_in,0,effective_target,&result);
+    const int status=beam_segment(ch,ma_in,mb_in,0,effective_target,&result,policy,pb_low,segment);
     if(status) return status;
     if(ta==0 && tb==0) {*out=result;return PB11_STATUS_OK;}
     const Real tr=(mb*ta+ma*tb)/m;
@@ -226,4 +248,55 @@ extern "C" int fusion_c_thermal_pair_maxwellian_window(int ch,double ma_in,
        std::abs(residual)>1e-12L*(a+b+relative_moment+cm)) return PB11_STATUS_NUMERICAL_FAILURE;
     *out=result;
     return PB11_STATUS_OK;
+}
+
+extern "C" int fusion_c_thermal_pair_maxwellian_window(int ch,double ma,double mb,
+    double ta,double tb,fusion_beam_window_v1 *out) {
+    return thermal_segment(ch,ma,mb,ta,tb,out);
+}
+
+namespace {
+int model_integral(bool thermal,int ch,int policy,int low,double ma,double mb,
+    double ea,double tb,fusion_rate_model_v1 *out) {
+    if(!out)return PB11_STATUS_NULL_OUTPUT;
+    *out={};
+    if(policy==0)return PB11_STATUS_INVALID_ARGUMENT;
+    fusion_rate_model_v1 r{};
+    fusion_beam_window_v1 *parts[]={&r.fit,&r.below,&r.above};
+    for(int j=0;j<3;++j) {
+        const int status=thermal?thermal_segment(ch,ma,mb,ea,tb,parts[j],policy,low,j):
+            beam_segment(ch,ma,mb,ea,tb,parts[j],policy,low,j);
+        if(status)return status;
+    }
+    // Sum named physical moments, never the complement probabilities: each
+    // complement overlaps other segments. No probability renormalization.
+    double fusion_beam_window_v1::*fields[]={
+        &fusion_beam_window_v1::resolved_reactivity_m3_s,
+        &fusion_beam_window_v1::projectile_energy_reactivity_J_m3_s,
+        &fusion_beam_window_v1::target_energy_reactivity_J_m3_s,
+        &fusion_beam_window_v1::relative_energy_reactivity_J_m3_s,
+        &fusion_beam_window_v1::cm_energy_reactivity_J_m3_s,
+        &fusion_beam_window_v1::resolved_pair_probability,
+        &fusion_beam_window_v1::quadrature_error_m3_s};
+    for(auto field:fields) {
+        const Real sum=static_cast<Real>(r.fit.*field)+r.below.*field+r.above.*field;
+        if(!put(sum,r.total.*field))return PB11_STATUS_NUMERICAL_FAILURE;
+    }
+    const Real a=r.total.projectile_energy_reactivity_J_m3_s,
+        b=r.total.target_energy_reactivity_J_m3_s,
+        er=r.total.relative_energy_reactivity_J_m3_s,cm=r.total.cm_energy_reactivity_J_m3_s;
+    if(!put(a+b-er-cm,r.total.energy_identity_error_J_m3_s) ||
+       std::abs(a+b-er-cm)>1e-9L*(a+b+er+cm) ||
+       std::abs(r.total.resolved_pair_probability-1)>1e-9)
+        return PB11_STATUS_NUMERICAL_FAILURE;
+    *out=r;return PB11_STATUS_OK;
+}
+}
+extern "C" int fusion_c_beam_maxwellian_model(int ch,int policy,int low,
+    double ma,double mb,double ea,double tb,fusion_rate_model_v1 *out) {
+    return model_integral(false,ch,policy,low,ma,mb,ea,tb,out);
+}
+extern "C" int fusion_c_thermal_pair_maxwellian_model(int ch,int policy,int low,
+    double ma,double mb,double ta,double tb,fusion_rate_model_v1 *out) {
+    return model_integral(true,ch,policy,low,ma,mb,ta,tb,out);
 }
