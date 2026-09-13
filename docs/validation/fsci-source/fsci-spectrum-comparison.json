@@ -1,0 +1,54 @@
+{
+  "metric": "half-L1 on 100 energy bins plus below/above categories, divided by 3 alphas/event",
+  "convergence": {
+    "l2_policy0": {
+      "128_to_256": 0.05718253637674162,
+      "256_to_512": 0.0042930976964305825,
+      "512_to_1024": 0.001988266821052854
+    },
+    "l2_policy1": {
+      "128_to_256": 0.05805710901849647,
+      "256_to_512": 0.004267092203741967,
+      "512_to_1024": 0.0020003697806283316
+    },
+    "l13_policy1": {
+      "128_to_256": 0.06210514134012015,
+      "256_to_512": 0.004201195540916073,
+      "512_to_1024": 0.0015671952875537989
+    }
+  },
+  "cutoff_1_to_10_keV": {
+    "l2_policy0": 1.1655173354219173e-18,
+    "l2_policy1": 8.806716988663261e-09,
+    "l13_policy1": 9.673578278817022e-09
+  },
+  "policy_difference": {
+    "l2": 0.01528543502395528,
+    "l13_fixed_unit_k": 0.005014087966932773,
+    "l13_fixed_raw_coefficients": 0.004822189267003968
+  },
+  "number_energy_residuals": {
+    "l2_policy0": {
+      "number_per_event": 0.0,
+      "energy_relative": 0.0,
+      "below_N": 0.0037451545560533922,
+      "above_N": 0.0
+    },
+    "l2_policy1": {
+      "number_per_event": 0.0,
+      "energy_relative": 0.0,
+      "below_N": 0.0035765520053626138,
+      "above_N": 0.0
+    },
+    "l13_policy1": {
+      "number_per_event": 0.0,
+      "energy_relative": 0.0,
+      "below_N": 0.00017974196523144517,
+      "above_N": 1.0919405414192848e-05
+    }
+  },
+  "paired_policy_difference_refinement_512_to_1024": {
+    "l2": 3.852375907150952e-05,
+    "l13_fixed_unit_k": 1.3195755819963087e-05
+  }
+}

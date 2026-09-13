@@ -35,14 +35,14 @@ std::vector<Node> gauss(int n){
 struct Event {std::array<C,5> a{},b{};double e[3],measure;};
 double norm(const std::array<C,5>&a){double s=0;for(C x:a)s+=std::norm(x);return s;}
 }
-extern "C" int fusion_c_alpha_spectrum_grid(int mode,double A,double cutoff,
+static int spectrum_impl(int mode,int policy,double A,double cutoff,
  double k,double phase,int nq,int nc,int cells,const double *edges,double *birth,
  fusion_alpha_spectrum_v1 *out){
  if(out)*out={};
  if(cells>0 && birth)std::fill(birth,birth+cells,0.);
  if(!birth || !out)return PB11_STATUS_NULL_OUTPUT;
- if(!edges || cells<1 || nq<4 || nc<4 || nq>512 || nc>512 ||
-  (mode!=1 && mode!=2 && mode!=3 && mode!=13) || !std::isfinite(A) ||
+ if(!edges || cells<1 || nq<4 || nc<4 || nq>1024 || nc>1024 ||
+  (policy!=0 && policy!=1) || (mode!=1 && mode!=2 && mode!=3 && mode!=13) || !std::isfinite(A) ||
   !std::isfinite(k) || !std::isfinite(phase) || !std::isfinite(cutoff))return PB11_STATUS_INVALID_ARGUMENT;
  if(A<=0 || A>12*mev || k<0 || k>1 || cutoff<.001*mev || cutoff>.01*mev)return PB11_STATUS_OUT_OF_RANGE;
  for(int i=0;i<=cells;++i)
@@ -54,8 +54,8 @@ extern "C" int fusion_c_alpha_spectrum_grid(int mode,double A,double cutoff,
   for(const auto &u:qnodes){double theta=(u.x+1)*pi/4,s=std::sin(theta),q=A*s*s;
    double dq=A*std::sin(2*theta)*u.w*pi/4;
    for(const auto &v:cnodes){Event e{};fusion_alpha_amplitudes_v1 a{},b{};int pa=0,pb=0;
-    int status=fusion_c_alpha_amplitudes_cutoff(mode==13?1:mode,A,q,v.x,cutoff,&a,&pa);if(status)return status;
-    if(mode==13){status=fusion_c_alpha_amplitudes_cutoff(3,A,q,v.x,cutoff,&b,&pb);if(status)return status;}
+    int status=fusion_c_alpha_amplitudes_fsci_cutoff(mode==13?1:mode,policy,A,q,v.x,cutoff,&a,&pa);if(status)return status;
+    if(mode==13){status=fusion_c_alpha_amplitudes_fsci_cutoff(3,policy,A,q,v.x,cutoff,&b,&pb);if(status)return status;}
     e.measure=a.phase_space_J*dq*v.w;
     for(int M=0;M<5;++M){e.a[M]={a.sym_real[M],a.sym_imag[M]};e.b[M]={b.sym_real[M],b.sym_imag[M]};}
     n1+=static_cast<long double>(e.measure)*norm(e.a);n3+=static_cast<long double>(e.measure)*norm(e.b);
@@ -90,4 +90,15 @@ extern "C" int fusion_c_alpha_spectrum_grid(int mode,double A,double cutoff,
    !std::isfinite(result.normalization_J2) || result.normalization_J2==0)return PB11_STATUS_NUMERICAL_FAILURE;
   std::copy(mapped.begin(),mapped.end(),birth);*out=result;return PB11_STATUS_OK;
  }catch(...){return PB11_STATUS_EXCEPTION;}
+}
+
+extern "C" int fusion_c_alpha_spectrum_grid(int mode,double A,double cutoff,
+ double k,double phase,int nq,int nc,int cells,const double *edges,double *birth,
+ fusion_alpha_spectrum_v1 *out){
+ return spectrum_impl(mode,0,A,cutoff,k,phase,nq,nc,cells,edges,birth,out);
+}
+extern "C" int fusion_c_alpha_spectrum_model_grid(int mode,int policy,double A,
+ double cutoff,double k,double phase,int nq,int nc,int cells,const double *edges,
+ double *birth,fusion_alpha_spectrum_v1 *out){
+ return spectrum_impl(mode,policy,A,cutoff,k,phase,nq,nc,cells,edges,birth,out);
 }

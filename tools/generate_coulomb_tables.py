@@ -15,8 +15,10 @@ import argparse
 import concurrent.futures
 import json
 import math
+import multiprocessing
 import os
 from pathlib import Path
+import sys
 import tempfile
 import time
 from typing import Any
@@ -53,7 +55,8 @@ REFERENCE_ENERGIES = (
 ENERGY_MIN = mp.mpf("0.001")
 ENERGY_MAX = mp.mpf("12.0")
 SEGMENT_FACTOR = mp.mpf("2.0")
-CACHE_VERSION = 3
+CACHE_VERSION = 4
+DEFAULT_TABLE_NAMESPACE = "fusion_table_data"
 
 ALPHA_INVERSE = mp.mpf("137.035999084")
 ALPHA = 1 / ALPHA_INVERSE
@@ -122,8 +125,172 @@ FAMILIES: dict[str, dict[str, Any]] = {
 }
 
 
+CPP_KEYWORDS = frozenset(
+    {
+        "alignas",
+        "alignof",
+        "and",
+        "and_eq",
+        "asm",
+        "atomic_cancel",
+        "atomic_commit",
+        "atomic_noexcept",
+        "auto",
+        "bitand",
+        "bitor",
+        "bool",
+        "break",
+        "case",
+        "catch",
+        "char",
+        "char8_t",
+        "char16_t",
+        "char32_t",
+        "class",
+        "compl",
+        "concept",
+        "const",
+        "consteval",
+        "constexpr",
+        "constinit",
+        "const_cast",
+        "continue",
+        "co_await",
+        "co_return",
+        "co_yield",
+        "decltype",
+        "default",
+        "delete",
+        "do",
+        "double",
+        "dynamic_cast",
+        "else",
+        "enum",
+        "explicit",
+        "export",
+        "extern",
+        "false",
+        "float",
+        "for",
+        "friend",
+        "goto",
+        "if",
+        "inline",
+        "int",
+        "long",
+        "mutable",
+        "namespace",
+        "new",
+        "noexcept",
+        "not",
+        "not_eq",
+        "nullptr",
+        "operator",
+        "or",
+        "or_eq",
+        "private",
+        "protected",
+        "public",
+        "reflexpr",
+        "register",
+        "reinterpret_cast",
+        "requires",
+        "return",
+        "short",
+        "signed",
+        "sizeof",
+        "static",
+        "static_assert",
+        "static_cast",
+        "struct",
+        "switch",
+        "synchronized",
+        "template",
+        "this",
+        "thread_local",
+        "throw",
+        "true",
+        "try",
+        "typedef",
+        "typeid",
+        "typename",
+        "union",
+        "unsigned",
+        "using",
+        "virtual",
+        "void",
+        "volatile",
+        "wchar_t",
+        "while",
+        "xor",
+        "xor_eq",
+    }
+)
+
+
 class ReferenceFailure(RuntimeError):
     """Raised when a reference special-function check is not trustworthy."""
+
+
+def _radius_value(radius: Any) -> mp.mpf:
+    """Validate and normalize a user-selected common Coulomb radius."""
+    try:
+        value = mp.mpf(str(radius))
+    except (TypeError, ValueError):
+        raise ValueError("common radius must be a finite positive number") from None
+    if not mp.isfinite(value) or value <= 0 or value > 100:
+        raise ValueError("common radius must be finite, positive, and <= 100 fm")
+    return value
+
+
+def configure_radius(radius: Any) -> mp.mpf:
+    """Apply one common radius to channel and family metadata.
+
+    The argument is intentionally converted before mutating either metadata
+    table, so an invalid value cannot leave a partially configured process.
+    """
+    value = _radius_value(radius)
+    radius_text = mp_string(value)
+    for channel in CHANNELS:
+        channel["radius_fm"] = radius_text
+    for family in FAMILIES.values():
+        family["radius_fm"] = value
+    return value
+
+
+def initialize_worker(radius_text: str | None) -> None:
+    """Initialize a spawned worker with the parent's selected radius."""
+    mp.mp.dps = MP_DPS
+    if radius_text is not None:
+        configure_radius(radius_text)
+
+
+def validate_cpp_identifier(value: str) -> str:
+    """Return *value* when it is a usable C++ namespace identifier."""
+    if not isinstance(value, str) or not value:
+        raise ValueError("table namespace must be a nonempty C++ identifier")
+    first = value[0]
+    ascii_letter = ("A" <= first <= "Z") or ("a" <= first <= "z")
+    if not (first == "_" or ascii_letter):
+        raise ValueError("table namespace must be a valid C++ identifier")
+    for character in value[1:]:
+        ascii_alnum = (
+            ("A" <= character <= "Z")
+            or ("a" <= character <= "z")
+            or ("0" <= character <= "9")
+        )
+        if not (character == "_" or ascii_alnum):
+            raise ValueError("table namespace must be a valid C++ identifier")
+    if value in CPP_KEYWORDS:
+        raise ValueError("table namespace must not be a C++ keyword")
+    return value
+
+
+def cpp_identifier_argument(value: str) -> str:
+    try:
+        return validate_cpp_identifier(value)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError(str(error)) from None
 
 
 def mp_string(value: mp.mpf) -> str:
@@ -405,9 +572,14 @@ def fit_family_segment(
 
 
 def cache_signature(family: str, index: int, xlo: str, xhi: str) -> dict[str, Any]:
+    family_spec = FAMILIES[family]
     return {
         "version": CACHE_VERSION,
         "family": family,
+        "Zproduct": mp_string(family_spec["Zproduct"]),
+        "mu_MeV_c2": mp_string(family_spec["mu_MeV_c2"]),
+        "radius_fm": mp_string(family_spec["radius_fm"]),
+        "ls": list(family_spec["ls"]),
         "index": index,
         "xlo": xlo,
         "xhi": xhi,
@@ -488,12 +660,15 @@ def c_double_literal(value: mp.mpf, label: str) -> str:
 
 
 def write_include(
-    path: Path, channel_segments: dict[int, list[dict[str, Any]]]
+    path: Path,
+    channel_segments: dict[int, list[dict[str, Any]]],
+    namespace: str = DEFAULT_TABLE_NAMESPACE,
 ) -> None:
+    namespace = validate_cpp_identifier(namespace)
     lines = [
         "// Generated by tools/generate_coulomb_tables.py; do not edit.",
         "// Coulomb reference: mpmath 1.3.0, 40 decimal digits.",
-        "namespace fusion_table_data {",
+        f"namespace {namespace} {{",
         "struct Segment {",
         "    int channel;",
         "    double lo, hi;",
@@ -528,7 +703,7 @@ def write_include(
             )
             lines.append(f"        {{{values}}}{row_comma}")
         lines.append(f"    }}}}{comma}")
-    lines.extend(("};", "}  // namespace fusion_table_data", ""))
+    lines.extend(("};", f"}}  // namespace {namespace}", ""))
     atomic_text_write(path, "\n".join(lines))
 
 
@@ -655,6 +830,58 @@ def write_validation_json(
     atomic_json_write(path, payload)
 
 
+def parse_radius_argument(value: str) -> float:
+    try:
+        radius = float(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            "common radius must be a finite positive number"
+        ) from None
+    if not math.isfinite(radius) or radius <= 0 or radius > 100:
+        raise argparse.ArgumentTypeError(
+            "common radius must be finite, positive, and <= 100 fm"
+        )
+    return radius
+
+
+def argument_supplied(option: str, argv: list[str] | None = None) -> bool:
+    arguments = sys.argv[1:] if argv is None else argv
+    return any(argument == option or argument.startswith(f"{option}=")
+               for argument in arguments)
+
+
+def validate_alternate_outputs(args: argparse.Namespace, repository: Path) -> None:
+    if args.common_radius_fm is None:
+        return
+    canonical_inc = (repository / "src/fusion_coulomb_tables.inc").resolve()
+    canonical_json = (
+        repository / "docs/validation/coulomb_table_validation.json"
+    ).resolve()
+    if not argument_supplied("--output-inc") or not argument_supplied(
+        "--output-json"
+    ):
+        raise SystemExit(
+            "--common-radius-fm requires explicit noncanonical "
+            "--output-inc and --output-json"
+        )
+    if Path(args.output_inc).resolve() == canonical_inc:
+        raise SystemExit(
+            "--common-radius-fm cannot overwrite the canonical --output-inc"
+        )
+    if Path(args.output_json).resolve() == canonical_json:
+        raise SystemExit(
+            "--common-radius-fm cannot overwrite the canonical --output-json"
+        )
+    if (
+        args.table_namespace == DEFAULT_TABLE_NAMESPACE
+        or not argument_supplied("--table-namespace")
+    ):
+        raise SystemExit(
+            "--common-radius-fm requires an explicit nondefault "
+            "--table-namespace"
+        )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     repository = Path(__file__).resolve().parents[1]
@@ -680,14 +907,37 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=repository / "docs/validation/coulomb_table_validation.json",
     )
+    parser.add_argument(
+        "--common-radius-fm",
+        type=parse_radius_argument,
+        default=None,
+        help=(
+            "use one common finite radius in fm for all channel families "
+            "(positive and <= 100; alternate outputs are required)"
+        ),
+    )
+    parser.add_argument(
+        "--table-namespace",
+        type=cpp_identifier_argument,
+        default=DEFAULT_TABLE_NAMESPACE,
+        help=(
+            "C++ namespace for generated tables "
+            f"(default: {DEFAULT_TABLE_NAMESPACE})"
+        ),
+    )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
+    repository = Path(__file__).resolve().parents[1]
+    validate_alternate_outputs(args, repository)
     if args.jobs < 1 or args.jobs > 5:
         raise SystemExit("--jobs must be between 1 and 5")
     mp.mp.dps = MP_DPS
+    worker_radius: str | None = None
+    if args.common_radius_fm is not None:
+        worker_radius = mp_string(configure_radius(args.common_radius_fm))
     args.cache_dir.mkdir(parents=True, exist_ok=True)
     boundaries = energy_boundaries()
     tasks: list[tuple[str, int, str, str, str]] = []
@@ -705,7 +955,14 @@ def main() -> int:
         flush=True,
     )
     completed: list[tuple[str, int, dict[str, Any]]] = []
-    with concurrent.futures.ProcessPoolExecutor(max_workers=args.jobs) as pool:
+    with concurrent.futures.ProcessPoolExecutor(
+        max_workers=args.jobs,
+        # Explicit spawn avoids platform-default forkserver socket requirements
+        # and exercises the same radius initializer on every supported platform.
+        mp_context=multiprocessing.get_context("spawn"),
+        initializer=initialize_worker,
+        initargs=(worker_radius,),
+    ) as pool:
         futures = {
             pool.submit(run_segment_task, task): task for task in tasks
         }
@@ -740,7 +997,7 @@ def main() -> int:
         if not channel_segments[channel]:
             raise ReferenceFailure(f"no generated segments for channel {channel}")
 
-    write_include(args.output_inc, channel_segments)
+    write_include(args.output_inc, channel_segments, args.table_namespace)
     write_validation_json(
         args.output_json, channel_segments, time.monotonic() - started
     )

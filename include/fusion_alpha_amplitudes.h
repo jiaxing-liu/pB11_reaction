@@ -36,6 +36,22 @@ int fusion_c_alpha_amplitudes(int primary_l,double available_energy_J,
 int fusion_c_alpha_amplitudes_cutoff(int primary_l,double available_energy_J,
     double intermediate_energy_J,double cos_theta,double cutoff_J,
     fusion_alpha_amplitudes_v1 *out,int *pruned_permutations);
+enum fusion_alpha_fsci_policy_v1 {
+ FUSION_ALPHA_FSCI_NONE=0, FUSION_ALPHA_FSCI_REFS2018_R16=1
+};
+/* Optional phenomenological final-state Coulomb correction, Refsgaard2018
+ * Eq4. Multiply EACH permutation amplitude by sqrt[C] before coherent sum:
+ * C=(rho1~/P_l1~)*(P_2~(E12)/rho12~)*(P_2~(E13)/rho13~), tilde radius16fm.
+ * Original5.1/4.5fm radii, phases, CG algebra and level parameters unchanged.
+ * NONE reproduces the existing cutoff API. Not a three-body scattering
+ * solution, measured universal radius or incident-energy branch selection.
+ * Numerical cutoff also covers the two additional pair energies. All three
+ * permutation terms may be suppressed; the caller normalizes the full source
+ * and must check cutoff sensitivity. Other Coulomb failures are returned.
+ * Same A/q/cosine/cutoff and output contracts as the existing cutoff API. */
+int fusion_c_alpha_amplitudes_fsci_cutoff(int primary_l,int fsci_policy,
+ double available_energy_J,double intermediate_energy_J,double cos_theta,
+ double cutoff_J,fusion_alpha_amplitudes_v1 *out,int *pruned_permutations);
 #ifdef __cplusplus
 }
 #endif

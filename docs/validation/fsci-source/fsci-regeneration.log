@@ -1,0 +1,32 @@
+generating 28 family segments with 5 workers (cache=/tmp/pb11-fsci-r16-cache)
+[1/28] alpha_be8 segment 0 -> 9 table segments; elapsed 0.1s
+[2/28] alpha_be8 segment 1 -> 7 table segments; elapsed 0.1s
+[3/28] alpha_be8 segment 2 -> 4 table segments; elapsed 0.1s
+[4/28] alpha_be8 segment 3 -> 3 table segments; elapsed 0.1s
+[5/28] alpha_be8 segment 4 -> 2 table segments; elapsed 0.1s
+[6/28] alpha_be8 segment 5 -> 1 table segments; elapsed 0.1s
+[7/28] alpha_be8 segment 6 -> 1 table segments; elapsed 0.1s
+[8/28] alpha_be8 segment 7 -> 1 table segments; elapsed 0.1s
+[9/28] alpha_be8 segment 8 -> 1 table segments; elapsed 0.1s
+[10/28] alpha_be8 segment 9 -> 1 table segments; elapsed 0.1s
+[11/28] alpha_be8 segment 10 -> 1 table segments; elapsed 0.1s
+[12/28] alpha_be8 segment 11 -> 1 table segments; elapsed 0.1s
+[13/28] alpha_be8 segment 12 -> 1 table segments; elapsed 0.1s
+[14/28] alpha_be8 segment 13 -> 1 table segments; elapsed 0.1s
+[15/28] alpha_alpha segment 0 -> 4 table segments; elapsed 0.1s
+[16/28] alpha_alpha segment 2 -> 2 table segments; elapsed 0.1s
+[17/28] alpha_alpha segment 3 -> 1 table segments; elapsed 0.1s
+[18/28] alpha_alpha segment 1 -> 2 table segments; elapsed 0.1s
+[19/28] alpha_alpha segment 5 -> 1 table segments; elapsed 0.1s
+[20/28] alpha_alpha segment 6 -> 1 table segments; elapsed 0.1s
+[21/28] alpha_alpha segment 4 -> 1 table segments; elapsed 0.1s
+[22/28] alpha_alpha segment 7 -> 1 table segments; elapsed 0.1s
+[23/28] alpha_alpha segment 8 -> 1 table segments; elapsed 0.1s
+[24/28] alpha_alpha segment 10 -> 1 table segments; elapsed 0.1s
+[25/28] alpha_alpha segment 11 -> 1 table segments; elapsed 0.1s
+[26/28] alpha_alpha segment 9 -> 1 table segments; elapsed 0.1s
+[27/28] alpha_alpha segment 12 -> 1 table segments; elapsed 0.1s
+[28/28] alpha_alpha segment 13 -> 1 table segments; elapsed 0.1s
+wrote /tmp/fsci-regenerated.inc
+wrote /tmp/fsci-regenerated.json
+segment counts: ch0=34, ch1=34, ch2=34, ch3=19, ch4=19

@@ -28,11 +28,11 @@ C spherical(int l,int m,const double *p){
 }
 }
 static int alpha_impl(int l,double A_in,double q_in,double cosine,
- fusion_alpha_amplitudes_v1 *out,double cutoff_MeV,int *pruned){
+ fusion_alpha_amplitudes_v1 *out,double cutoff_MeV,int *pruned,int fsci=0){
  if(pruned)*pruned=0;
  if(!out)return PB11_STATUS_NULL_OUTPUT;
  *out={};
- if(l<1 || l>3 || !std::isfinite(A_in) || !std::isfinite(q_in) || !std::isfinite(cosine))return PB11_STATUS_INVALID_ARGUMENT;
+ if((fsci!=0 && fsci!=1) || l<1 || l>3 || !std::isfinite(A_in) || !std::isfinite(q_in) || !std::isfinite(cosine))return PB11_STATUS_INVALID_ARGUMENT;
  if(A_in<=0 || q_in<0 || q_in>A_in || (cutoff_MeV==0 && (q_in==0 || q_in==A_in)) || std::abs(cosine)>1)return PB11_STATUS_OUT_OF_RANGE;
  const double A=A_in/mev,q=q_in/mev,m=3727.3794118;
  // Momenta are MeV/c in the declared nonrelativistic convention.
@@ -47,12 +47,30 @@ static int alpha_impl(int l,double A_in,double q_in,double cosine,
   // Explicit caller-selected numerical approximation: retain the event and
   // all other permutations. Never discard a whole event for one small channel.
   if(cutoff_MeV>0 && (ep<cutoff_MeV || e23<cutoff_MeV)){++skipped;continue;}
+  double e12=0,e13=0;
+  for(int d=0;d<3;++d){
+   e12+=(p[i][d]-p[j][d])*(p[i][d]-p[j][d])/(4*m);
+   e13+=(p[i][d]-p[k][d])*(p[i][d]-p[k][d])/(4*m);
+  }
+  if(fsci && (e12<cutoff_MeV || e13<cutoff_MeV)){++skipped;continue;}
   fusion_nuclear_coulomb_v1 primary{},secondary{};
   status=fusion_c_nuclear_coulomb(l-1,ep*mev,&primary);if(status)return status;
   status=fusion_c_nuclear_coulomb(4,e23*mev,&secondary);if(status)return status;
+  double log_correction=0;
+  if(fsci){
+   fusion_nuclear_coulomb_v1 tilde1{},tilde12{},tilde13{};
+   status=fusion_c_nuclear_coulomb_radius16(l-1,ep*mev,&tilde1);if(status)return status;
+   status=fusion_c_nuclear_coulomb_radius16(4,e12*mev,&tilde12);if(status)return status;
+   status=fusion_c_nuclear_coulomb_radius16(4,e13*mev,&tilde13);if(status)return status;
+   // Refsgaard2018 Eq4 replaces P1/rho1 in the SQUARED radial amplitude.
+   // Apply its square root independently to each coherent permutation.
+   log_correction=std::log(tilde1.rho)-tilde1.log_penetrability
+       +tilde12.log_penetrability-std::log(tilde12.rho)
+       +tilde13.log_penetrability-std::log(tilde13.rho);
+  }
   const double g2=1.075,P=std::exp(secondary.log_penetrability);
   C denominator(3.129-e23-g2*(secondary.shift-at_level.shift),-g2*P);
-  C radial=2*std::sqrt(g2/(primary.rho*secondary.rho))*std::exp(.5*(primary.log_penetrability+secondary.log_penetrability))*
+  C radial=2*std::sqrt(g2/(primary.rho*secondary.rho))*std::exp(.5*(primary.log_penetrability+secondary.log_penetrability+log_correction))*
    C(primary.phase_real,primary.phase_imag)*C(secondary.phase_real,secondary.phase_imag)*ipow[l]*ipow[2]/denominator;
   for(int M=-2;M<=2;++M)for(int b=-2;b<=2;++b){int a=M-b;if(std::abs(a)>l)continue;
    amplitudes[i][M+2]+=cg(2,b,l,a,2,M)*spherical(l,a,p[i])*spherical(2,b,relative)*radial;}
@@ -77,4 +95,14 @@ extern "C" int fusion_c_alpha_amplitudes_cutoff(int l,double A,double q,double c
  if(!std::isfinite(cutoff_J))return PB11_STATUS_INVALID_ARGUMENT;
  if(cutoff_J<minimum || cutoff_J>maximum)return PB11_STATUS_OUT_OF_RANGE;
  return alpha_impl(l,A,q,cosine,out,cutoff_J/mev,pruned);
+}
+
+extern "C" int fusion_c_alpha_amplitudes_fsci_cutoff(int l,int policy,double A,
+ double q,double cosine,double cutoff_J,fusion_alpha_amplitudes_v1 *out,int *pruned){
+ if(out)*out={};
+ if(pruned)*pruned=0;
+ if(!out || !pruned)return PB11_STATUS_NULL_OUTPUT;
+ if(!std::isfinite(cutoff_J))return PB11_STATUS_INVALID_ARGUMENT;
+ if(cutoff_J<.001*mev || cutoff_J>.01*mev)return PB11_STATUS_OUT_OF_RANGE;
+ return alpha_impl(l,A,q,cosine,out,cutoff_J/mev,pruned,policy);
 }

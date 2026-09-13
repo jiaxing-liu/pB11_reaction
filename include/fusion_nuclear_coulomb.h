@@ -21,6 +21,12 @@ typedef struct fusion_nuclear_coulomb_v1 {
  * Stateless; output zero on error. Validation/generator are versioned. */
 int fusion_c_nuclear_coulomb(int channel, double relative_energy_J,
     fusion_nuclear_coulomb_v1 *out);
+/* Same channel IDs, masses and energy domain as above, but ALL channel
+ * radii are explicitly16fm. Separately generated/validated tables; used in
+ * the Refsgaard2018 Model-II FSCI factor. Does not replace ordinary radii.
+ * Same errors/clearing contract. */
+int fusion_c_nuclear_coulomb_radius16(int channel,double relative_energy_J,
+ fusion_nuclear_coulomb_v1 *out);
 #ifdef __cplusplus
 }
 #endif

@@ -297,7 +297,7 @@ contains
 
     birth = 1.0_c_double
     call fusion_alpha_spectrum_grid(1_c_int, available, cutoff, &
-         0.5_c_double, 0.0_c_double, 16_c_int, 513_c_int, cells, edges, &
+         0.5_c_double, 0.0_c_double, 16_c_int, 1025_c_int, cells, edges, &
          birth, out, status)
     call check(status == PB11_STATUS_INVALID_ARGUMENT .and. all(birth == 0.0_c_double) &
          .and. spectrum_is_zero(out), 'too-large quadrature clears outputs')

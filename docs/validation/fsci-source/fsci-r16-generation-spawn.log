@@ -1,0 +1,32 @@
+generating 28 family segments with 5 workers (cache=/tmp/pb11-fsci-r16-cache)
+[1/28] alpha_be8 segment 4 -> 2 table segments; elapsed 11.0s
+[2/28] alpha_be8 segment 5 -> 1 table segments; elapsed 14.5s
+[3/28] alpha_be8 segment 6 -> 1 table segments; elapsed 17.9s
+[4/28] alpha_be8 segment 3 -> 3 table segments; elapsed 19.7s
+[5/28] alpha_be8 segment 7 -> 1 table segments; elapsed 21.4s
+[6/28] alpha_be8 segment 8 -> 1 table segments; elapsed 23.2s
+[7/28] alpha_be8 segment 9 -> 1 table segments; elapsed 25.0s
+[8/28] alpha_be8 segment 10 -> 1 table segments; elapsed 27.0s
+[9/28] alpha_be8 segment 11 -> 1 table segments; elapsed 28.8s
+[10/28] alpha_be8 segment 12 -> 1 table segments; elapsed 31.1s
+[11/28] alpha_be8 segment 13 -> 1 table segments; elapsed 33.2s
+[12/28] alpha_be8 segment 2 -> 4 table segments; elapsed 41.7s
+[13/28] alpha_alpha segment 1 -> 2 table segments; elapsed 41.7s
+[14/28] alpha_alpha segment 3 -> 1 table segments; elapsed 44.3s
+[15/28] alpha_alpha segment 4 -> 1 table segments; elapsed 46.9s
+[16/28] alpha_alpha segment 5 -> 1 table segments; elapsed 49.5s
+[17/28] alpha_alpha segment 2 -> 2 table segments; elapsed 49.8s
+[18/28] alpha_alpha segment 6 -> 1 table segments; elapsed 52.0s
+[19/28] alpha_alpha segment 7 -> 1 table segments; elapsed 52.5s
+[20/28] alpha_alpha segment 8 -> 1 table segments; elapsed 54.7s
+[21/28] alpha_alpha segment 9 -> 1 table segments; elapsed 55.3s
+[22/28] alpha_alpha segment 10 -> 1 table segments; elapsed 57.6s
+[23/28] alpha_alpha segment 11 -> 1 table segments; elapsed 58.3s
+[24/28] alpha_alpha segment 0 -> 4 table segments; elapsed 58.7s
+[25/28] alpha_alpha segment 12 -> 1 table segments; elapsed 60.7s
+[26/28] alpha_alpha segment 13 -> 1 table segments; elapsed 61.5s
+[27/28] alpha_be8 segment 1 -> 7 table segments; elapsed 101.6s
+[28/28] alpha_be8 segment 0 -> 9 table segments; elapsed 233.6s
+wrote /tmp/fsci-implementation/fusion_fsci_coulomb_tables.inc
+wrote /tmp/fsci-r16-validation.json
+segment counts: ch0=34, ch1=34, ch2=34, ch3=19, ch4=19

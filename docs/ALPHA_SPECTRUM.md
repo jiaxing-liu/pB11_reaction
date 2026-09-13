@@ -109,3 +109,12 @@ particle/energy closure;256 to512 changes normalized bin shape by about0.4%.
 Do not infer spectral convergence from moment closure. The published l3 and
 mixture curves are not yet reproduced to the same accuracy as pure l1; the
 paper's fitted coefficient is not certified in this API's unit-basis convention.
+
+## Explicit FSCI alternative
+
+The compatibility entry point retains the ordinary amplitude.
+`fusion_c_alpha_spectrum_model_grid` selects NONE or the explicit16fm
+Refsgaard Model-II correction; see [FSCI_SOURCE](FSCI_SOURCE.md). Both APIs
+now permit quadrature orders through1024. The compiled/source studies retain
+spill and distinguish individual-profile convergence from convergence of a
+paired policy difference. This does not certify an incident-energy mixture.

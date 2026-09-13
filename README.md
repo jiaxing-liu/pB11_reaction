@@ -278,3 +278,8 @@ restart are documented in [SOURCE_STATE](docs/SOURCE_STATE.md). They wrap
 physical operators and do not by themselves implement host coupling. The
 [Taskaev2024 audit](docs/TASKAEV_2024_CHANNEL_EVIDENCE.md) extends the
 channel-resolved pB evidence with target-energy and angular-model caveats.
+
+[Explicit FSCI source policy](docs/FSCI_SOURCE.md) adds the documented
+Refsgaard Model-II correction at16fm and source-shape refinement to1024
+quadrature nodes. Conditional CM source sensitivity is validated separately
+from incident-branch/laboratory composition and host feedback.
