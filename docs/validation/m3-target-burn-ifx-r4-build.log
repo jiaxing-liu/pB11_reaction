@@ -1,0 +1,82 @@
+[  1%] Building CXX object CMakeFiles/pb11.dir/src/fusion_target_burn.cpp.o
+[  2%] Linking CXX static library libpb11.a
+[ 18%] Built target pb11
+[ 20%] Linking CXX executable benchmark_pb11
+[ 20%] Linking CXX executable thermal_network
+[ 22%] Built target benchmark_pb11
+[ 22%] Built target thermal_network
+[ 27%] Built target fusion_fortran
+[ 27%] Built target pb11_fortran
+[ 31%] Built target fusion_kinetics_fortran
+[ 31%] Built target fusion_beam_fortran
+[ 36%] Built target fusion_products_fortran
+[ 36%] Built target fusion_laboratory_fortran
+[ 38%] Built target fusion_spectrum_fortran
+[ 39%] Linking CXX executable test_pb11
+[ 40%] Linking CXX executable test_pb11_c
+[ 42%] Built target test_pb11
+[ 43%] Built target test_pb11_c
+[ 44%] Linking CXX executable test_pb11_source
+[ 45%] Linking CXX executable test_fusion_network
+[ 46%] Built target test_pb11_source
+[ 47%] Built target test_fusion_network
+[ 48%] Linking CXX executable test_fusion_rates
+[ 50%] Linking CXX executable test_fusion_cross_sections
+[ 51%] Built target test_fusion_rates
+[ 52%] Built target test_fusion_cross_sections
+[ 53%] Linking CXX executable test_fusion_closed_box
+[ 54%] Linking CXX executable test_fusion_kinetics
+[ 55%] Built target test_fusion_closed_box
+[ 56%] Built target test_fusion_kinetics
+[ 57%] Linking CXX executable test_fusion_coulomb
+[ 59%] Linking CXX executable test_fusion_slowing
+[ 60%] Built target test_fusion_coulomb
+[ 61%] Built target test_fusion_slowing
+[ 62%] Linking CXX executable test_fusion_beam
+[ 63%] Building CXX object CMakeFiles/test_fusion_target_burn.dir/tests/test_fusion_target_burn.cpp.o
+[ 64%] Built target test_fusion_beam
+[ 65%] Linking CXX executable test_fusion_products
+[ 67%] Built target test_fusion_products
+[ 68%] Linking CXX executable test_fusion_laboratory
+[ 69%] Built target test_fusion_laboratory
+[ 70%] Linking CXX executable test_fusion_spectrum
+[ 71%] Built target test_fusion_spectrum
+[ 72%] Linking CXX executable test_fusion_alpha_grid
+[ 73%] Built target test_fusion_alpha_grid
+[ 75%] Linking CXX executable validate_alpha_grid
+[ 76%] Linking CXX executable test_fusion_target_burn
+[ 77%] Built target validate_alpha_grid
+[ 78%] Linking Fortran executable test_pb11_fortran
+[ 78%] Built target test_fusion_target_burn
+[ 79%] Linking Fortran executable test_fusion_fortran
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[ 80%] Built target test_pb11_fortran
+[ 81%] Linking Fortran executable test_fusion_kinetics_fortran
+[ 82%] Built target test_fusion_fortran
+[ 84%] Linking Fortran executable test_fusion_beam_fortran
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[ 85%] Built target test_fusion_kinetics_fortran
+[ 86%] Linking Fortran executable test_fusion_products_fortran
+[ 87%] Built target test_fusion_beam_fortran
+[ 88%] Linking Fortran executable test_fusion_laboratory_fortran
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[ 89%] Built target test_fusion_products_fortran
+[ 90%] Built target test_fusion_laboratory_fortran
+[ 92%] Linking Fortran executable test_fusion_spectrum_fortran
+[ 93%] Linking Fortran executable test_fusion_alpha_grid_fortran
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[ 94%] Built target test_fusion_spectrum_fortran
+[ 95%] Built target test_fusion_alpha_grid_fortran
+[ 96%] Building Fortran object CMakeFiles/fusion_target_burn_fortran.dir/fortran/fusion_target_burn_fortran.f90.o
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[ 97%] Linking CXX static library libfusion_target_burn_fortran.a
+[ 97%] Built target fusion_target_burn_fortran
+[ 98%] Building Fortran object CMakeFiles/test_fusion_target_burn_fortran.dir/tests/test_fusion_target_burn_fortran.f90.o
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[100%] Linking Fortran executable test_fusion_target_burn_fortran
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[100%] Built target test_fusion_target_burn_fortran

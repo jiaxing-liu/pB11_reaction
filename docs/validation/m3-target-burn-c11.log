@@ -1,0 +1,4 @@
+cc -std=c11 -Wall -Wextra -Wpedantic -I/tmp/m3-target-burn-installed/include -c docs/validation/m3-target-burn-c11.c -o /tmp/m3-target-burn-c11.o
+c++ /tmp/m3-target-burn-c11.o -L/tmp/m3-target-burn-installed/lib -l:libpb11.a -o /tmp/m3-target-burn-c11
+/tmp/m3-target-burn-c11
+PASS trial=0.6180339887498949 window_rate=7.8655405625061842e-22 reactions=72919814837853.344

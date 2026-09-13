@@ -1,0 +1,42 @@
+[  1%] Building CXX object CMakeFiles/pb11.dir/src/fusion_target_burn.cpp.o
+[  3%] Linking CXX static library libpb11.a
+[ 29%] Built target pb11
+[ 33%] Linking CXX executable thermal_network
+[ 33%] Linking CXX executable benchmark_pb11
+[ 37%] Built target thermal_network
+[ 37%] Built target benchmark_pb11
+[ 40%] Linking CXX executable test_pb11_c
+[ 40%] Linking CXX executable test_pb11
+[ 44%] Built target test_pb11_c
+[ 44%] Built target test_pb11
+[ 48%] Linking CXX executable test_pb11_source
+[ 48%] Linking CXX executable test_fusion_network
+[ 50%] Built target test_fusion_network
+[ 51%] Built target test_pb11_source
+[ 53%] Linking CXX executable test_fusion_rates
+[ 55%] Linking CXX executable test_fusion_cross_sections
+[ 57%] Built target test_fusion_rates
+[ 59%] Built target test_fusion_cross_sections
+[ 61%] Linking CXX executable test_fusion_closed_box
+[ 62%] Linking CXX executable test_fusion_kinetics
+[ 66%] Built target test_fusion_kinetics
+[ 66%] Built target test_fusion_closed_box
+[ 70%] Linking CXX executable test_fusion_slowing
+[ 70%] Linking CXX executable test_fusion_coulomb
+[ 72%] Built target test_fusion_coulomb
+[ 74%] Built target test_fusion_slowing
+[ 75%] Building CXX object CMakeFiles/test_fusion_target_burn.dir/tests/test_fusion_target_burn.cpp.o
+[ 77%] Linking CXX executable test_fusion_beam
+[ 79%] Built target test_fusion_beam
+[ 81%] Linking CXX executable test_fusion_products
+[ 83%] Built target test_fusion_products
+[ 85%] Linking CXX executable test_fusion_laboratory
+[ 87%] Built target test_fusion_laboratory
+[ 88%] Linking CXX executable test_fusion_spectrum
+[ 90%] Built target test_fusion_spectrum
+[ 92%] Linking CXX executable test_fusion_alpha_grid
+[ 94%] Built target test_fusion_alpha_grid
+[ 96%] Linking CXX executable validate_alpha_grid
+[ 98%] Linking CXX executable test_fusion_target_burn
+[100%] Built target validate_alpha_grid
+[100%] Built target test_fusion_target_burn

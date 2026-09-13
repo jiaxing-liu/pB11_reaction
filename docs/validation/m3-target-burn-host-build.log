@@ -1,0 +1,33 @@
+ifx (IFX) 2026.1.1 20260724
+Copyright (C) 1985-2026 Intel Corporation. All rights reserved.
+
+make: Entering directory '/home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90'
+using ifx
+mkdir -p /home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/lib
+mkdir -p /home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/cache/ifx/ifort_debug
+make -C lib-srcs/src-pdx
+make[1]: Entering directory '/home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/lib-srcs/src-pdx'
+make[1]: '/home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/lib/libdivertor_ifx_r8.a' is up to date.
+make[1]: Leaving directory '/home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/lib-srcs/src-pdx'
+make -C lib-srcs/src-pdrive
+make[1]: Entering directory '/home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/lib-srcs/src-pdrive'
+make[1]: '/home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/lib/libdpellet_ifx_r8.a' is up to date.
+make[1]: Leaving directory '/home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/lib-srcs/src-pdrive'
+make -C bald
+make[1]: Entering directory '/home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/bald'
+cmake -S /home/cloud/research/pB11_reaction -B /home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/cache/ifx/ifort_debug/pb11 -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DPB11_BUILD_FORTRAN=OFF
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/cache/ifx/ifort_debug/pb11
+cmake --build /home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/cache/ifx/ifort_debug/pb11 --target pb11 -j2
+gmake[2]: Entering directory '/home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/cache/ifx/ifort_debug/pb11'
+[  6%] Building CXX object CMakeFiles/pb11.dir/src/fusion_target_burn.cpp.o
+[ 12%] Linking CXX static library libpb11.a
+[100%] Built target pb11
+gmake[2]: Leaving directory '/home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/cache/ifx/ifort_debug/pb11'
+mkdir -p ../run
+ifx main.f90 -g -check bounds -r8 -fstack-protector-all  -o ../run/xbaldur_ifx_r8 /home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/lib/libbald_ifx_r8.a /home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/cache/ifx/ifort_debug/pb11/libpb11.a -lstdc++ -L../lib/trans/lib -ltrans_ifort_r8 /home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/lib/futil/lib/libfutil_ifort_r8.a -L../lib/vmom2/lib -lgseq_ifort_r8 /home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/lib/monte/lib/libmonte_ifort_r8.a /home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/lib/aegis/lib/libaegis_ifort_r8.a  -lncarg -lncarg_gks -lncarg_c -lX11 -lXext -lcairo -lfontconfig -lpixman-1 -lfreetype -lexpat -lpng -lz -lgfortran -lblas -llapack /home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/lib/aegis/lib/libaegisloc_ifort_r8.a -L/home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/lib -ldivertor_ifx_r8 -L/home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/lib -ldpellet_ifx_r8
+ifx: remark #10440: Note that use of a debug option without any optimization-level option will turnoff most compiler optimizations similar to use of '-O0'
+new ../run/xbaldur_ifx_r8 constructed
+make[1]: Leaving directory '/home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90/bald'
+make: Leaving directory '/home/cloud/research/pB-baldur/baldur-code/bald_ifort-stdf90'

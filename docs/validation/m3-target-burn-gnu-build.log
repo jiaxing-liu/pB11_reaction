@@ -1,0 +1,101 @@
+[ 18%] Built target pb11
+[ 20%] Building CXX object CMakeFiles/benchmark_pb11.dir/examples/benchmark_pb11.cpp.o
+[ 20%] Building CXX object CMakeFiles/thermal_network.dir/examples/thermal_network.cpp.o
+[ 21%] Linking CXX executable thermal_network
+[ 21%] Built target thermal_network
+[ 22%] Building Fortran object CMakeFiles/pb11_fortran.dir/fortran/pb11_fortran.f90.o
+[ 23%] Linking CXX executable benchmark_pb11
+[ 25%] Linking CXX static library libpb11_fortran.a
+[ 25%] Built target pb11_fortran
+[ 26%] Building Fortran object CMakeFiles/fusion_fortran.dir/fortran/fusion_fortran.f90.o
+[ 26%] Built target benchmark_pb11
+[ 27%] Building Fortran object CMakeFiles/fusion_kinetics_fortran.dir/fortran/fusion_kinetics_fortran.f90.o
+[ 28%] Linking CXX static library libfusion_fortran.a
+[ 29%] Linking CXX static library libfusion_kinetics_fortran.a
+[ 29%] Built target fusion_fortran
+[ 31%] Built target fusion_beam_fortran
+[ 31%] Built target fusion_kinetics_fortran
+[ 32%] Building Fortran object CMakeFiles/fusion_products_fortran.dir/fortran/fusion_products_fortran.f90.o
+[ 34%] Building Fortran object CMakeFiles/fusion_laboratory_fortran.dir/fortran/fusion_laboratory_fortran.f90.o
+[ 35%] Linking CXX static library libfusion_products_fortran.a
+[ 36%] Linking CXX static library libfusion_laboratory_fortran.a
+[ 36%] Built target fusion_products_fortran
+[ 36%] Built target fusion_laboratory_fortran
+[ 37%] Building Fortran object CMakeFiles/fusion_spectrum_fortran.dir/fortran/fusion_spectrum_fortran.f90.o
+[ 38%] Building CXX object CMakeFiles/test_pb11.dir/tests/test_pb11.cpp.o
+[ 39%] Linking CXX static library libfusion_spectrum_fortran.a
+[ 39%] Built target fusion_spectrum_fortran
+[ 40%] Building CXX object CMakeFiles/test_pb11_c.dir/tests/test_pb11_c.cpp.o
+[ 42%] Linking CXX executable test_pb11
+[ 43%] Linking CXX executable test_pb11_c
+[ 43%] Built target test_pb11
+[ 44%] Building CXX object CMakeFiles/test_pb11_source.dir/tests/test_pb11_source.cpp.o
+[ 44%] Built target test_pb11_c
+[ 45%] Building CXX object CMakeFiles/test_fusion_network.dir/tests/test_fusion_network.cpp.o
+[ 47%] Linking CXX executable test_fusion_network
+[ 47%] Linking CXX executable test_pb11_source
+[ 47%] Built target test_fusion_network
+[ 47%] Built target test_pb11_source
+[ 48%] Building CXX object CMakeFiles/test_fusion_rates.dir/tests/test_fusion_rates.cpp.o
+[ 50%] Building CXX object CMakeFiles/test_fusion_cross_sections.dir/tests/test_fusion_cross_sections.cpp.o
+[ 51%] Linking CXX executable test_fusion_rates
+[ 51%] Built target test_fusion_rates
+[ 52%] Building CXX object CMakeFiles/test_fusion_closed_box.dir/tests/test_fusion_closed_box.cpp.o
+[ 53%] Linking CXX executable test_fusion_closed_box
+[ 53%] Built target test_fusion_closed_box
+[ 54%] Building CXX object CMakeFiles/test_fusion_kinetics.dir/tests/test_fusion_kinetics.cpp.o
+[ 55%] Linking CXX executable test_fusion_cross_sections
+[ 55%] Built target test_fusion_cross_sections
+[ 56%] Building CXX object CMakeFiles/test_fusion_coulomb.dir/tests/test_fusion_coulomb.cpp.o
+[ 57%] Linking CXX executable test_fusion_kinetics
+[ 57%] Built target test_fusion_kinetics
+[ 59%] Building CXX object CMakeFiles/test_fusion_slowing.dir/tests/test_fusion_slowing.cpp.o
+[ 60%] Linking CXX executable test_fusion_coulomb
+[ 60%] Built target test_fusion_coulomb
+[ 61%] Building CXX object CMakeFiles/test_fusion_beam.dir/tests/test_fusion_beam.cpp.o
+[ 62%] Linking CXX executable test_fusion_slowing
+[ 62%] Built target test_fusion_slowing
+[ 64%] Built target test_fusion_target_burn
+[ 65%] Building CXX object CMakeFiles/test_fusion_products.dir/tests/test_fusion_products.cpp.o
+[ 67%] Linking CXX executable test_fusion_products
+[ 67%] Built target test_fusion_products
+[ 68%] Building CXX object CMakeFiles/test_fusion_laboratory.dir/tests/test_fusion_laboratory.cpp.o
+[ 69%] Linking CXX executable test_fusion_laboratory
+[ 69%] Built target test_fusion_laboratory
+[ 70%] Building CXX object CMakeFiles/test_fusion_spectrum.dir/tests/test_fusion_spectrum.cpp.o
+[ 71%] Linking CXX executable test_fusion_beam
+[ 71%] Built target test_fusion_beam
+[ 72%] Building CXX object CMakeFiles/test_fusion_alpha_grid.dir/tests/test_fusion_alpha_grid.cpp.o
+[ 73%] Linking CXX executable test_fusion_spectrum
+[ 73%] Built target test_fusion_spectrum
+[ 75%] Building CXX object CMakeFiles/validate_alpha_grid.dir/tools/validate_alpha_grid.cpp.o
+[ 76%] Linking CXX executable test_fusion_alpha_grid
+[ 76%] Built target test_fusion_alpha_grid
+[ 77%] Building Fortran object CMakeFiles/test_pb11_fortran.dir/tests/test_pb11_fortran.f90.o
+[ 78%] Linking Fortran executable test_pb11_fortran
+[ 78%] Built target test_pb11_fortran
+[ 79%] Linking CXX executable validate_alpha_grid
+[ 80%] Building Fortran object CMakeFiles/test_fusion_fortran.dir/tests/test_fusion_fortran.f90.o
+[ 81%] Linking Fortran executable test_fusion_fortran
+[ 81%] Built target validate_alpha_grid
+[ 82%] Building Fortran object CMakeFiles/test_fusion_kinetics_fortran.dir/tests/test_fusion_kinetics_fortran.f90.o
+[ 82%] Built target test_fusion_fortran
+[ 84%] Linking Fortran executable test_fusion_kinetics_fortran
+[ 85%] Building Fortran object CMakeFiles/test_fusion_beam_fortran.dir/tests/test_fusion_beam_fortran.f90.o
+[ 86%] Linking Fortran executable test_fusion_beam_fortran
+[ 86%] Built target test_fusion_kinetics_fortran
+[ 87%] Building Fortran object CMakeFiles/test_fusion_products_fortran.dir/tests/test_fusion_products_fortran.f90.o
+[ 87%] Built target test_fusion_beam_fortran
+[ 88%] Linking Fortran executable test_fusion_products_fortran
+[ 89%] Building Fortran object CMakeFiles/test_fusion_laboratory_fortran.dir/tests/test_fusion_laboratory_fortran.f90.o
+[ 90%] Linking Fortran executable test_fusion_laboratory_fortran
+[ 90%] Built target test_fusion_products_fortran
+[ 92%] Building Fortran object CMakeFiles/test_fusion_spectrum_fortran.dir/tests/test_fusion_spectrum_fortran.f90.o
+[ 93%] Linking Fortran executable test_fusion_spectrum_fortran
+[ 93%] Built target test_fusion_laboratory_fortran
+[ 94%] Building Fortran object CMakeFiles/test_fusion_alpha_grid_fortran.dir/tests/test_fusion_alpha_grid_fortran.f90.o
+[ 94%] Built target test_fusion_spectrum_fortran
+[ 95%] Linking Fortran executable test_fusion_alpha_grid_fortran
+[ 97%] Built target fusion_target_burn_fortran
+[100%] Built target test_fusion_target_burn_fortran
+[100%] Built target test_fusion_alpha_grid_fortran
