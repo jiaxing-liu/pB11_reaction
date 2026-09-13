@@ -1,4 +1,7 @@
 #include "fusion_rate_model.h"
+#include "fusion_pb_population.h"
+#include "fusion_nuclear_data.h"
+#include "fusion_pb_population_data.h"
 #include <boost/math/quadrature/gauss_kronrod.hpp>
 #include <algorithm>
 #include <cmath>
@@ -30,17 +33,35 @@ Real one_minus_langevin(Real a) {
     return 1/a-2/std::expm1(2*a);
 }
 
+double population_weight(int population,int policy,int low,double energy,double peak,double scale) {
+    if(!population)return 1.;
+    fusion_pb_population_v1 r{};
+    const int status=fusion_c_pb_population(policy,low,energy,peak,scale,&r);
+    if(status)throw status;
+    switch(population){
+    case 1:return r.alpha0_peak_fraction;
+    case 2:return r.narrow_remainder_fraction;
+    case 3:return r.other_remainder_fraction;
+    case 4:return r.continuum_extrapolated_fraction;
+    default:throw PB11_STATUS_INVALID_ARGUMENT;
+    }
+}
 struct Kernel {
     int channel;
     int policy=0,pb_low=0;
     Real ma,mb,mu,ea,temp,v,u,energy_scale;
     double s;
+    int population=0;
+    double peak=0,continuum_scale=0;
     double probability(double x) const {
         const Real a=4*static_cast<Real>(x)*s;
         const Real factor=a==0?1:-std::expm1(-a)/a;
         const Real delta=static_cast<Real>(x)-s;
-        return static_cast<double>(4*x*static_cast<Real>(x)/std::sqrt(std::acos(-1.L))*
+        const double base=static_cast<double>(4*x*static_cast<Real>(x)/std::sqrt(std::acos(-1.L))*
                                   std::exp(-delta*delta)*factor);
+        if(!population || base==0)return base;
+        double e=0;if(!put(relative_energy(x),e))throw PB11_STATUS_NUMERICAL_FAILURE;
+        return base*population_weight(population,policy,pb_low,e,peak,continuum_scale);
     }
     Real relative_energy(double x) const {const Real w=u*x;return mu*w*w/2;}
     double reaction_integrand(double x,int moment) const {
@@ -75,7 +96,7 @@ std::vector<double> make_cuts(const Kernel &k,double lo,double hi,bool nuclear) 
     std::vector<double> cuts{lo,hi};
     for(double delta:{-40.,-16.,-8.,-4.,-2.,-1.,0.,1.,2.,4.,8.,16.,40.})
         add_cut(cuts,k.s+delta,lo,hi);
-    if(nuclear) {
+    if(nuclear || k.population) {
         // Existing fit boundaries and narrow/broad resonance scales. Gaussian
         // knots above keep the cold-target peak resolved independently.
         if(k.channel==FUSION_PB11_3ALPHA) {
@@ -85,6 +106,14 @@ std::vector<double> make_cuts(const Kernel &k,double lo,double hi,bool nuclear) 
             add_cut(cuts,static_cast<double>(std::sqrt(2*530*kev/k.mu)/k.u),lo,hi);
         else if(k.channel==FUSION_DHE3_ALPHAP)
             add_cut(cuts,static_cast<double>(std::sqrt(2*900*kev/k.mu)/k.u),lo,hi);
+    }
+    if(k.population){
+        fusion_nuclear_mass_v1 p{},b{};
+        int status=fusion_c_nuclear_mass(FUSION_PROTON,&p);if(status)throw status;
+        status=fusion_c_nuclear_mass(FUSION_BORON11,&b);if(status)throw status;
+        const Real ratio=static_cast<Real>(b.mass_kg)/(p.mass_kg+static_cast<Real>(b.mass_kg));
+        for(double e:pb_population_data::lab_keV)
+            add_cut(cuts,static_cast<double>(std::sqrt(2*e*kev*ratio/k.mu)/k.u),lo,hi);
     }
     std::sort(cuts.begin(),cuts.end());
     cuts.erase(std::unique(cuts.begin(),cuts.end()),cuts.end());
@@ -113,7 +142,7 @@ double integrate(const Kernel &k,double lo,double hi,bool nuclear,
 
 static int beam_segment(int ch,double ma_in,double mb_in,
     double ea_in,double temp_in,fusion_beam_window_v1 *out,
-    int policy=0,int pb_low=0,int segment=0) {
+    int policy=0,int pb_low=0,int segment=0,int population=0,double peak=0,double continuum_scale=0) {
     if(!out) return PB11_STATUS_NULL_OUTPUT;
     *out={};
     if(!std::isfinite(ma_in) || !std::isfinite(mb_in) ||
@@ -157,6 +186,19 @@ static int beam_segment(int ch,double ma_in,double mb_in,
                    !put((ea-er)*v*sigma,result.cm_energy_reactivity_J_m3_s))
                     return PB11_STATUS_NUMERICAL_FAILURE;
             }
+            if(population){
+                const double weight=population_weight(population,policy,pb_low,er_double,peak,continuum_scale);
+                double fusion_beam_window_v1::*fields[]={
+                    &fusion_beam_window_v1::resolved_reactivity_m3_s,
+                    &fusion_beam_window_v1::projectile_energy_reactivity_J_m3_s,
+                    &fusion_beam_window_v1::target_energy_reactivity_J_m3_s,
+                    &fusion_beam_window_v1::relative_energy_reactivity_J_m3_s,
+                    &fusion_beam_window_v1::cm_energy_reactivity_J_m3_s,
+                    &fusion_beam_window_v1::resolved_pair_probability,
+                    &fusion_beam_window_v1::unresolved_pair_probability,
+                    &fusion_beam_window_v1::unresolved_relative_speed_m_s};
+                for(auto field:fields)result.*field*=weight;
+            }
             *out=result; return PB11_STATUS_OK;
         }
         const Real u=std::sqrt(2*temp/mb);
@@ -164,7 +206,7 @@ static int beam_segment(int ch,double ma_in,double mb_in,
         // Beyond this ratio subtracting neighboring speeds loses useful
         // quadrature resolution. The exact cold target remains available.
         if(!std::isfinite(s) || s>1e6) return PB11_STATUS_NUMERICAL_FAILURE;
-        Kernel k{ch,policy,pb_low,ma,mb,mu,ea,temp,v,u,std::max({ea,temp,static_cast<Real>(fit_max)}),s};
+        Kernel k{ch,policy,pb_low,ma,mb,mu,ea,temp,v,u,std::max({ea,temp,static_cast<Real>(fit_max)}),s,population,peak,continuum_scale};
         const double lower=std::max(0.,s-gaussian_extent),upper=s+gaussian_extent;
         const double data_lower=static_cast<double>(std::sqrt(2*emin/mu)/u);
         const double data_upper=static_cast<double>(std::sqrt(2*emax/mu)/u);
@@ -200,7 +242,7 @@ static int beam_segment(int ch,double ma_in,double mb_in,
             result.target_energy_reactivity_J_m3_s+result.relative_energy_reactivity_J_m3_s+
             result.cm_energy_reactivity_J_m3_s;
         if(!put(residual,result.energy_identity_error_J_m3_s) || std::abs(residual)>1e-9L*escale ||
-           std::abs(result.resolved_pair_probability+result.unresolved_pair_probability-1)>1e-9 ||
+           (!population && std::abs(result.resolved_pair_probability+result.unresolved_pair_probability-1)>1e-9) ||
            (rate>0 && rate_error>1e-8*rate)) return PB11_STATUS_NUMERICAL_FAILURE;
         *out=result;
         return PB11_STATUS_OK;
@@ -215,7 +257,7 @@ extern "C" int fusion_c_beam_maxwellian_window(int ch,double ma,double mb,
 
 static int thermal_segment(int ch,double ma_in,
     double mb_in,double ta_in,double tb_in,fusion_beam_window_v1 *out,
-    int policy=0,int pb_low=0,int segment=0) {
+    int policy=0,int pb_low=0,int segment=0,int population=0,double peak=0,double continuum_scale=0) {
     if(!out) return PB11_STATUS_NULL_OUTPUT;
     *out={};
     if(!std::isfinite(ma_in) || !std::isfinite(mb_in) ||
@@ -229,7 +271,7 @@ static int thermal_segment(int ch,double ma_in,
     if(!put(tb+(mb/ma)*ta,effective_target) ||
        (effective_target==0 && (ta>0 || tb>0))) return PB11_STATUS_NUMERICAL_FAILURE;
     fusion_beam_window_v1 result{};
-    const int status=beam_segment(ch,ma_in,mb_in,0,effective_target,&result,policy,pb_low,segment);
+    const int status=beam_segment(ch,ma_in,mb_in,0,effective_target,&result,policy,pb_low,segment,population,peak,continuum_scale);
     if(status) return status;
     if(ta==0 && tb==0) {*out=result;return PB11_STATUS_OK;}
     const Real tr=(mb*ta+ma*tb)/m;
@@ -257,15 +299,15 @@ extern "C" int fusion_c_thermal_pair_maxwellian_window(int ch,double ma,double m
 
 namespace {
 int model_integral(bool thermal,int ch,int policy,int low,double ma,double mb,
-    double ea,double tb,fusion_rate_model_v1 *out) {
+    double ea,double tb,fusion_rate_model_v1 *out,int population=0,double peak=0,double continuum_scale=0) {
     if(!out)return PB11_STATUS_NULL_OUTPUT;
     *out={};
     if(policy==0)return PB11_STATUS_INVALID_ARGUMENT;
     fusion_rate_model_v1 r{};
     fusion_beam_window_v1 *parts[]={&r.fit,&r.below,&r.above};
     for(int j=0;j<3;++j) {
-        const int status=thermal?thermal_segment(ch,ma,mb,ea,tb,parts[j],policy,low,j):
-            beam_segment(ch,ma,mb,ea,tb,parts[j],policy,low,j);
+        const int status=thermal?thermal_segment(ch,ma,mb,ea,tb,parts[j],policy,low,j,population,peak,continuum_scale):
+            beam_segment(ch,ma,mb,ea,tb,parts[j],policy,low,j,population,peak,continuum_scale);
         if(status)return status;
     }
     // Sum named physical moments, never the complement probabilities: each
@@ -287,7 +329,7 @@ int model_integral(bool thermal,int ch,int policy,int low,double ma,double mb,
         er=r.total.relative_energy_reactivity_J_m3_s,cm=r.total.cm_energy_reactivity_J_m3_s;
     if(!put(a+b-er-cm,r.total.energy_identity_error_J_m3_s) ||
        std::abs(a+b-er-cm)>1e-9L*(a+b+er+cm) ||
-       std::abs(r.total.resolved_pair_probability-1)>1e-9)
+       (!population && std::abs(r.total.resolved_pair_probability-1)>1e-9))
         return PB11_STATUS_NUMERICAL_FAILURE;
     *out=r;return PB11_STATUS_OK;
 }
@@ -299,4 +341,50 @@ extern "C" int fusion_c_beam_maxwellian_model(int ch,int policy,int low,
 extern "C" int fusion_c_thermal_pair_maxwellian_model(int ch,int policy,int low,
     double ma,double mb,double ta,double tb,fusion_rate_model_v1 *out) {
     return model_integral(true,ch,policy,low,ma,mb,ta,tb,out);
+}
+
+namespace {
+int population_rates(bool thermal,int policy,int low,double ma,double mb,double ea,double tb,
+ double peak,double scale,fusion_pb_population_rates_v1 *out){
+    if(!out)return PB11_STATUS_NULL_OUTPUT;
+    *out={};
+    fusion_pb_population_v1 check{};
+    int status=fusion_c_pb_population(policy,low,0,peak,scale,&check);if(status)return status;
+    if(!std::isfinite(ma)||!std::isfinite(mb))return PB11_STATUS_INVALID_ARGUMENT;
+    fusion_nuclear_mass_v1 p{},b{};
+    status=fusion_c_nuclear_mass(FUSION_PROTON,&p);if(status)return status;
+    status=fusion_c_nuclear_mass(FUSION_BORON11,&b);if(status)return status;
+    if(!((ma==p.mass_kg && mb==b.mass_kg)||(ma==b.mass_kg && mb==p.mass_kg)))return PB11_STATUS_OUT_OF_RANGE;
+    fusion_pb_population_rates_v1 result{};
+    fusion_beam_window_v1 *outputs[]={&result.total,&result.alpha0_peak,&result.narrow_remainder,
+        &result.other_remainder,&result.continuum_extrapolated};
+    for(int j=0;j<5;++j){
+        fusion_rate_model_v1 r{};
+        status=model_integral(thermal,FUSION_PB11_3ALPHA,policy,low,ma,mb,ea,tb,&r,j,peak,scale);
+        if(status)return status;
+        *outputs[j]=r.total;
+    }
+    double fusion_beam_window_v1::*fields[]={
+        &fusion_beam_window_v1::resolved_reactivity_m3_s,
+        &fusion_beam_window_v1::projectile_energy_reactivity_J_m3_s,
+        &fusion_beam_window_v1::target_energy_reactivity_J_m3_s,
+        &fusion_beam_window_v1::relative_energy_reactivity_J_m3_s,
+        &fusion_beam_window_v1::cm_energy_reactivity_J_m3_s,
+        &fusion_beam_window_v1::resolved_pair_probability};
+    for(auto field:fields){
+        Real sum=static_cast<Real>(result.alpha0_peak.*field)+result.narrow_remainder.*field+result.other_remainder.*field;
+        Real total=result.total.*field;
+        if(std::abs(sum-total)>1e-8L*(std::abs(sum)+std::abs(total)) ||
+           result.continuum_extrapolated.*field>total*(1+1e-8L))return PB11_STATUS_NUMERICAL_FAILURE;
+    }
+    *out=result;return PB11_STATUS_OK;
+}
+}
+extern "C" int fusion_c_pb_thermal_population_rates(int policy,int low,double ma,double mb,
+ double ta,double tb,double peak,double scale,fusion_pb_population_rates_v1 *out){
+ return population_rates(true,policy,low,ma,mb,ta,tb,peak,scale,out);
+}
+extern "C" int fusion_c_pb_beam_population_rates(int policy,int low,double ma,double mb,
+ double ea,double tb,double peak,double scale,fusion_pb_population_rates_v1 *out){
+ return population_rates(false,policy,low,ma,mb,ea,tb,peak,scale,out);
 }

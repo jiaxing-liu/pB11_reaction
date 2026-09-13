@@ -132,3 +132,11 @@ The analytic alpha0 marginal and explicit conditional three-family CM mixture
 are now implemented in fusion_pb_birth.h; see PB_BIRTH.md. This supplies no
 automatic incident-energy branching or laboratory angular samples. The
 remaining composition steps above are unchanged.
+
+The effective entrance-energy population model is now available through
+fusion_pb_population.h; see PB_POPULATION.md for assumptions, selected
+energy moments and coverage diagnostics. Its narrow/other REMAINDERS are
+not automatically the low/broad alpha1 fractions of fusion_pb_birth.h.
+The ground-state ghost and continuum source shapes remain explicit source
+choices requiring sensitivity accounting. Do not silently equate the two
+interfaces just because each returns three fractions.

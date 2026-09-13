@@ -287,3 +287,8 @@ from incident-branch/laboratory composition and host feedback.
 Conditional pB CM birth composition and narrow-width alpha0 source are
 available through `fusion_pb_birth.h` and `fusion_pb_birth_fortran`; see
 [PB_BIRTH](docs/PB_BIRTH.md) for explicit branch inputs and validation scope.
+
+[Explicit pB population weighting](docs/PB_POPULATION.md) adds point fractions
+and thermal/beam reaction-weighted rates and selected energy moments through
+`fusion_pb_population.h` and its Fortran module. Remainders are deliberately
+not relabeled as experimentally resolved alpha1 spectra.

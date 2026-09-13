@@ -1,0 +1,128 @@
+-- Configuring done (0.0s)
+-- Generating done (0.1s)
+-- Build files have been written to: /tmp/m3-target-burn-gnu
+[  2%] Building CXX object CMakeFiles/pb11.dir/src/fusion_pb_population.cpp.o
+[  2%] Building CXX object CMakeFiles/pb11.dir/src/fusion_beam.cpp.o
+[  3%] Linking CXX static library libpb11.a
+[ 16%] Built target pb11
+[ 18%] Linking CXX executable benchmark_pb11
+[ 18%] Linking CXX executable thermal_network
+[ 18%] Built target thermal_network
+[ 18%] Built target benchmark_pb11
+[ 20%] Built target pb11_fortran
+[ 20%] Built target fusion_fortran
+[ 22%] Built target fusion_handoff_fortran
+[ 22%] Built target fusion_kinetics_fortran
+[ 24%] Built target fusion_pb_birth_fortran
+[ 24%] Built target fusion_beam_fortran
+[ 26%] Built target fusion_spectrum_fortran
+[ 26%] Built target fusion_source_state_fortran
+[ 29%] Built target fusion_laboratory_fortran
+[ 29%] Built target fusion_thermal_burn_fortran
+[ 32%] Built target fusion_rate_model_fortran
+[ 32%] Built target fusion_target_burn_fortran
+[ 33%] Built target fusion_products_fortran
+[ 34%] Linking CXX executable test_pb11
+[ 34%] Linking CXX executable test_pb11_c
+[ 34%] Built target test_pb11
+[ 35%] Built target test_pb11_c
+[ 36%] Linking CXX executable test_pb11_source
+[ 37%] Linking CXX executable test_fusion_network
+[ 38%] Built target test_pb11_source
+[ 39%] Built target test_fusion_network
+[ 39%] Linking CXX executable test_fusion_rates
+[ 40%] Linking CXX executable test_fusion_cross_sections
+[ 41%] Built target test_fusion_rates
+[ 41%] Built target test_fusion_cross_sections
+[ 41%] Linking CXX executable test_fusion_closed_box
+[ 41%] Linking CXX executable test_fusion_kinetics
+[ 42%] Built target test_fusion_closed_box
+[ 43%] Built target test_fusion_kinetics
+[ 44%] Linking CXX executable test_fusion_coulomb
+[ 45%] Linking CXX executable test_fusion_slowing
+[ 46%] Built target test_fusion_coulomb
+[ 47%] Built target test_fusion_slowing
+[ 48%] Linking CXX executable test_fusion_rate_model
+[ 49%] Linking CXX executable test_fusion_beam
+[ 49%] Built target test_fusion_rate_model
+[ 49%] Built target test_fusion_beam
+[ 50%] Linking CXX executable test_fusion_transfer_rate
+[ 50%] Linking CXX executable test_fusion_two_component
+[ 50%] Built target test_fusion_transfer_rate
+[ 51%] Built target test_fusion_two_component
+[ 52%] Linking CXX executable test_fusion_two_component_slowing
+[ 53%] Linking CXX executable test_fusion_handoff
+[ 54%] Built target test_fusion_two_component_slowing
+[ 54%] Built target test_fusion_handoff
+[ 54%] Building CXX object CMakeFiles/test_fusion_pb_population.dir/tests/test_fusion_pb_population.cpp.o
+[ 54%] Linking CXX executable test_fusion_pb_birth
+[ 55%] Built target test_fusion_pb_birth
+[ 55%] Linking CXX executable test_fusion_fsci
+[ 56%] Built target test_fusion_fsci
+[ 57%] Linking CXX executable test_fusion_source_state
+[ 57%] Built target test_fusion_source_state
+[ 58%] Linking CXX executable test_fusion_nuclear_data
+[ 59%] Linking CXX executable test_fusion_pb_population
+[ 59%] Built target test_fusion_nuclear_data
+[ 60%] Linking CXX executable study_nuclear_windows
+[ 60%] Built target test_fusion_pb_population
+[ 61%] Linking CXX executable validate_nuclear_birth
+[ 61%] Built target study_nuclear_windows
+[ 61%] Linking CXX executable test_fusion_thermal_burn
+[ 62%] Built target validate_nuclear_birth
+[ 63%] Linking CXX executable test_fusion_target_burn
+[ 64%] Built target test_fusion_thermal_burn
+[ 64%] Linking CXX executable test_fusion_products
+[ 64%] Built target test_fusion_target_burn
+[ 65%] Linking CXX executable test_fusion_laboratory
+[ 66%] Built target test_fusion_products
+[ 66%] Linking CXX executable test_fusion_spectrum
+[ 66%] Built target test_fusion_laboratory
+[ 66%] Linking CXX executable test_fusion_alpha_grid
+[ 67%] Built target test_fusion_spectrum
+[ 67%] Linking CXX executable validate_alpha_grid
+[ 68%] Built target test_fusion_alpha_grid
+[ 68%] Linking Fortran executable test_pb11_fortran
+[ 69%] Built target validate_alpha_grid
+[ 69%] Linking Fortran executable test_fusion_fortran
+[ 70%] Built target test_pb11_fortran
+[ 71%] Linking Fortran executable test_fusion_kinetics_fortran
+[ 72%] Built target test_fusion_fortran
+[ 73%] Linking Fortran executable test_fusion_rate_model_fortran
+[ 74%] Built target test_fusion_kinetics_fortran
+[ 74%] Linking Fortran executable test_fusion_beam_fortran
+[ 74%] Built target test_fusion_rate_model_fortran
+[ 74%] Linking Fortran executable test_fusion_handoff_fortran
+[ 75%] Built target test_fusion_beam_fortran
+[ 76%] Linking Fortran executable test_fusion_pb_birth_fortran
+[ 77%] Built target test_fusion_handoff_fortran
+[ 78%] Linking Fortran executable test_fusion_source_state_fortran
+[ 79%] Built target test_fusion_pb_birth_fortran
+[ 80%] Linking Fortran executable test_fusion_thermal_burn_fortran
+[ 80%] Built target test_fusion_source_state_fortran
+[ 80%] Linking Fortran executable test_fusion_target_burn_fortran
+[ 81%] Built target test_fusion_thermal_burn_fortran
+[ 82%] Linking Fortran executable test_fusion_products_fortran
+[ 83%] Built target test_fusion_target_burn_fortran
+[ 83%] Linking Fortran executable test_fusion_laboratory_fortran
+[ 84%] Built target test_fusion_products_fortran
+[ 85%] Linking Fortran executable test_fusion_spectrum_fortran
+[ 86%] Built target test_fusion_laboratory_fortran
+[ 87%] Linking Fortran executable test_fusion_alpha_grid_fortran
+[ 88%] Built target test_fusion_spectrum_fortran
+[ 89%] Built target fusion_two_component_fortran
+[ 90%] Built target test_fusion_alpha_grid_fortran
+[ 90%] Building Fortran object CMakeFiles/fusion_pb_population_fortran.dir/fortran/fusion_pb_population_fortran.f90.o
+[ 92%] Built target fusion_fsci_fortran
+[ 94%] Built target fusion_nuclear_data_fortran
+[ 95%] Linking CXX static library libfusion_pb_population_fortran.a
+[ 95%] Linking Fortran executable test_fusion_two_component_fortran
+[ 95%] Built target fusion_pb_population_fortran
+[ 96%] Linking Fortran executable test_fusion_fsci_fortran
+[ 97%] Built target test_fusion_two_component_fortran
+[ 98%] Linking Fortran executable test_fusion_nuclear_data_fortran
+[ 99%] Built target test_fusion_fsci_fortran
+[ 99%] Building Fortran object CMakeFiles/test_fusion_pb_population_fortran.dir/tests/test_fusion_pb_population_fortran.f90.o
+[100%] Linking Fortran executable test_fusion_pb_population_fortran
+[100%] Built target test_fusion_nuclear_data_fortran
+[100%] Built target test_fusion_pb_population_fortran

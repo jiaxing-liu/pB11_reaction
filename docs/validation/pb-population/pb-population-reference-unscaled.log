@@ -1,0 +1,12 @@
+checked 0 2
+checked 0 10
+checked 0 50
+checked 0 150
+checked 0 300
+checked 0 1000
+checked 1 150
+Traceback (most recent call last):
+  File "/tmp/reference_pb_population.py", line 69, in <module>
+    assert max(errs.values())<2e-7,(kind,T,part,errs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: (1, 1000, 2, {'K': 0.0016046987912996245, 'Ea': 0.0016046987912994505, ' Eb': 0.0016185002313473145, 'Erel': 0.0015975178674951394, 'Ecm': 0.001615593175594057})
