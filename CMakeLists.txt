@@ -31,7 +31,9 @@ add_library(pb11 src/pb11.cpp src/pb11_c.cpp src/pb11_source.cpp
                    src/fusion_network.cpp src/fusion_rates.cpp
                    src/fusion_cross_sections.cpp src/fusion_kinetics.cpp
                    src/fusion_coulomb.cpp src/fusion_beam.cpp
-                   src/fusion_products.cpp src/fusion_laboratory.cpp)
+                   src/fusion_products.cpp src/fusion_laboratory.cpp
+                   src/fusion_nuclear_coulomb.cpp
+                   src/fusion_alpha_amplitudes.cpp)
 add_library(pb11::pb11 ALIAS pb11)
 
 target_compile_features(pb11 PUBLIC cxx_std_17)
@@ -160,6 +162,24 @@ if(PB11_FORTRAN_AVAILABLE)
             "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>"
     )
     target_link_libraries(fusion_laboratory_fortran PUBLIC pb11::pb11)
+
+    add_library(fusion_spectrum_fortran STATIC
+                fortran/fusion_spectrum_fortran.f90)
+    add_library(pb11::fusion_spectrum_fortran ALIAS fusion_spectrum_fortran)
+    set_target_properties(
+        fusion_spectrum_fortran
+        PROPERTIES
+            Fortran_MODULE_DIRECTORY
+                "${CMAKE_CURRENT_BINARY_DIR}/fortran-mod"
+            EXPORT_NAME fusion_spectrum_fortran
+    )
+    target_include_directories(
+        fusion_spectrum_fortran
+        INTERFACE
+            "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>"
+            "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>"
+    )
+    target_link_libraries(fusion_spectrum_fortran PUBLIC pb11::pb11)
 endif()
 
 include(CTest)
@@ -218,6 +238,10 @@ if(BUILD_TESTING)
     target_link_libraries(test_fusion_laboratory PRIVATE pb11::pb11)
     add_test(NAME fusion_laboratory_tests COMMAND test_fusion_laboratory)
 
+    add_executable(test_fusion_spectrum tests/test_fusion_spectrum.cpp)
+    target_link_libraries(test_fusion_spectrum PRIVATE pb11::pb11)
+    add_test(NAME fusion_spectrum_tests COMMAND test_fusion_spectrum)
+
     if(PB11_FORTRAN_AVAILABLE)
         add_executable(test_pb11_fortran tests/test_pb11_fortran.f90)
         set_target_properties(test_pb11_fortran PROPERTIES
@@ -272,6 +296,16 @@ if(BUILD_TESTING)
                               pb11::fusion_laboratory_fortran)
         add_test(NAME fusion_laboratory_fortran_binding_tests
                  COMMAND test_fusion_laboratory_fortran)
+
+        add_executable(test_fusion_spectrum_fortran
+                       tests/test_fusion_spectrum_fortran.f90)
+        set_target_properties(test_fusion_spectrum_fortran PROPERTIES
+                              POSITION_INDEPENDENT_CODE ON
+                              LINKER_LANGUAGE Fortran)
+        target_link_libraries(test_fusion_spectrum_fortran PRIVATE
+                              pb11::fusion_spectrum_fortran)
+        add_test(NAME fusion_spectrum_fortran_binding_tests
+                 COMMAND test_fusion_spectrum_fortran)
     endif()
 endif()
 
@@ -286,7 +320,7 @@ if(PB11_FORTRAN_AVAILABLE)
     install(
         TARGETS pb11_fortran fusion_fortran fusion_kinetics_fortran
                 fusion_beam_fortran fusion_products_fortran
-                fusion_laboratory_fortran
+                fusion_laboratory_fortran fusion_spectrum_fortran
         EXPORT pb11Targets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -304,6 +338,7 @@ install(
           include/fusion_cross_sections.h include/fusion_kinetics.h
           include/fusion_coulomb.h include/fusion_beam.h
           include/fusion_products.h include/fusion_laboratory.h
+          include/fusion_nuclear_coulomb.h include/fusion_alpha_amplitudes.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(

@@ -1,0 +1,1 @@
+PASS: 27 coherent events, cyclic/secondary/rotation checks and independent angular polynomial

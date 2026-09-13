@@ -15,6 +15,7 @@ The public API uses `double` precision. Implemented modules include:
 - [Beam/Maxwellian window rates and unequal-temperature reactant energy moments](docs/BEAM_AND_THERMAL_MOMENTS.md).
 - [Conservative birth mapping and sequential product kinematics](docs/PRODUCT_KINEMATICS_AND_MAPPING.md).
 - [Unequal-mass two-body kinematics and laboratory Lorentz transformation](docs/LABORATORY_PRODUCTS.md).
+- [Nuclear Coulomb functions and coherent alpha-amplitude kernel](docs/ALPHA_AMPLITUDES.md), with an explicit finite numerical domain and unresolved experimental spectrum validation.
 
 The simplified pB instantaneous-thermalization source API remains available.
 These tested primitives do not yet constitute a complete pB fast-particle
