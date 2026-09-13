@@ -272,3 +272,9 @@ for the complete terms.
 Explicit continuation and per-segment thermal/beam rate/energy APIs: [RATE_MODEL.md](docs/RATE_MODEL.md).
 
 Published alpha-spectrum comparison and convergence limitations: [PUBLISHED_SPECTRUM_CHECK.md](docs/PUBLISHED_SPECTRUM_CHECK.md).
+
+Accepted/trial kinetic contexts, explicit source/heat ledgers and portable
+restart are documented in [SOURCE_STATE](docs/SOURCE_STATE.md). They wrap
+physical operators and do not by themselves implement host coupling. The
+[Taskaev2024 audit](docs/TASKAEV_2024_CHANNEL_EVIDENCE.md) extends the
+channel-resolved pB evidence with target-energy and angular-model caveats.

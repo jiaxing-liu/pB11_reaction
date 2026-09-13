@@ -163,8 +163,10 @@ partial-wave fit is absent from these primary sources.
 
 Root located Taskaev etal2024, DOI10.1016/j.nimb.2024.165490, with an
 institution-hosted full text at
-https://bnct.inp.nsk.su/publics/2024/NIMB_2024_3a.pdf . Its abstract reports
-both alpha0 and alpha1 tabulated cross sections up to2.2MeV. A separate audit
-of the actual table definitions, angular assumptions and uncertainties is
-in progress; no values have been adopted from its abstract. The absence
-statements above apply to the enumerated source set, not all publications.
+https://bnct.inp.nsk.su/publics/2024/NIMB_2024_3a.pdf . The completed
+[TASKAEV_2024_CHANNEL_EVIDENCE](TASKAEV_2024_CHANNEL_EVIDENCE.md) audit and
+132-row transcription cover both channels. These are target-depth averaged
+proton energies; angle integration uses a two-angle angular ansatz. They
+extend channel-resolved coverage but are not unfolded pointwise or
+resonance-separated partial-wave data. The absence statements above apply
+to the older enumerated source set, not all publications.
