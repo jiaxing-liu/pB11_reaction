@@ -1,0 +1,106 @@
+{
+  "scope": "independent isotropic prescribed energy-work numerical kernel; no host coupling",
+  "parent_external_commit": "a2f8658",
+  "host_commit": "19e7c4e",
+  "reference": {
+    "url": "https://par.nsf.gov/servlets/purl/10493805",
+    "equations": "112-113",
+    "printed_page": 24,
+    "visual_check": true,
+    "pdf_sha256": "43259f00dbedf7d99f3a747db43caec7a5b03906acfc56a562137d402f4b2fef"
+  },
+  "files": [
+    {
+      "path": "energy-work-build01.log.gz",
+      "uncompressed_sha256": "4654c1d16f717dbcd0fefc118205355d1f2fd8384ba710ad2979b7349bc8c9ee"
+    },
+    {
+      "path": "energy-work-config01.log.gz",
+      "uncompressed_sha256": "891c414c2864aab73bf5a94e30c863a29a649072ee7e47f2f3f1e904af0ed59c"
+    },
+    {
+      "path": "energy-work-final-build.log.gz",
+      "uncompressed_sha256": "46f8fb200a6c9ab3a7622f869b95ddf3cf8dedb821ca811db9445b173f98e7c3"
+    },
+    {
+      "path": "energy-work-final-test.log.gz",
+      "uncompressed_sha256": "fdc54b1ed770df1321fd152c8bd2420a6653eae400934c75b80d0ea956c61a89"
+    },
+    {
+      "path": "energy-work-gnu-build.log.gz",
+      "uncompressed_sha256": "359f619608ae7497d839751959413438a44af079938e18c7889154338c934c5d"
+    },
+    {
+      "path": "energy-work-gnu-config.log.gz",
+      "uncompressed_sha256": "891c414c2864aab73bf5a94e30c863a29a649072ee7e47f2f3f1e904af0ed59c"
+    },
+    {
+      "path": "energy-work-gnu-test.log.gz",
+      "uncompressed_sha256": "ee237222afb8e74ed5de3694a2ac3a9923a3ad95449e3834753ec81f5ca4b190"
+    },
+    {
+      "path": "energy-work-ifx-build.log.gz",
+      "uncompressed_sha256": "71deb3424e9c809e105d7620f716efd75d969a9bc06306806e5acfad002f4434"
+    },
+    {
+      "path": "energy-work-ifx-config.log.gz",
+      "uncompressed_sha256": "5496e953d81bcb0537a58ca1e661b671920e70c266bc64392b283d296bcc2492"
+    },
+    {
+      "path": "energy-work-ifx-env.log.gz",
+      "uncompressed_sha256": "e6eb92119de581919a731f87e44c25b62bb362d377879d7ac99522f315bc4c18"
+    },
+    {
+      "path": "energy-work-ifx-final-build.log.gz",
+      "uncompressed_sha256": "46f8fb200a6c9ab3a7622f869b95ddf3cf8dedb821ca811db9445b173f98e7c3"
+    },
+    {
+      "path": "energy-work-ifx-final-env.log.gz",
+      "uncompressed_sha256": "e6eb92119de581919a731f87e44c25b62bb362d377879d7ac99522f315bc4c18"
+    },
+    {
+      "path": "energy-work-ifx-final-test.log.gz",
+      "uncompressed_sha256": "4a6290743f36bce70ccfb848bb15360a0e281b3758c6c7cd9cb43dff278634f1"
+    },
+    {
+      "path": "energy-work-ifx-test.log.gz",
+      "uncompressed_sha256": "4a6290743f36bce70ccfb848bb15360a0e281b3758c6c7cd9cb43dff278634f1"
+    },
+    {
+      "path": "energy-work-install.log.gz",
+      "uncompressed_sha256": "17ded33136ba76b122c43a6248a86ad247959581ffd6c8841c5e0012f2354abf"
+    },
+    {
+      "path": "energy-work-test01.log.gz",
+      "uncompressed_sha256": "fdc54b1ed770df1321fd152c8bd2420a6653eae400934c75b80d0ea956c61a89"
+    },
+    {
+      "path": "installed-consumer/consumer.c",
+      "uncompressed_sha256": "92574289ed6925f76f5ed8b8626c342ac23ace12248287e30ab31e8062caac41"
+    },
+    {
+      "path": "installed-consumer/fortran_consumer.f90",
+      "uncompressed_sha256": "3f85d33350bb6383720b17300503a97626e086d79b1130c2452111723b81bac8"
+    },
+    {
+      "path": "installed-consumer/CMakeLists.txt",
+      "uncompressed_sha256": "bc3e7df3b236af9af9e691309de586758c9bf82e8f3c6ce5d95d6712a195e498"
+    },
+    {
+      "path": "installed-consumer/configure.log.gz",
+      "uncompressed_sha256": "6ee5c14fd29dccc07e98b3a68c2d19b88dbf6de8b51d8159b2d5948d523803ea"
+    },
+    {
+      "path": "installed-consumer/build.log.gz",
+      "uncompressed_sha256": "d8d7611f17b16416b913aaa497a11be8f1eeeef477dd4c52b302d65d098214b5"
+    },
+    {
+      "path": "installed-consumer/run-c.log.gz",
+      "uncompressed_sha256": "874a537acfab85f938db8442e7382eaaa8a53b0aa557817c5d9f0b41143bf5e3"
+    },
+    {
+      "path": "installed-consumer/run-fortran.log.gz",
+      "uncompressed_sha256": "aa94bdb393bbab75dc2e273dcffaf0d485ae3aba5dd04a5cc19ce3c307c4ec38"
+    }
+  ]
+}
