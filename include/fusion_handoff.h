@@ -51,7 +51,11 @@ int fusion_c_maxwellian_energy_grid(int cells, double kT_J,
  * Changing the target kT requires a new trial from the accepted old state.
  * Inputs and outputs must not overlap. No clipping/hidden counters. On any
  * failure, nonnull outputs are zero for valid dimensions; no exception crosses
- * C. Numerical overflow or invalid probability normalization rejects.
+ * C. Positive energy diagnostics/sources may undergo IEEE underflow. Gates
+ * use the unrounded long-double inventory. Correction compensates RETURNED
+ * fluid energy; closure permits only measured subnormal correction rounding.
+ * Rejected candidates are retained exactly, even if their energy diagnostic
+ * rounds to zero. Numerical overflow or invalid normalization still rejects.
  */
 int fusion_c_maxwellian_handoff_trial(int cells, double target_kT_J,
     double max_L1, double max_relative_mean_error,

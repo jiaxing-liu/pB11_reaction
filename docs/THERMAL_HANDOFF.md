@@ -114,3 +114,15 @@ build/public_handoff 4000 2000 .001 > build/public-handoff.csv
 ```
 
 Boost is a build dependency; there is no GSL or Python runtime dependency.
+
+## Representable particle tails with subnormal energy
+
+A nonzero double particle inventory can have energy below double range. The
+initial energy diagnostic permits ordinary IEEE rounding; rejection still copies
+every input population exactly. L1 and mean-energy eligibility use the original
+long-double sums, never the rounded energy diagnostic. Accepted fluid energy
+also permits IEEE rounding. The signed correction is computed from the actual
+returned fluid energy, so its rounding compensates the fluid conversion. The
+energy check adds only the measured subnormal correction rounding error to its
+existing relative bound. This introduces no population floor and changes neither
+physical gate. Nonfinite values and overflow still fail with cleared outputs.

@@ -68,7 +68,7 @@ extern "C" int fusion_c_maxwellian_handoff_trial(int n,double T,double maxL1,
    N+=old[i];U+=R(old[i])*(R(e[i])+e[i+1])/2;
   }
   fusion_handoff_ledger_v1 r{};
-  if(!put(N,r.initial_number_m3)||!put(U,r.initial_energy_J_m3))return PB11_STATUS_NUMERICAL_FAILURE;
+  if(!put(N,r.initial_number_m3)||!put(U,r.initial_energy_J_m3,true))return PB11_STATUS_NUMERICAL_FAILURE;
   std::vector<double> q(n);fusion_maxwellian_grid_v1 grid{};
   s=fusion_c_maxwellian_energy_grid(n,T,e,q.data(),&grid);if(s)return s;
   const R outside=R(grid.below_probability)+grid.above_probability;
@@ -84,13 +84,20 @@ extern "C" int fusion_c_maxwellian_handoff_trial(int n,double T,double maxL1,
   const bool accept=N>0 && l1<=maxL1 && mean_error<=maxMean;
   if(accept){
    r.fluid_number_m3=r.initial_number_m3;
-   if(!put(1.5L*T*r.fluid_number_m3,r.fluid_energy_J_m3)||
+   if(!put(1.5L*T*r.fluid_number_m3,r.fluid_energy_J_m3,true)||
       !put(U-r.fluid_energy_J_m3,r.bath_energy_correction_J_m3,true))return PB11_STATUS_NUMERICAL_FAILURE;
    // Balance the quantities actually returned at double precision.
    const R nr=R(r.fluid_number_m3)-N;
+   const R correction=U-R(r.fluid_energy_J_m3);
    const R er=R(r.fluid_energy_J_m3)+r.bath_energy_correction_J_m3-U;
+   // Compensate the RETURNED fluid energy, including its IEEE underflow.
+   // Only measured subnormal rounding of the signed correction may remain;
+   // no population floor and no change to either physical eligibility gate.
+   const R round=std::abs(correction)<std::numeric_limits<double>::min()
+       ?std::abs(correction-R(r.bath_energy_correction_J_m3)):0;
+
    if(std::abs(nr)>1e-12L*(N+r.fluid_number_m3)||
-      std::abs(er)>1e-12L*(U+r.fluid_energy_J_m3+std::abs(R(r.bath_energy_correction_J_m3)))||
+      std::abs(er)>1e-12L*(U+r.fluid_energy_J_m3+std::abs(R(r.bath_energy_correction_J_m3)))+round||
       !put(nr,r.particle_balance_error_m3,true)||!put(er,r.energy_balance_error_J_m3,true))
     return PB11_STATUS_NUMERICAL_FAILURE;
   }else{

@@ -240,6 +240,22 @@ void calculate_old_moments(const FineGrid& grid, const std::vector<double>& old,
     }
 }
 
+void calculate_handoff_moments(int cells, const double* edges,
+                               const double* old, long double& number,
+                               long double& energy) {
+    number = 0.0L;
+    energy = 0.0L;
+    for (int i = 0; i < cells; ++i) {
+        const std::size_t index = static_cast<std::size_t>(i);
+        const long double center =
+            (static_cast<long double>(edges[index]) +
+             static_cast<long double>(edges[index + 1])) /
+            2.0L;
+        number += static_cast<long double>(old[index]);
+        energy += center * static_cast<long double>(old[index]);
+    }
+}
+
 void check_rejected_handoff(const fusion_handoff_ledger_v1& out,
                             const std::vector<double>& old,
                             const std::vector<double>& trial, int projected,
@@ -450,6 +466,147 @@ void test_zero_candidate_and_rollback(const FineGrid& grid) {
     check(old == old_copy, "repeated rollback trials leave old state unchanged");
 }
 
+void test_rejected_subnormal_energy_diagnostic() {
+    const double target = 1.1647381648857963e-17;
+    const double edges[3]{0.0, 1.0e-15, 2.0e-15};
+    const double weak = 60.0 * std::numeric_limits<double>::denorm_min();
+    const double old[2]{0.0, weak};
+    double trial[2]{-1.0, -1.0};
+    int projected = -1;
+    fusion_handoff_ledger_v1 out;
+    fill_handoff(out, -1.0);
+
+    constexpr double max_l1 = 1.0e-3;
+    constexpr double max_mean_error = 1.0e-3;
+    const int status = fusion_c_maxwellian_handoff_trial(
+        2, target, max_l1, max_mean_error, edges, old, trial, &projected,
+        &out);
+    check(status == PB11_STATUS_OK,
+          "subnormal-energy rejection fixture returns OK");
+    check(projected == 0,
+          "subnormal-energy rejection fixture is not projected");
+    check(trial[0] == old[0] && trial[1] == old[1],
+          "subnormal-energy rejection retains every candidate bin exactly");
+
+    long double number = 0.0L;
+    long double energy = 0.0L;
+    calculate_handoff_moments(2, edges, old, number, energy);
+    check(number > 0.0L && static_cast<double>(number) == weak,
+          "subnormal-energy rejection has a representable positive N");
+    check(energy > 0.0L && static_cast<double>(energy) == 0.0,
+          "subnormal-energy rejection energy diagnostic rounds to zero");
+    check(out.initial_number_m3 == weak,
+          "subnormal-energy rejection reports representable initial N");
+    check(out.initial_energy_J_m3 == 0.0,
+          "subnormal-energy rejection reports rounded initial U");
+
+    const long double expected_mean =
+        std::abs(energy / (1.5L * static_cast<long double>(target) * number) -
+                 1.0L);
+    check(close_relative(out.relative_mean_energy_error,
+                         static_cast<double>(expected_mean), 2.0e-15),
+          "subnormal-energy rejection computes mean gate from long-double U");
+    check(out.relative_mean_energy_error > max_mean_error,
+          "subnormal-energy rejection fails the actual mean-energy gate");
+    check(out.distribution_L1 > max_l1,
+          "subnormal-energy rejection fails the actual normalized L1 gate");
+    check_rejected_handoff(out, std::vector<double>(old, old + 2),
+                           std::vector<double>(trial, trial + 2), projected,
+                           "subnormal-energy candidate");
+}
+
+void test_accepted_subnormal_energy() {
+    const double target = 1.0e-17;
+    const double edges[2]{target, 2.0 * target};
+    const double weak = 60.0 * std::numeric_limits<double>::denorm_min();
+    const double old[1]{weak};
+    double trial[1]{-1.0};
+    int projected = -1;
+    fusion_handoff_ledger_v1 out;
+    fill_handoff(out, -1.0);
+
+    const int status = fusion_c_maxwellian_handoff_trial(
+        1, target, 2.0, 1.0e-3, edges, old, trial, &projected, &out);
+    check(status == PB11_STATUS_OK,
+          "accepted subnormal-energy fixture returns OK");
+    check(projected == 1,
+          "accepted subnormal-energy fixture is projected");
+    check(trial[0] == 0.0,
+          "accepted subnormal-energy fixture clears the trial candidate");
+    check(out.initial_number_m3 == weak && out.fluid_number_m3 == weak,
+          "accepted subnormal-energy fixture preserves particle number");
+    check(out.initial_energy_J_m3 == 0.0,
+          "accepted subnormal-energy fixture initial U may round to zero");
+    check(out.fluid_energy_J_m3 == 0.0 &&
+              out.bath_energy_correction_J_m3 == 0.0,
+          "accepted subnormal-energy fixture returned energy sources round to zero");
+    check(out.relative_mean_energy_error == 0.0,
+          "accepted subnormal-energy fixture has exact long-double mean match");
+
+    long double number = 0.0L;
+    long double energy = 0.0L;
+    calculate_handoff_moments(1, edges, old, number, energy);
+    const long double residual =
+        static_cast<long double>(out.fluid_energy_J_m3) +
+        static_cast<long double>(out.bath_energy_correction_J_m3) - energy;
+    check(energy > 0.0L && static_cast<double>(energy) == 0.0,
+          "accepted subnormal-energy fixture has positive unrounded U");
+    check(residual != 0.0L &&
+              out.energy_balance_error_J_m3 == static_cast<double>(residual),
+          "accepted subnormal-energy fixture permits only measured residual rounding");
+    check_handoff_finite(out, "accepted subnormal-energy handoff");
+}
+
+void test_subnormal_signed_correction_quantization() {
+    const double target = 1.0e-17;
+    const double number =
+        std::numeric_limits<double>::denorm_min() / (1.5 * target);
+    check(std::isnormal(number),
+          "signed subnormal-correction fixture uses a normal particle N");
+
+    for (double shift : {-0.01, 0.01}) {
+        const double edges[2]{(1.0 + shift) * target,
+                              (2.0 + shift) * target};
+        const double old[1]{number};
+        double trial[1]{-1.0};
+        int projected = -1;
+        fusion_handoff_ledger_v1 out;
+        fill_handoff(out, -1.0);
+
+        const int status = fusion_c_maxwellian_handoff_trial(
+            1, target, 2.0, 0.02, edges, old, trial, &projected, &out);
+        check(status == PB11_STATUS_OK && projected == 1,
+              "broad subnormal-correction fixture projects for both signs");
+        check(trial[0] == 0.0,
+              "broad subnormal-correction fixture clears its trial candidate");
+
+        long double number_ld = 0.0L;
+        long double energy_ld = 0.0L;
+        calculate_handoff_moments(1, edges, old, number_ld, energy_ld);
+        const long double returned_fluid_energy =
+            static_cast<long double>(out.fluid_energy_J_m3);
+        const long double exact_correction = energy_ld - returned_fluid_energy;
+        const double expected_correction =
+            static_cast<double>(exact_correction);
+        const long double exact_residual =
+            returned_fluid_energy +
+            static_cast<long double>(expected_correction) - energy_ld;
+        const double expected_residual = static_cast<double>(exact_residual);
+
+        check(out.initial_number_m3 == number && out.fluid_number_m3 == number,
+              "subnormal-correction fixture preserves normal N");
+        check(out.bath_energy_correction_J_m3 == expected_correction,
+              "subnormal correction is the measured long-double residual cast");
+        check(out.energy_balance_error_J_m3 == expected_residual,
+              "subnormal energy closure reports only its measured residual");
+        check(std::signbit(out.bath_energy_correction_J_m3) ==
+                  std::signbit(expected_correction),
+              "subnormal correction preserves the positive/negative sign bit");
+        check(exact_correction * shift > 0.0L,
+              "long-double correction retains the requested heating/cooling sign");
+    }
+}
+
 void test_grid_errors() {
     const double kT = 2.0 * kJoulesPerKeV;
     const double valid_edges[3]{0.4 * kT, 1.0 * kT, 2.0 * kT};
@@ -621,6 +778,9 @@ int main() {
         test_zero_candidate_and_rollback(grid);
     }
     test_both_correction_signs();
+    test_rejected_subnormal_energy_diagnostic();
+    test_accepted_subnormal_energy();
+    test_subnormal_signed_correction_quantization();
     test_grid_errors();
     test_handoff_errors();
 
