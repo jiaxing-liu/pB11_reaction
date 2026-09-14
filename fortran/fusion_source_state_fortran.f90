@@ -63,6 +63,7 @@ module fusion_source_state_fortran
   public :: fusion_source_state_stage
   public :: fusion_source_state_stage_inert
   public :: fusion_source_state_commit
+  public :: fusion_source_state_commit_many
   public :: fusion_source_state_discard
   public :: fusion_source_state_pack_size
   public :: fusion_source_state_pack
@@ -165,6 +166,15 @@ module fusion_source_state_fortran
        integer(c_int64_t), value :: ticket
        integer(c_int) :: status
      end function c_fusion_source_state_commit
+
+     function c_fusion_source_state_commit_many(count, states, tickets) bind(C, &
+          name="fusion_c_source_state_commit_many") result(status)
+       import :: c_int, c_int64_t, c_ptr
+       integer(c_int), value :: count
+       type(c_ptr), value :: states
+       type(c_ptr), value :: tickets
+       integer(c_int) :: status
+     end function c_fusion_source_state_commit_many
 
      function c_fusion_source_state_discard(state, ticket) bind(C, &
           name="fusion_c_source_state_discard") result(status)
@@ -560,6 +570,30 @@ contains
     if (.not. c_associated(state)) return
     status = c_fusion_source_state_commit(state, ticket)
   end subroutine fusion_source_state_commit
+
+  subroutine fusion_source_state_commit_many(states, tickets, status)
+    type(c_ptr), intent(in), target, contiguous :: states(:)
+    integer(c_int64_t), intent(in), target, contiguous :: tickets(:)
+    integer(c_int), intent(out) :: status
+
+    integer(c_size_t) :: count_size
+    integer(c_int) :: count
+    type(c_ptr) :: states_ptr, tickets_ptr
+
+    status = PB11_STATUS_INVALID_ARGUMENT
+    count_size = size(states, kind=c_size_t)
+    ! Validate both extents and nonempty input before either C_LOC.  The C
+    ! routine has the same one-million-context bound, but keeping the check
+    ! here also makes the size-to-c_int conversion explicit and portable.
+    if (count_size <= 0_c_size_t) return
+    if (size(tickets, kind=c_size_t) /= count_size) return
+    if (count_size > 1000000_c_size_t) return
+
+    count = int(count_size, c_int)
+    states_ptr = c_loc(states(1))
+    tickets_ptr = c_loc(tickets(1))
+    status = c_fusion_source_state_commit_many(count, states_ptr, tickets_ptr)
+  end subroutine fusion_source_state_commit_many
 
   subroutine fusion_source_state_discard(state, ticket, status)
     type(c_ptr), intent(in) :: state

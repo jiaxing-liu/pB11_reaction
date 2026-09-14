@@ -81,6 +81,18 @@ int fusion_c_source_state_snapshot_inert(const fusion_source_state_v1 *state,
  double *accepted_s_m3,double *accepted_t_m3,fusion_source_ledger_v1 *cumulative,
  double *cumulative_inert_heat_J_m3,double *accepted_time_s,uint64_t *epoch);
 int fusion_c_source_state_commit(fusion_source_state_v1 *state,uint64_t ticket);
+/* Atomically publish a synchronous group of independently staged contexts.
+ * count in[1,1000000]; arrays required; context pointers distinct and nonnull.
+ * Every current ticket must be valid/staged; accepted time, trial time and
+ * accepted epoch must match EXACTLY across contexts. Grids/tags may differ.
+ * Validate/allocate before mutation, then publication cannot fail. Any failure
+ * preserves all accepted AND pending states, so the caller can repair/retry.
+ * Caller must exclusively own every context throughout the call. This is not
+ * an OS transaction or a commit of caller-owned thermal/geometry state.
+ */
+int fusion_c_source_state_commit_many(int count,
+ fusion_source_state_v1 *const *states,const uint64_t *tickets);
+
 int fusion_c_source_state_discard(fusion_source_state_v1 *state,uint64_t ticket);
 /* Portable versioned little-endian IEEE754 restart, with accidental-corruption
  * checksum. Legacy contexts retain byte-compatible version 1; extended

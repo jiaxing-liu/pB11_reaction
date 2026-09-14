@@ -4,6 +4,7 @@
 #include <array>
 #include <cmath>
 #include <cstring>
+#include <functional>
 #include <limits>
 #include <memory>
 #include <stdexcept>
@@ -220,11 +221,34 @@ extern "C" int fusion_c_source_state_stage_inert(fusion_source_state_v1* p,uint6
  const double* s,const double* t,const fusion_source_ledger_v1* step,const double* inert){
  return stage(p,ticket,s,t,step,inert,true);
 }
-extern "C" int fusion_c_source_state_commit(fusion_source_state_v1* p,uint64_t ticket){
- if(!p||!p->pending||!p->staged||ticket!=p->counter)return BAD;
+namespace {
+// Only swaps and trivially copyable fields: no allocation after validation.
+void publish(fusion_source_state_v1* p) noexcept {
  p->s.swap(p->trial_s);p->t.swap(p->trial_t);p->cumulative=p->staged_cumulative;
  p->inert=p->staged_inert;p->extended=p->staged_extended;
- p->time=p->trial_time;++p->epoch;p->pending=false;p->staged=false;return OK;
+ p->time=p->trial_time;++p->epoch;p->pending=false;p->staged=false;
+}
+}
+extern "C" int fusion_c_source_state_commit(fusion_source_state_v1* p,uint64_t ticket){
+ if(!p||!p->pending||!p->staged||ticket!=p->counter)return BAD;
+ publish(p);return OK;
+}
+extern "C" int fusion_c_source_state_commit_many(int count,
+ fusion_source_state_v1* const* states,const uint64_t* tickets){
+ if(count<1||count>1000000||!states||!tickets)return BAD;
+ try {
+  std::vector<fusion_source_state_v1*> distinct(states,states+count);
+  std::sort(distinct.begin(),distinct.end(),std::less<fusion_source_state_v1*>{});
+  if(std::adjacent_find(distinct.begin(),distinct.end())!=distinct.end())return BAD;
+  for(int i=0;i<count;++i){
+   const auto* p=states[i];
+   if(!p||!p->pending||!p->staged||tickets[i]!=p->counter)return BAD;
+   if(i&&(p->time!=states[0]->time||p->trial_time!=states[0]->trial_time||
+          p->epoch!=states[0]->epoch))return BAD;
+  }
+  for(int i=0;i<count;++i)publish(states[i]);
+  return OK;
+ }catch(...){return EXC;}
 }
 extern "C" int fusion_c_source_state_discard(fusion_source_state_v1* p,uint64_t ticket){
  if(!p||!p->pending||ticket!=p->counter)return BAD;

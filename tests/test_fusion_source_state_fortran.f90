@@ -18,6 +18,7 @@ program test_fusion_source_state_fortran
   call test_pack_roundtrip_and_tag()
   call test_inert_stage_and_v2_restart()
   call test_invalid_extent_guards()
+  call test_commit_many()
 
   if (failures /= 0) then
      write(*, '(I0, A)') failures, &
@@ -613,6 +614,112 @@ contains
     call fusion_source_state_destroy(state)
     deallocate(empty_buffer)
   end subroutine test_invalid_extent_guards
+
+  subroutine test_commit_many()
+    real(c_double), target :: edges_a(3), edges_b(3)
+    real(c_double), target :: initial_a(12), initial_b(12)
+    real(c_double), target :: initial_t_a(12), initial_t_b(12)
+    real(c_double), target :: candidate_a(12), candidate_b(12)
+    real(c_double), target :: accepted_a(12), accepted_b(12)
+    real(c_double), target :: accepted_t_a(12), accepted_t_b(12)
+    real(c_double), target :: accepted_time_a, accepted_time_b
+    integer(c_int64_t), target :: ticket_a, ticket_b
+    integer(c_int64_t), target :: epoch_a, epoch_b
+    integer(c_int64_t), target :: tickets(2)
+    integer(c_int) :: status
+    type(fusion_source_ledger_v1), target :: step_a, step_b
+    type(fusion_source_ledger_v1), target :: cumulative_a, cumulative_b
+    type(c_ptr), target :: state_a, state_b, states(2)
+
+    call make_initial(edges_a, initial_a, initial_t_a)
+    initial_b = initial_a
+    initial_t_b = initial_t_a
+    edges_b = [0.0_c_double, 4.0_c_double * mev_j, &
+         8.0_c_double * mev_j]
+    candidate_a = initial_a
+    candidate_a(9) = initial_a(9) - 1.0e11_c_double
+    candidate_b = initial_b
+    candidate_b(9) = initial_b(9) - 2.0e11_c_double
+    call zero_ledger(step_a)
+    call zero_ledger(step_b)
+    step_a%escaped_number_m3(5) = 1.0e11_c_double
+    step_a%escaped_energy_J_m3(5) = 1.0e11_c_double * mev_j
+    step_b%escaped_number_m3(5) = 2.0e11_c_double
+    step_b%escaped_energy_J_m3(5) = 4.0e11_c_double * mev_j
+
+    state_a = c_null_ptr
+    state_b = c_null_ptr
+    call fusion_source_state_create(2_c_int, edges_a, initial_a, initial_t_a, &
+         6.0_c_double, test_tag + 20_c_int64_t, state_a, status)
+    call check_status(status, 'create first context for batch commit')
+    call fusion_source_state_create(2_c_int, edges_b, initial_b, initial_t_b, &
+         6.0_c_double, test_tag + 21_c_int64_t, state_b, status)
+    call check_status(status, 'create second context for batch commit')
+    states(1) = state_a
+    states(2) = state_b
+
+    call fusion_source_state_begin(state_a, 0.25_c_double, ticket_a, status)
+    call check_status(status, 'begin first batch context')
+    call fusion_source_state_begin(state_b, 0.25_c_double, ticket_b, status)
+    call check_status(status, 'begin second batch context')
+    call fusion_source_state_stage(state_a, ticket_a, candidate_a, initial_t_a, &
+         step_a, status)
+    call check_status(status, 'stage first batch candidate')
+    call fusion_source_state_stage(state_b, ticket_b, candidate_b, initial_t_b, &
+         step_b, status)
+    call check_status(status, 'stage second batch candidate')
+    tickets = [ticket_a, ticket_b]
+
+    ! A stale ticket in the last slot rejects the whole transaction.  The
+    ! accepted snapshots remain at their initial values, while a later retry
+    ! with the corrected ticket must still publish both staged candidates.
+    tickets(2) = ticket_b + 1_c_int64_t
+    call fusion_source_state_commit_many(states, tickets, status)
+    call check(status == PB11_STATUS_INVALID_ARGUMENT, &
+         'stale last ticket rejects batch commit')
+    call fusion_source_state_snapshot(state_a, accepted_a, accepted_t_a, &
+         cumulative_a, accepted_time_a, epoch_a, status)
+    call check_status(status, 'snapshot first context after stale batch')
+    call fusion_source_state_snapshot(state_b, accepted_b, accepted_t_b, &
+         cumulative_b, accepted_time_b, epoch_b, status)
+    call check_status(status, 'snapshot second context after stale batch')
+    call check(all(accepted_a == initial_a) .and. &
+         all(accepted_b == initial_b) .and. ledger_is_zero(cumulative_a) .and. &
+         ledger_is_zero(cumulative_b) .and. accepted_time_a == 6.0_c_double .and. &
+         accepted_time_b == 6.0_c_double .and. epoch_a == 0_c_int64_t .and. &
+         epoch_b == 0_c_int64_t, &
+         'stale batch leaves both accepted snapshots unchanged')
+
+    tickets(2) = ticket_b
+    call fusion_source_state_commit_many(states, tickets(1:1), status)
+    call check(status == PB11_STATUS_INVALID_ARGUMENT, &
+         'short ticket extent rejects batch commit before C_LOC')
+    call fusion_source_state_commit_many(states(1:1), tickets, status)
+    call check(status == PB11_STATUS_INVALID_ARGUMENT, &
+         'short state extent rejects batch commit before C_LOC')
+
+    call fusion_source_state_commit_many(states, tickets, status)
+    call check_status(status, 'corrected tickets publish both batch candidates')
+    call fusion_source_state_snapshot(state_a, accepted_a, accepted_t_a, &
+         cumulative_a, accepted_time_a, epoch_a, status)
+    call check_status(status, 'snapshot first context after batch commit')
+    call fusion_source_state_snapshot(state_b, accepted_b, accepted_t_b, &
+         cumulative_b, accepted_time_b, epoch_b, status)
+    call check_status(status, 'snapshot second context after batch commit')
+    call check(all(accepted_a == candidate_a) .and. &
+         all(accepted_b == candidate_b), &
+         'batch commit publishes each preserved staged population')
+    call check(ledger_equal(cumulative_a, step_a) .and. &
+         ledger_equal(cumulative_b, step_b), &
+         'batch commit publishes each preserved staged ledger')
+    call check(accepted_time_a == 6.25_c_double .and. &
+         accepted_time_b == 6.25_c_double .and. epoch_a == 1_c_int64_t .and. &
+         epoch_b == 1_c_int64_t, &
+         'batch commit advances both matching contexts once')
+
+    call fusion_source_state_destroy(state_b)
+    call fusion_source_state_destroy(state_a)
+  end subroutine test_commit_many
 
   logical function ledger_equal(left, right)
     type(fusion_source_ledger_v1), intent(in) :: left, right

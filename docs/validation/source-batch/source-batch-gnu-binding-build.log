@@ -1,0 +1,7 @@
+[ 88%] Built target pb11
+[ 94%] Building Fortran object CMakeFiles/fusion_source_state_fortran.dir/fortran/fusion_source_state_fortran.f90.o
+[ 94%] Linking CXX static library libfusion_source_state_fortran.a
+[ 94%] Built target fusion_source_state_fortran
+[ 94%] Building Fortran object CMakeFiles/test_fusion_source_state_fortran.dir/tests/test_fusion_source_state_fortran.f90.o
+[100%] Linking Fortran executable test_fusion_source_state_fortran
+[100%] Built target test_fusion_source_state_fortran

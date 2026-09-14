@@ -1,0 +1,25 @@
+[  0%] Building CXX object CMakeFiles/pb11.dir/src/fusion_source_state.cpp.o
+[  0%] Building CXX object CMakeFiles/pb11.dir/src/fusion_coupled_thermal.cpp.o
+[  6%] Linking CXX static library libpb11.a
+[ 93%] Built target pb11
+[ 93%] Building CXX object CMakeFiles/test_fusion_source_batch.dir/tests/test_fusion_source_batch.cpp.o
+[100%] Linking CXX executable test_fusion_source_batch
+[100%] Built target test_fusion_source_batch
+[ 93%] Built target pb11
+[ 93%] Building CXX object CMakeFiles/test_fusion_source_state.dir/tests/test_fusion_source_state.cpp.o
+[100%] Linking CXX executable test_fusion_source_state
+[100%] Built target test_fusion_source_state
+[ 93%] Built target pb11
+[ 93%] Building CXX object CMakeFiles/test_fusion_source_state_inert.dir/tests/test_fusion_source_state_inert.cpp.o
+[100%] Linking CXX executable test_fusion_source_state_inert
+[100%] Built target test_fusion_source_state_inert
+[ 88%] Built target pb11
+[ 94%] Building Fortran object CMakeFiles/fusion_source_state_fortran.dir/fortran/fusion_source_state_fortran.f90.o
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[ 94%] Linking CXX static library libfusion_source_state_fortran.a
+[ 94%] Built target fusion_source_state_fortran
+[ 94%] Building Fortran object CMakeFiles/test_fusion_source_state_fortran.dir/tests/test_fusion_source_state_fortran.f90.o
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[100%] Linking Fortran executable test_fusion_source_state_fortran
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[100%] Built target test_fusion_source_state_fortran

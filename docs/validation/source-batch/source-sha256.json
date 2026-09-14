@@ -1,0 +1,8 @@
+{
+  "CMakeLists.txt": "c9b73849d4d498d278888b3497d0bf49320c12e976bdd4354da0db906a24b03b",
+  "include/fusion_source_state.h": "ba5a87de1c1aafceb90e79ad3700547e7c925e0ef64c374b92fc8501c6cca5ed",
+  "src/fusion_source_state.cpp": "0ea363f7397e837a2972569a9a449b439c091eb6a2cf8587f2436c96ed8626a2",
+  "fortran/fusion_source_state_fortran.f90": "1870ea0cfbc1127ade638c936a72268026e83f14ca22a7b8e2a693afedc6e397",
+  "tests/test_fusion_source_batch.cpp": "398c2ea00d4fda3287345cacc6af3724a5c21455494c2a94845f7278c061ad37",
+  "tests/test_fusion_source_state_fortran.f90": "5f3455aa901bbf12aff519561a685511ee6552d8a2e6f197e5327c5c4b369f66"
+}
