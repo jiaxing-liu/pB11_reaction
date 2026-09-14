@@ -1,0 +1,282 @@
+[
+  {
+    "source": "/tmp/beam-birth-root01/host-build.log",
+    "archive": "00-host-build.log.gz",
+    "bytes": 3484,
+    "sha256": "58675d9c9b9eb65371167543ce1950085b6e5d9f6fa125f87a841f49b43c1245",
+    "archive_sha256": "f3b4d14b3e37eb2e4136f4f5d7a222d5e7f235f8bf632c3523fd403fb770624d"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/intel-test.log",
+    "archive": "01-intel-test.log.gz",
+    "bytes": 764,
+    "sha256": "4634ece03938d023145f2ac3df85e0221c563121f57fbc2a31eb8316128d7851",
+    "archive_sha256": "b5c275ed4de65676f128c876053ab388ffd2f6e44ffe34708884897ae103bfc4"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/gnu-test.log",
+    "archive": "02-gnu-test.log.gz",
+    "bytes": 986,
+    "sha256": "e6449d73494a7fed3bc16fcb89b44c38b16cec4c29f033676414f39e06b1c897",
+    "archive_sha256": "658e7b26fd3ffd15b6648886eb5c4802e6e433f6d4359c3e0241e69e437a72b0"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/intel-build.log",
+    "archive": "03-intel-build.log.gz",
+    "bytes": 1840,
+    "sha256": "ad900875f5d7e6f0d8eafd0de60c292d473d9300308c7fd95e75eeb17f03a3b8",
+    "archive_sha256": "b94c9651d70022787e9ab844ac843d892a00a9dbcfe8b6f8f5cf92f420a92f31"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/intel-configure.log",
+    "archive": "04-intel-configure.log.gz",
+    "bytes": 105,
+    "sha256": "5496e953d81bcb0537a58ca1e661b671920e70c266bc64392b283d296bcc2492",
+    "archive_sha256": "2e13195ac6de022d563683e97cb160c26f0af98e47f0821c17c423fc4590e892"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/gnu-build.log",
+    "archive": "05-gnu-build.log.gz",
+    "bytes": 1704,
+    "sha256": "fb4b304d88db1c02e0c97f6b18dae43f432d943e7e59d1c32d03e3a8a5d18d98",
+    "archive_sha256": "60328166d9fb09e4bd8a19f8ec4d14f8c280c26d2945d8faf40826cfa1d9380f"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/intel-env.log",
+    "archive": "06-intel-env.log.gz",
+    "bytes": 270,
+    "sha256": "e6eb92119de581919a731f87e44c25b62bb362d377879d7ac99522f315bc4c18",
+    "archive_sha256": "dc57cf5e7b4a08e517c9cc9906475182bd94c6b167ef168f4a08e8a162c08654"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/gnu-configure.log",
+    "archive": "07-gnu-configure.log.gz",
+    "bytes": 114,
+    "sha256": "891c414c2864aab73bf5a94e30c863a29a649072ee7e47f2f3f1e904af0ed59c",
+    "archive_sha256": "47e9d4c750c809468a085438d125c289aa605f0cc0b88dd1a0d217e02db2c64f"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/compose.log",
+    "archive": "08-compose.log.gz",
+    "bytes": 205,
+    "sha256": "deb622d38462d512b11a320571ebba970643b43ddb5ee9d5ff3e104ec89c630a",
+    "archive_sha256": "185c8638c374ca695f80a7ff4cc9b001484c29a36dec85fa77a08c4529574585"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/tests.log",
+    "archive": "09-tests.log.gz",
+    "bytes": 124,
+    "sha256": "2f381c7d3c350c6c56af96dccc15db36d7f728f6928acde512c7aa41817b3eda",
+    "archive_sha256": "f476b71a2a7c74c822b4c7eb0b7b717dd2eee5fe9473cadc7de77e06cd18f1c4"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/study.log",
+    "archive": "10-study.log.gz",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archive_sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/legacy_2.log",
+    "archive": "11-legacy_2.log.gz",
+    "bytes": 135,
+    "sha256": "71da1d45a54b79fdc9dda4bbe92d3ebfffe861e621ba9224657e5dae4b3ca09e",
+    "archive_sha256": "17c98c377ec5c0d62b32cdcc255e3e8e0071da7afb29d530c7545e1ba90c885c"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/legacy_0.1.log",
+    "archive": "12-legacy_0.1.log.gz",
+    "bytes": 134,
+    "sha256": "2e4e2e8a9eb528c8b3dd44a34da93c11649d2b22b0d57b1a91dc320c623cf55c",
+    "archive_sha256": "c3ad6b33042da0bef237a81cfe2975be7c8db47ccec9e3580d4e2f5e3bbef3c8"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/legacy_0.006.log",
+    "archive": "13-legacy_0.006.log.gz",
+    "bytes": 137,
+    "sha256": "1bb0d843a8ce4267dcc3ddc27d647fdc9d389016f6131fcb20f2bf698f4c1a15",
+    "archive_sha256": "31d4b7bdd44cf59e23978019b8d996e5647e7ec2c080c03aa6a1ba2a49ed33a0"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/legacy_0.002.log",
+    "archive": "14-legacy_0.002.log.gz",
+    "bytes": 116,
+    "sha256": "88162e86fdd5793cf1e8200dec96881a65a70c5ab656c17df4eacc27bc89c6bb",
+    "archive_sha256": "98b117e681fa5c2d7f004e34ed468142164e663167f1dc9833fb58eb9fefe0ec"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/legacy_2.bin",
+    "archive": "15-legacy_2.bin.gz",
+    "bytes": 89952,
+    "sha256": "87edeae7442591b8af68718f810bce2c75ffcb064c10f30ac532289d6a529a53",
+    "archive_sha256": "cb962d851314fc5a37814c6bc712fac370a8b3e29f1547432e4043830969bf6a"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/legacy_0.1.bin",
+    "archive": "16-legacy_0.1.bin.gz",
+    "bytes": 89952,
+    "sha256": "dab9cba222ee6aa6e4802f17e57ea16de1143480b5a5ae37ecb68e8b72b6723a",
+    "archive_sha256": "1671980611ed8bab9e089066df7c71c38b28ffe72e1fd46367494c3896e84e8f"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/legacy_0.006.bin",
+    "archive": "17-legacy_0.006.bin.gz",
+    "bytes": 89952,
+    "sha256": "2349a6ce970d215c4486eae41235845a840dd057f23399b850b7d6b6b8aeade4",
+    "archive_sha256": "456192cfcbb58ace7dc269f3418af11e6b31a187db8ad1dd8a914ecdd6bc1215"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/legacy_0.002.bin",
+    "archive": "18-legacy_0.002.bin.gz",
+    "bytes": 89952,
+    "sha256": "781e58d544af846b195efba714ca5794c8fa20b68ca6bbb4f0e64a9efb99d367",
+    "archive_sha256": "7a9d3610f1115fbf45559f37a44eda57de80e9356ac9bc72b7713749406cb532"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/prechange.cpp",
+    "archive": "19-prechange.cpp.gz",
+    "bytes": 17003,
+    "sha256": "0954bc4a533e1a840546f9eca7c756b856dd35f3c646c6b78d3a38da78071b18",
+    "archive_sha256": "b77c7078c3cb343e82dffa8616134a4d820b504dba48c7ecd8f7921d1a43fce8"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/study.cpp",
+    "archive": "20-study.cpp.gz",
+    "bytes": 1889,
+    "sha256": "265762a46a52fa170973cfc2ce240ea21eb9360b40fe2e899ac0ed557ef3ab02",
+    "archive_sha256": "0f266f77a91228deb380e1dc8ccfa7dc30160c37ed2c0e66ac2a8ae7b37f776c"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/study.csv",
+    "archive": "21-study.csv.gz",
+    "bytes": 949,
+    "sha256": "23e56a4f174f3db6d7ad518c7362d66a89c7572ff39113a2089f0320a0df75db",
+    "archive_sha256": "f1f6264a979b860db05864a609d78700466e8b7fa6cbb3b661208aea58bc67b3"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/compose.cpp",
+    "archive": "22-compose.cpp.gz",
+    "bytes": 2122,
+    "sha256": "9bf2733a5a78edd7b143e80b34bc2faf0764ae8d45a90a65645253e7cbf10fd4",
+    "archive_sha256": "5c8872b8081ea1dfce18506f3d2f70b10c76c8927ca61a4c7b426024efd93c37"
+  },
+  {
+    "source": "/tmp/beam-birth-root01/legacy-parity.json",
+    "archive": "23-legacy-parity.json.gz",
+    "bytes": 285,
+    "sha256": "c3038fb48c0e84b840d6e1b1b8470162f6a4d8dce7b91a2249f072342be7af2c",
+    "archive_sha256": "783149af03b15d1561bd9244f5273f624b6a00d27f8a9aabd0bf369104dccb3d"
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/src/fusion_thermal_birth.cpp",
+    "archive": "24-fusion_thermal_birth.cpp.gz",
+    "bytes": 26630,
+    "sha256": "771c7e9c01715605355854e83494deeab08116883d9287c39b69d80bcaee62e6",
+    "archive_sha256": "ef4e8322ae2c073c8f6d76ac20ce7b9b5825532232562819a0494b292c5edf00"
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/include/fusion_beam_birth.h",
+    "archive": "25-fusion_beam_birth.h.gz",
+    "bytes": 2748,
+    "sha256": "1a80665895597aa250e8dcfcf2c7129fb845ea19d2d721d6c0957d0142b6c461",
+    "archive_sha256": "d2c6fe628db75e8df44a484d6f181455fe788272c9cd5d5ba20109390d7cb2f0"
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/fortran/fusion_beam_birth_fortran.f90",
+    "archive": "26-fusion_beam_birth_fortran.f90.gz",
+    "bytes": 9686,
+    "sha256": "1bfa6dda7dc0377ac945a4ab1479e42e97c9224a59af7e0a2c561974ffb31e2f",
+    "archive_sha256": "98e02f2de836acc2f3aeabb7e8c007c80f200824cbfe3d86d6e95112f8fd8cd8"
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/tests/test_fusion_beam_birth.cpp",
+    "archive": "27-test_fusion_beam_birth.cpp.gz",
+    "bytes": 28333,
+    "sha256": "05f2cd7e41c4fcb12a55f8a67859f835c30cce7f0cf32731eb632fd2b8acfee7",
+    "archive_sha256": "0902d72ee8c19dcb7111536d94169a1bdbbd724165c80b7857897f730de821db"
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/tests/test_fusion_beam_birth_composition.cpp",
+    "archive": "28-test_fusion_beam_birth_composition.cpp.gz",
+    "bytes": 2184,
+    "sha256": "0296e8ba7b661471e70dc00a6f0b92ad57436db3b9d26e2be366454524dbbb78",
+    "archive_sha256": "c3783a05715be6564b39e2250474f92fa70acb16a33fbfd2865fd7e02c118034"
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/tests/test_fusion_beam_birth_fortran.f90",
+    "archive": "29-test_fusion_beam_birth_fortran.f90.gz",
+    "bytes": 6960,
+    "sha256": "228c64be73b8be71d09a73486dfca6d9dfe88bdf1066b55ae546cbacad4ff8cc",
+    "archive_sha256": "26e99f2360a5e7c3776dfe90fa32683661f6931f0689ba250ba25804ca3aff8f"
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/CMakeLists.txt",
+    "archive": "30-CMakeLists.txt.gz",
+    "bytes": 49478,
+    "sha256": "128822f3d5faf070747f5d5c584b405c8763fe5a2bf9825d0f7cdc3239d6037c",
+    "archive_sha256": "ef84feae023040844365a113f8befb1899fd7fc494456a357e354716bbbf4fbf"
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/docs/BEAM_BIRTH.md",
+    "archive": "31-BEAM_BIRTH.md.gz",
+    "bytes": 5942,
+    "sha256": "19765824e773164bbe5c33cfbd7b7be3e05bd08f1a11a3cd13da044907a6a506",
+    "archive_sha256": "c27b7f402f020b20bbf5651723e26cb22bffa51a019024cc05e5f08056491e89"
+  },
+  {
+    "source": "/tmp/beam-birth-install01/logs/fortran-consumer.log",
+    "archive": "32-fortran-consumer.log.gz",
+    "bytes": 76,
+    "sha256": "e4c7e8522f8fb2f75a0f5859bf736c5014871bfc87ad1eec623e173ca51854fb",
+    "archive_sha256": "0ff7e8a6af03d49c82e063036702f2c5088ea2d41bcf7c318a3a4466609df6b3"
+  },
+  {
+    "source": "/tmp/beam-birth-install01/logs/c-consumer.log",
+    "archive": "33-c-consumer.log.gz",
+    "bytes": 83,
+    "sha256": "401e200cfe73af18f7db7eafcc3794c4ab9f12bd92bfb2f8fd32ebe0b3a1c830",
+    "archive_sha256": "4a6e0d662984ff87f79549e93f45be516cf4765ec49800978c16e5475fc2b3bc"
+  },
+  {
+    "source": "/tmp/beam-birth-install01/logs/build.log",
+    "archive": "34-build.log.gz",
+    "bytes": 302,
+    "sha256": "5c7ec5f5c8ae1e025b2e03e33b855a3eee2c365c7da1589564cf3331675288f6",
+    "archive_sha256": "d5fc5a90de1f4af84b42e971ddf8aa7c80d65f95829252f5cebc5c3da5289e7a"
+  },
+  {
+    "source": "/tmp/beam-birth-install01/logs/configure.log",
+    "archive": "35-configure.log.gz",
+    "bytes": 841,
+    "sha256": "9b0ccfb3516596529806c63a67d0d1a182f8214f145fcbc1f6d6995ad02226cd",
+    "archive_sha256": "f6bb91b5f4a66210e025cf298ea321386ad4135c14d8e1e83eefe10e64ecd99e"
+  },
+  {
+    "source": "/tmp/beam-birth-install01/logs/install.log",
+    "archive": "36-install.log.gz",
+    "bytes": 7667,
+    "sha256": "16f66b7533be1e9765cfd9ed73a6583229cb31ec350d4b7c12c0f0c34f6b78ec",
+    "archive_sha256": "843fb547276333ff18ed611fd98bade5b562b918cecc5ad7cd8731abe04d163d"
+  },
+  {
+    "source": "/tmp/beam-birth-install01/consumer/consumer.f90",
+    "archive": "37-consumer.f90.gz",
+    "bytes": 2328,
+    "sha256": "46c68e0f380bbb3693a87f12c3c612bc7405733c2ae311b4dd93600ee7bbc455",
+    "archive_sha256": "9f729909e51a82f21574281cae34884d67584247880ab4bf1e50006751aca3f3"
+  },
+  {
+    "source": "/tmp/beam-birth-install01/consumer/consumer.c",
+    "archive": "38-consumer.c.gz",
+    "bytes": 2128,
+    "sha256": "d791be88583c66375361806ffc138e10e96ff756f28ecf3623b39d1593387885",
+    "archive_sha256": "86aab93a78cdf10a817cfc5dd16e2af6ee5d0e7561893f808953cb6c5dc4365b"
+  },
+  {
+    "source": "/tmp/beam-birth-install01/consumer/CMakeLists.txt",
+    "archive": "39-CMakeLists.txt.gz",
+    "bytes": 680,
+    "sha256": "cf18665f961c9eb75b0603808f47f3d0a498ac43c28ae6996e9a77b8e30235d1",
+    "archive_sha256": "216fbc24e6af558127f44227113e4fe5220d389aa72a74484ae2295215e6b9d3"
+  }
+]

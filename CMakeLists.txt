@@ -177,6 +177,16 @@ if(PB11_FORTRAN_AVAILABLE)
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>")
     target_link_libraries(fusion_coupled_thermal_fortran PUBLIC pb11::pb11 fusion_thermal_birth_fortran fusion_source_state_fortran)
 
+    add_library(fusion_beam_birth_fortran STATIC fortran/fusion_beam_birth_fortran.f90)
+    add_library(pb11::fusion_beam_birth_fortran ALIAS fusion_beam_birth_fortran)
+    set_target_properties(fusion_beam_birth_fortran PROPERTIES
+        Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fortran-mod"
+        EXPORT_NAME fusion_beam_birth_fortran)
+    target_include_directories(fusion_beam_birth_fortran INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>)
+    target_link_libraries(fusion_beam_birth_fortran PUBLIC pb11::pb11 fusion_thermal_birth_fortran)
+
     add_library(fusion_thermal_birth_fortran STATIC fortran/fusion_thermal_birth_fortran.f90)
     add_library(pb11::fusion_thermal_birth_fortran ALIAS fusion_thermal_birth_fortran)
     set_target_properties(fusion_thermal_birth_fortran PROPERTIES
@@ -484,6 +494,14 @@ if(BUILD_TESTING)
     add_executable(study_coupled_thermal tools/study_coupled_thermal.cpp)
     target_link_libraries(study_coupled_thermal PRIVATE pb11::pb11)
 
+    add_executable(test_fusion_beam_birth_composition tests/test_fusion_beam_birth_composition.cpp)
+    target_link_libraries(test_fusion_beam_birth_composition PRIVATE pb11::pb11)
+    add_test(NAME fusion_beam_birth_composition_tests COMMAND test_fusion_beam_birth_composition)
+
+    add_executable(test_fusion_beam_birth tests/test_fusion_beam_birth.cpp)
+    target_link_libraries(test_fusion_beam_birth PRIVATE pb11::pb11)
+    add_test(NAME fusion_beam_birth_tests COMMAND test_fusion_beam_birth)
+
     add_executable(test_fusion_thermal_pair_birth tests/test_fusion_thermal_pair_birth.cpp)
     target_link_libraries(test_fusion_thermal_pair_birth PRIVATE pb11::pb11)
     add_test(NAME fusion_thermal_pair_birth_tests COMMAND test_fusion_thermal_pair_birth)
@@ -662,6 +680,13 @@ if(BUILD_TESTING)
         target_link_libraries(test_fusion_coupled_thermal_fortran PRIVATE pb11::fusion_coupled_thermal_fortran)
         add_test(NAME fusion_coupled_thermal_fortran_binding_tests COMMAND test_fusion_coupled_thermal_fortran)
 
+        add_executable(test_fusion_beam_birth_fortran tests/test_fusion_beam_birth_fortran.f90)
+        set_target_properties(test_fusion_beam_birth_fortran PROPERTIES
+            LINKER_LANGUAGE Fortran
+            Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod")
+        target_link_libraries(test_fusion_beam_birth_fortran PRIVATE pb11::fusion_beam_birth_fortran)
+        add_test(NAME fusion_beam_birth_fortran_binding_tests COMMAND test_fusion_beam_birth_fortran)
+
         add_executable(test_fusion_thermal_pair_birth_fortran tests/test_fusion_thermal_pair_birth_fortran.f90)
         set_target_properties(test_fusion_thermal_pair_birth_fortran PROPERTIES
             LINKER_LANGUAGE Fortran
@@ -803,7 +828,7 @@ if(PB11_FORTRAN_AVAILABLE)
         TARGETS pb11_fortran fusion_fortran fusion_energy_work_fortran fusion_kinetics_fortran fusion_radial_transport_fortran
                 fusion_two_component_fortran fusion_handoff_fortran fusion_thermal_burn_fortran fusion_nuclear_data_fortran fusion_source_state_fortran fusion_source_volume_fortran fusion_kinetic_geometry_fortran fusion_fast_moments_fortran
                 fusion_beam_fortran fusion_rate_model_fortran fusion_target_burn_fortran fusion_fsci_fortran fusion_pb_birth_fortran fusion_pb_population_fortran fusion_reaction_event_fortran
-                fusion_products_fortran fusion_thermal_birth_fortran fusion_birth_table_fortran fusion_coupled_thermal_fortran
+                fusion_products_fortran fusion_thermal_birth_fortran fusion_beam_birth_fortran fusion_birth_table_fortran fusion_coupled_thermal_fortran
                 fusion_laboratory_fortran fusion_spectrum_fortran
         EXPORT pb11Targets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -825,7 +850,7 @@ install(
           include/fusion_thermal_burn.h include/fusion_nuclear_data.h include/fusion_source_state.h include/fusion_kinetic_geometry.h include/fusion_fast_moments.h
           include/fusion_products.h include/fusion_laboratory.h
           include/fusion_nuclear_coulomb.h include/fusion_alpha_amplitudes.h
-          include/fusion_alpha_spectrum.h include/fusion_birth_table.h include/fusion_coupled_thermal.h include/fusion_thermal_birth.h include/fusion_pb_birth.h include/fusion_pb_population.h include/fusion_reaction_event.h
+          include/fusion_alpha_spectrum.h include/fusion_birth_table.h include/fusion_coupled_thermal.h include/fusion_thermal_birth.h include/fusion_beam_birth.h include/fusion_pb_birth.h include/fusion_pb_population.h include/fusion_reaction_event.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(
