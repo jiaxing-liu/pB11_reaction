@@ -1,4 +1,6 @@
-#include "fusion_coupled_thermal.h"
+#include "fusion_coupled_fast.h"
+#include "fusion_beam_birth.h"
+#include "fusion_target_network.h"
 #include "fusion_birth_table_internal.h"
 #include "fusion_thermal_burn.h"
 #include "fusion_nuclear_data.h"
@@ -52,7 +54,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
  int n,const double*edges,const double*thermal,double Ue,double Ui,double ne,const double*charge2,
  int ninert,const fusion_inert_ion_v1*inert,const double*logs,const double*old_s,const double*old_t,
  const double*external,const double*escape,double*new_thermal,double*new_s,double*new_t,fusion_coupled_thermal_v1*out,
- fusion_handoff_diagnostics_v1*diagnostics=nullptr,bool require_diagnostics=false){
+ fusion_handoff_diagnostics_v1*diagnostics=nullptr,bool require_diagnostics=false,const fusion_fast_target_options_v1*fastop=nullptr,bool require_fast=false){
  if(out)*out={};
  if(diagnostics)*diagnostics={};
  fusion_handoff_diagnostics_v1 observation{};
@@ -63,6 +65,8 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
  if(!finite_value(dt)||!finite_value(Ue)||!finite_value(Ui)||!finite_value(ne))return BAD;
  if(dt<=0||Ue<=0||Ui<=0||ne<=0)return PB11_STATUS_OUT_OF_RANGE;
  int st=validate_options(*op);if(st)return st;
+ if(require_fast&&!fastop)return BAD;
+ if(fastop){if(!finite_value(fastop->angular_max_exponent)||fastop->angular_max_exponent<8||fastop->angular_max_exponent>80||fastop->angular_order<4||fastop->angular_order>32)return BAD;for(int ch=0;ch<5;++ch)if(fastop->channels[ch]!=0&&fastop->channels[ch]!=1)return BAD;}
  const int nb=7+ninert;
  for(int j=0;j<=n;++j)if(!nonnegative(edges[j])||(j&&edges[j]<=edges[j-1]))return BAD;
  for(int i=0;i<6*n;++i)if(!nonnegative(old_s[i])||!nonnegative(old_t[i])||!nonnegative(external[i])||!nonnegative(escape[i]))return BAD;
@@ -109,10 +113,79 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
   fusion_thermal_burn_v1 burn{};st=fusion_c_thermal_burn_trial(dt,thermal,oldUi,rates,mean_a,mean_b,trialNi,trialUi,&burn);if(st)return st;
   R ionU=Ui,electronU=Ue;Npool=Ninert;for(int i=0;i<6;++i){l.thermal_consumed_number_m3[i]=burn.reactant_removed_m3[i];l.thermal_consumed_energy_J_m3[i]=burn.reactant_removed_energy_J_m3[i];ionU-=burn.reactant_removed_energy_J_m3[i];Npool+=trialNi[i];}
   if(ionU<=0||Npool<=0||!put(ionU/(1.5L*Npool),Ti)||Ti<=0)return NUM;
-  std::vector<double> birth(6*n),s(6*n),t(6*n);R Q=0,neutronN=0,neutronE=0;
-  for(int ch=0;ch<5;++ch){l.events_m3[ch]=burn.events_m3[ch];Q+=R(l.events_m3[ch])*reactions[ch].q_J;}
+  // Old kinetic components are consumed before nuclear/external births enter FP.
+  const double*fp_s=old_s;const double*fp_t=old_t;
+  std::vector<double> surviving_s,surviving_t;
+  std::vector<R> fast_birth;R fast_neutronN=0,fast_neutronE=0;
+  std::array<R,5> fast_events{};
+  bool fast_enabled=false;if(fastop)for(int ch=0;ch<5;++ch)fast_enabled=fast_enabled||fastop->channels[ch];
+  if(fast_enabled){
+   struct EdgeMeta{int channel,slot,index;};
+   std::vector<fusion_target_network_edge_v1> links;std::vector<EdgeMeta> meta;
+   std::vector<double> fast_initial(6*n),fast_energy(6*n),spectrum(7*n);
+   for(int i=0;i<6;++i)for(int j=0;j<n;++j){int k=i*n+j;if(!put(R(old_s[k])+old_t[k],fast_initial[k]))return NUM;fast_energy[k]=double(centers[j]);}
+   fusion_beam_birth_options_v1 beam{};
+   beam.relative_max_J=op->birth.relative_max_J;beam.angular_max_exponent=fastop->angular_max_exponent;
+   beam.ground_state_q_J=op->birth.ground_state_q_J;beam.cutoff_J=op->birth.cutoff_J;
+   beam.l1_fraction=op->birth.l1_fraction;beam.relative_phase=op->birth.relative_phase;
+   beam.narrow_peak_fraction=op->birth.narrow_peak_fraction;beam.continuum_peak_scale=op->birth.continuum_peak_scale;
+   beam.continuation=op->birth.continuation;beam.remainder_policy=op->birth.remainder_policy;
+   beam.broad_mode=op->birth.broad_mode;beam.fsci_policy=op->birth.fsci_policy;
+   beam.relative_order=op->birth.relative_order;beam.angular_order=fastop->angular_order;beam.nq=op->birth.nq;beam.ncos=op->birth.ncos;
+   const double fastTi=Ti;
+   auto sample=[&](int ch,int slot,int k,fusion_beam_birth_v1&value)->int{
+    beam.pb_low=ch==0?op->birth.pb_low:FUSION_PB_LOW_TB;
+    int code=fusion_c_beam_birth_grid(ch,slot,fast_energy[k],fastTi,&beam,n,edges,spectrum.data(),&value);if(code)return code;
+    auto&r=value.spectrum;double rate_error=std::abs(r.relative_rate_discrepancy),debit_error=r.relative_reactant_energy_discrepancy;
+    result.max_source_rate_discrepancy=std::max(result.max_source_rate_discrepancy,rate_error);result.max_source_debit_discrepancy=std::max(result.max_source_debit_discrepancy,debit_error);
+    if(rate_error>op->max_source_rate_error||debit_error>op->max_source_debit_error)return NUM;
+    for(int i=0;i<6;++i)if(r.below_number_m3_s[i]>0||r.above_number_m3_s[i]>0)return PB11_STATUS_OUT_OF_RANGE;
+    return PB11_STATUS_OK;
+   };
+   for(int ch=0;ch<5;++ch)if(fastop->channels[ch])for(int slot=0;slot<2;++slot){
+    const auto&r=reactions[ch];if(slot==1&&r.reactant_ids[0]==r.reactant_ids[1])continue;
+    int projectile=r.reactant_ids[slot],target=r.reactant_ids[1-slot];if(trialNi[target]==0)continue;
+    for(int j=0;j<n;++j){int k=projectile*n+j;if(fast_initial[k]==0)continue;fusion_beam_birth_v1 value{};st=sample(ch,slot,k,value);if(st)return st;
+     links.push_back({k,target,value.spectrum.reactivity_m3_s,value.spectrum.reactant_energy_moment_J_m3_s[1-slot]});meta.push_back({ch,slot,k});
+    }
+   }
+   if(!links.empty()){
+    double targetU[6]{},afterN[6]{},afterU[6]{};
+    for(int i=0;i<6;++i)if(!put(1.5L*fastTi*trialNi[i],targetU[i]))return NUM;
+    std::vector<double> afterFast(6*n),loss(links.size());fusion_target_network_v1 debit{};
+    st=fusion_c_target_network_trial(6*n,6,int(links.size()),dt,fast_energy.data(),fast_initial.data(),trialNi,targetU,links.data(),afterFast.data(),afterN,afterU,loss.data(),&debit);if(st)return st;
+    // Use the same hazard denominator for S and T, avoiding loss of a small
+    // component when a summed inventory rounds or the other component dominates.
+    std::vector<R> hazard(6*n,0);for(size_t e=0;e<links.size();++e)hazard[links[e].fast_index]+=R(dt)*links[e].reactivity_m3_s*afterN[links[e].target_index];
+    surviving_s.resize(6*n);surviving_t.resize(6*n);
+    for(int k=0;k<6*n;++k){if(!put(R(old_s[k])/(1+hazard[k]),surviving_s[k])||!put(R(old_t[k])/(1+hazard[k]),surviving_t[k]))return NUM;
+     R round=16*std::numeric_limits<double>::epsilon()*(R(old_s[k])+old_t[k]+afterFast[k]);
+     if(!close({R(surviving_s[k]),R(surviving_t[k]),-R(afterFast[k])},round))return NUM;
+    }
+    fp_s=surviving_s.data();fp_t=surviving_t.data();fast_birth.assign(6*n,0);
+    std::array<R,6> fastNremoved{},fastEremoved{},targetNremoved{},targetEremoved{};
+    for(size_t e=0;e<links.size();++e){if(loss[e]==0)continue;const auto&m=meta[e];const auto&link=links[e];if(link.reactivity_m3_s<=0)return NUM;
+     fusion_beam_birth_v1 value{};st=sample(m.channel,m.slot,m.index,value);if(st)return st;
+     const auto&r=value.spectrum;if(r.reactivity_m3_s!=link.reactivity_m3_s||r.reactant_energy_moment_J_m3_s[1-m.slot]!=link.target_energy_reactivity_J_m3_s)return NUM;
+     R amount=loss[e],scale=amount/link.reactivity_m3_s;int projectile=m.index/n;
+     fast_events[m.channel]+=amount;fastNremoved[projectile]+=amount;fastEremoved[projectile]+=amount*centers[m.index%n];
+     targetNremoved[link.target_index]+=amount;targetEremoved[link.target_index]+=scale*link.target_energy_reactivity_J_m3_s;
+     for(int k=0;k<6*n;++k)fast_birth[k]+=scale*spectrum[k];
+     R neutronNumber=R(r.below_number_m3_s[6])+r.above_number_m3_s[6],neutronEnergy=R(r.below_energy_J_m3_s[6])+r.above_energy_J_m3_s[6];
+     for(int j=0;j<n;++j){neutronNumber+=spectrum[6*n+j];neutronEnergy+=R(spectrum[6*n+j])*centers[j];}
+     fast_neutronN+=scale*neutronNumber;fast_neutronE+=scale*neutronEnergy;
+    }
+    Npool=Ninert;
+    for(int i=0;i<6;++i){trialNi[i]=afterN[i];Npool+=trialNi[i];ionU-=targetEremoved[i];
+     if(!put(fastNremoved[i],l.fast_consumed_number_m3[i])||!put(fastEremoved[i],l.fast_consumed_energy_J_m3[i])||!put(R(l.thermal_consumed_number_m3[i])+targetNremoved[i],l.thermal_consumed_number_m3[i])||!put(R(l.thermal_consumed_energy_J_m3[i])+targetEremoved[i],l.thermal_consumed_energy_J_m3[i]))return NUM;
+    }
+    if(ionU<=0||Npool<=0||!put(ionU/(1.5L*Npool),Ti)||Ti<=0)return NUM;
+   }
+  }
+  std::vector<double> birth(6*n),s(6*n),t(6*n);R Q=0,neutronN=fast_neutronN,neutronE=fast_neutronE;
+  for(int ch=0;ch<5;++ch){if(!put(R(burn.events_m3[ch])+fast_events[ch],l.events_m3[ch]))return NUM;Q+=R(l.events_m3[ch])*reactions[ch].q_J;}
   for(int i=0;i<6;++i){R bornN=0,bornE=0,extN=0,extE=0;
-   for(int j=0;j<n;++j){R amount=0;
+   for(int j=0;j<n;++j){R amount=fast_birth.empty()?0:fast_birth[i*n+j];
     for(int ch=0;ch<5;++ch)if(burn.events_m3[ch]>0){if(rates[ch]<=0)return NUM;amount+=R(grids[ch][i*n+j])/rates[ch]*burn.events_m3[ch];}
     bornN+=amount;bornE+=amount*centers[j];R ex=R(dt)*external[i*n+j];extN+=ex;extE+=ex*centers[j];
     if(!put((amount+ex)/dt,birth[i*n+j]))return NUM;
@@ -134,7 +207,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
     if(b>0)for(int j=0;j<n;++j){double lambda=0;st=fusion_c_coulomb_transfer_rate(double(centers[j]),mass[i].mass_kg,mass[i].nuclear_charge,&baths[b],&lambda);if(st)return st;if(!put(R(transfer[j])+lambda,transfer[j]))return NUM;}
    }
    fusion_two_component_ledger_v1 fp{};
-   st=fusion_c_two_component_trial(n,nb,dt,edges,old_s+i*n,old_t+i*n,temperatures.data(),diffusion.data(),birth.data()+i*n,zero.data(),escape+i*n,transfer.data(),s.data()+i*n,t.data()+i*n,heat.data(),&fp);if(st)return st;
+   st=fusion_c_two_component_trial(n,nb,dt,edges,fp_s+i*n,fp_t+i*n,temperatures.data(),diffusion.data(),birth.data()+i*n,zero.data(),escape+i*n,transfer.data(),s.data()+i*n,t.data()+i*n,heat.data(),&fp);if(st)return st;
    if(diagnostics){
     observation.transferred_number_m3[i]=fp.transferred_number_m3;
     observation.transferred_energy_J_m3[i]=fp.transferred_energy_J_m3;
@@ -166,14 +239,14 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
   R escapedE=0,externalE=0;
   for(int i=0;i<6;++i){R N=0,E=0,H=result.inert_ion_heat_J_m3[i];for(int b=0;b<7;++b)H+=l.heat_to_bath_J_m3[i*7+b];
    for(int j=0;j<n;++j){R z=R(s[i*n+j])+t[i*n+j];N+=z;E+=z*centers[j];}
-   if(!close({N,-oldN[i],-R(l.nuclear_born_number_m3[i]),-R(l.external_born_number_m3[i]),R(l.escaped_number_m3[i]),R(l.handed_off_number_m3[i])})||
-      !close({E,-oldE[i],-R(l.nuclear_born_energy_J_m3[i]),-R(l.external_born_energy_J_m3[i]),R(l.escaped_energy_J_m3[i]),R(l.handed_off_energy_J_m3[i]),H}))return NUM;
-   R dN=R(trialNi[i])-thermal[i]+N-oldN[i]-l.nuclear_born_number_m3[i]+l.thermal_consumed_number_m3[i]-l.external_born_number_m3[i]+l.escaped_number_m3[i];
+   if(!close({N,-oldN[i],-R(l.nuclear_born_number_m3[i]),-R(l.external_born_number_m3[i]),R(l.escaped_number_m3[i]),R(l.handed_off_number_m3[i]),R(l.fast_consumed_number_m3[i])})||
+      !close({E,-oldE[i],-R(l.nuclear_born_energy_J_m3[i]),-R(l.external_born_energy_J_m3[i]),R(l.escaped_energy_J_m3[i]),R(l.handed_off_energy_J_m3[i]),H,R(l.fast_consumed_energy_J_m3[i])}))return NUM;
+   R dN=R(trialNi[i])-thermal[i]+N-oldN[i]-l.nuclear_born_number_m3[i]+l.thermal_consumed_number_m3[i]-l.external_born_number_m3[i]+l.escaped_number_m3[i]+l.fast_consumed_number_m3[i];
    // Difference-of-inventory residuals inherit rounding from BOTH pools,
    // including a seeded kinetic species with no thermal counterpart.
    R round=16*std::numeric_limits<double>::epsilon()*(R(thermal[i])+trialNi[i]+oldN[i]+N);
-   if(!put(dN,result.particle_residual_m3[i])||!close({R(trialNi[i])-thermal[i],N-oldN[i],-R(l.nuclear_born_number_m3[i]),R(l.thermal_consumed_number_m3[i]),-R(l.external_born_number_m3[i]),R(l.escaped_number_m3[i])},round))return NUM;
-   nuclearE+=l.nuclear_born_energy_J_m3[i];removedE+=l.thermal_consumed_energy_J_m3[i];totalOld+=oldE[i];totalNew+=E;escapedE+=l.escaped_energy_J_m3[i];externalE+=l.external_born_energy_J_m3[i];
+   if(!put(dN,result.particle_residual_m3[i])||!close({R(trialNi[i])-thermal[i],N-oldN[i],-R(l.nuclear_born_number_m3[i]),R(l.thermal_consumed_number_m3[i]),-R(l.external_born_number_m3[i]),R(l.escaped_number_m3[i]),R(l.fast_consumed_number_m3[i])},round))return NUM;
+   nuclearE+=l.nuclear_born_energy_J_m3[i];removedE+=R(l.thermal_consumed_energy_J_m3[i])+l.fast_consumed_energy_J_m3[i];totalOld+=oldE[i];totalNew+=E;escapedE+=l.escaped_energy_J_m3[i];externalE+=l.external_born_energy_J_m3[i];
   }
   if(!close({nuclearE,-removedE,-Q}))return NUM;
   R residual=totalNew-totalOld+neutronE+escapedE-externalE-Q;
@@ -246,4 +319,28 @@ extern "C" int fusion_c_coupled_thermal_increment(const fusion_source_ledger_v1*
  }
  if(!put(electron,result.electron_energy_J_m3)||!put(ion,result.ion_energy_J_m3))return NUM;
  *out=result;return PB11_STATUS_OK;
+}
+
+extern "C" int fusion_c_coupled_fast_trial(double dt,const fusion_coupled_thermal_options_v1*op,
+ const fusion_fast_target_options_v1*fastop,
+ int n,const double*edges,const double*thermal,double Ue,double Ui,double ne,const double*charge2,
+ int ninert,const fusion_inert_ion_v1*inert,const double*logs,const double*old_s,const double*old_t,
+ const double*external,const double*escape,double*new_thermal,double*new_s,double*new_t,fusion_coupled_thermal_v1*out){
+ return coupled_trial(dt,op,nullptr,false,false,n,edges,thermal,Ue,Ui,ne,charge2,ninert,inert,logs,old_s,old_t,external,escape,new_thermal,new_s,new_t,out,nullptr,false,fastop,true);
+}
+
+extern "C" int fusion_c_coupled_fast_table_trial(double dt,const fusion_coupled_thermal_options_v1*op,
+ const fusion_fast_target_options_v1*fastop,
+ const fusion_birth_table_v1*const*tables,int n,const double*edges,const double*thermal,double Ue,double Ui,double ne,const double*charge2,
+ int ninert,const fusion_inert_ion_v1*inert,const double*logs,const double*old_s,const double*old_t,
+ const double*external,const double*escape,double*new_thermal,double*new_s,double*new_t,fusion_coupled_thermal_v1*out){
+ return coupled_trial(dt,op,tables,true,false,n,edges,thermal,Ue,Ui,ne,charge2,ninert,inert,logs,old_s,old_t,external,escape,new_thermal,new_s,new_t,out,nullptr,false,fastop,true);
+}
+
+extern "C" int fusion_c_coupled_fast_table_trial_effective_charge(double dt,const fusion_coupled_thermal_options_v1*op,
+ const fusion_fast_target_options_v1*fastop,
+ const fusion_birth_table_v1*const*tables,int n,const double*edges,const double*thermal,double Ue,double Ui,double ne,const double*charge2,
+ int ninert,const fusion_inert_ion_v1*inert,const double*logs,const double*old_s,const double*old_t,
+ const double*external,const double*escape,double*new_thermal,double*new_s,double*new_t,fusion_coupled_thermal_v1*out){
+ return coupled_trial(dt,op,tables,true,true,n,edges,thermal,Ue,Ui,ne,charge2,ninert,inert,logs,old_s,old_t,external,escape,new_thermal,new_s,new_t,out,nullptr,false,fastop,true);
 }

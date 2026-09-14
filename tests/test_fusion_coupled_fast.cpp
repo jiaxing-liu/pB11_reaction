@@ -1,0 +1,714 @@
+#include "fusion_coupled_fast.h"
+#include "fusion_network.h"
+#include "fusion_nuclear_data.h"
+#include "fusion_rate_model.h"
+#include "fusion_source_state.h"
+
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <iostream>
+#include <limits>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+namespace {
+
+constexpr int kSpecies = FUSION_SPECIES_COUNT;
+constexpr int kChannels = FUSION_CHANNEL_COUNT;
+constexpr int kBaths = 7;
+constexpr double kElectronVoltJ = 1.602176634e-19;
+constexpr double kKeVJ = 1.0e3 * kElectronVoltJ;
+constexpr double kMeVJ = 1.0e6 * kElectronVoltJ;
+
+using Species = std::array<double, kSpecies>;
+
+void require(bool condition, const std::string& message) {
+    if (!condition) throw std::runtime_error(message);
+}
+
+bool close_scaled(double actual, double expected, double relative,
+                  double absolute = 0.0) {
+    if (actual == expected) return true;
+    if (!std::isfinite(actual) || !std::isfinite(expected)) return false;
+    const double scale = std::max(std::abs(actual), std::abs(expected));
+    return std::abs(actual - expected) <=
+           std::max(absolute, relative * scale);
+}
+
+struct Grid {
+    std::vector<double> edges;
+
+    int cells() const { return static_cast<int>(edges.size()) - 1; }
+};
+
+Grid make_grid() {
+    // A small but useful grid: a real zero lower edge, an eV-scale first
+    // center for the FP operator, and a linear tail through all charged DT
+    // products.  No pB channel is enabled in these tests.
+    constexpr int log_cells = 48;
+    constexpr int linear_cells = 64;
+    constexpr int cells = 1 + log_cells + linear_cells;
+    const double first_center = 1.0 * kElectronVoltJ;
+    const double first_edge = 2.0 * first_center;
+    const double split = 0.5 * kMeVJ;
+    const double maximum = 25.0 * kMeVJ;
+
+    Grid grid;
+    grid.edges.resize(static_cast<std::size_t>(cells) + 1);
+    grid.edges[0] = 0.0;
+    grid.edges[1] = first_edge;
+    const double log_first = std::log(first_edge);
+    const double log_split = std::log(split);
+    for (int i = 1; i <= log_cells; ++i) {
+        const double fraction = static_cast<double>(i) / log_cells;
+        grid.edges[static_cast<std::size_t>(1 + i)] =
+            std::exp(log_first + fraction * (log_split - log_first));
+    }
+    for (int i = 1; i <= linear_cells; ++i) {
+        const double fraction = static_cast<double>(i) / linear_cells;
+        grid.edges[static_cast<std::size_t>(1 + log_cells + i)] =
+            split + fraction * (maximum - split);
+    }
+    require(grid.cells() == cells, "fast test grid cell count");
+    require(grid.edges.front() == 0.0 &&
+                grid.edges.back() == 25.0 * kMeVJ,
+            "fast test grid bounds");
+    for (std::size_t i = 1; i < grid.edges.size(); ++i)
+        require(grid.edges[i] > grid.edges[i - 1],
+                "fast test grid is strictly increasing");
+    return grid;
+}
+
+double cell_center(const Grid& grid, int cell) {
+    return 0.5 * (grid.edges[static_cast<std::size_t>(cell)] +
+                  grid.edges[static_cast<std::size_t>(cell + 1)]);
+}
+
+int nearest_cell(const Grid& grid, double energy) {
+    int result = 0;
+    double best = std::numeric_limits<double>::infinity();
+    for (int cell = 0; cell < grid.cells(); ++cell) {
+        const double distance = std::abs(cell_center(grid, cell) - energy);
+        if (distance < best) {
+            best = distance;
+            result = cell;
+        }
+    }
+    return result;
+}
+
+fusion_coupled_thermal_options_v1 make_options(
+    const std::array<int, kChannels>& channels) {
+    fusion_coupled_thermal_options_v1 options{};
+    options.birth.relative_max_J = 5.0 * kMeVJ;
+    options.birth.cm_max_kT = 40.0;
+    options.birth.ground_state_q_J = 91.84 * kKeVJ;
+    options.birth.cutoff_J = 0.002 * kMeVJ;
+    options.birth.l1_fraction = 0.76;
+    options.birth.relative_phase = 0.0;
+    options.birth.narrow_peak_fraction = 0.051;
+    options.birth.continuum_peak_scale = 1.0;
+    options.birth.continuation = FUSION_ENDPOINT_S;
+    options.birth.pb_low = FUSION_PB_LOW_TB;
+    options.birth.remainder_policy = FUSION_PB_REMAINDER_ENTRANCE_PROXY;
+    options.birth.broad_mode = 13;
+    options.birth.fsci_policy = 0;
+    options.birth.relative_order = 8;
+    options.birth.cm_order = 8;
+    options.birth.nq = 8;
+    options.birth.ncos = 8;
+    options.max_source_rate_error = 2.0e-3;
+    options.max_source_debit_error = 2.0e-3;
+    options.handoff_max_L1 = 1.0e-3;
+    options.handoff_max_mean_error = 1.0e-3;
+    options.handoff_enabled = 0;
+    for (int channel = 0; channel < kChannels; ++channel)
+        options.channels[channel] = channels[static_cast<std::size_t>(channel)];
+    return options;
+}
+
+fusion_fast_target_options_v1 make_fast_options(
+    const std::array<int, kChannels>& channels) {
+    fusion_fast_target_options_v1 options{};
+    for (int channel = 0; channel < kChannels; ++channel)
+        options.channels[channel] = channels[static_cast<std::size_t>(channel)];
+    options.angular_order = 8;
+    options.angular_max_exponent = 40.0;
+    return options;
+}
+
+struct Inputs {
+    Grid grid = make_grid();
+    Species thermal_number{{0.0, 0.0, 5.0e19, 0.0, 0.0, 0.0}};
+    double electron_energy_J_m3 = 0.0;
+    double ion_energy_J_m3 = 0.0;
+    double electron_density_m3 = 1.0e20;
+    Species thermal_charge_squared{{1.0, 1.0, 1.0, 4.0, 4.0, 25.0}};
+    int inert_count = 0;
+    std::vector<double> coulomb_logs;
+    std::vector<double> old_s;
+    std::vector<double> old_t;
+    std::vector<double> external_birth;
+    std::vector<double> escape;
+    fusion_coupled_thermal_options_v1 options{};
+    fusion_fast_target_options_v1 fast_options{};
+
+    explicit Inputs(bool thermal_dt = false) {
+        const double ti = 10.0 * kKeVJ;
+        electron_energy_J_m3 = 1.5 * electron_density_m3 * ti;
+        double thermal_ions = thermal_number[FUSION_TRITON];
+        if (thermal_dt) {
+            thermal_number[FUSION_DEUTERON] = 5.0e19;
+            thermal_ions += thermal_number[FUSION_DEUTERON];
+        }
+        ion_energy_J_m3 = 1.5 * thermal_ions * ti;
+
+        const std::size_t fast_size =
+            static_cast<std::size_t>(kSpecies) * grid.cells();
+        coulomb_logs.assign(static_cast<std::size_t>(kSpecies) * kBaths,
+                            15.0);
+        old_s.assign(fast_size, 0.0);
+        old_t.assign(fast_size, 0.0);
+        external_birth.assign(fast_size, 0.0);
+        escape.assign(fast_size, 0.0);
+        options = make_options({{0, 0, 0, thermal_dt ? 1 : 0, 0}});
+        fast_options = make_fast_options({{0, 0, 0, 0, 0}});
+
+        // A representative fast deuteron in both components and one energy
+        // cell.  Fast-target DT is then a distinct D+thermal-T pool reaction.
+        const int cell = nearest_cell(grid, 100.0 * kKeVJ);
+        const std::size_t index = static_cast<std::size_t>(FUSION_DEUTERON) *
+                                      grid.cells() +
+                                  static_cast<std::size_t>(cell);
+        old_s[index] = 6.0e19;
+        old_t[index] = 4.0e19;
+    }
+};
+
+struct Trial {
+    Species thermal_number{};
+    std::vector<double> s;
+    std::vector<double> t;
+    fusion_coupled_thermal_v1 result{};
+};
+
+Trial make_trial(const Inputs& inputs) {
+    Trial trial;
+    const std::size_t fast_size =
+        static_cast<std::size_t>(kSpecies) * inputs.grid.cells();
+    trial.thermal_number.fill(-7.0);
+    trial.s.assign(fast_size, -7.0);
+    trial.t.assign(fast_size, -7.0);
+    trial.result = {};
+    return trial;
+}
+
+int call_fast(const Inputs& inputs, double dt_s, Trial& trial) {
+    return fusion_c_coupled_fast_trial(
+        dt_s, &inputs.options, &inputs.fast_options, inputs.grid.cells(),
+        inputs.grid.edges.data(), inputs.thermal_number.data(),
+        inputs.electron_energy_J_m3, inputs.ion_energy_J_m3,
+        inputs.electron_density_m3, inputs.thermal_charge_squared.data(),
+        inputs.inert_count, nullptr, inputs.coulomb_logs.data(),
+        inputs.old_s.data(), inputs.old_t.data(), inputs.external_birth.data(),
+        inputs.escape.data(), trial.thermal_number.data(), trial.s.data(),
+        trial.t.data(), &trial.result);
+}
+
+int call_legacy(const Inputs& inputs, double dt_s, Trial& trial) {
+    return fusion_c_coupled_thermal_trial(
+        dt_s, &inputs.options, inputs.grid.cells(), inputs.grid.edges.data(),
+        inputs.thermal_number.data(), inputs.electron_energy_J_m3,
+        inputs.ion_energy_J_m3, inputs.electron_density_m3,
+        inputs.thermal_charge_squared.data(), inputs.inert_count, nullptr,
+        inputs.coulomb_logs.data(), inputs.old_s.data(), inputs.old_t.data(),
+        inputs.external_birth.data(), inputs.escape.data(),
+        trial.thermal_number.data(), trial.s.data(), trial.t.data(),
+        &trial.result);
+}
+
+double fast_number(const Trial& trial, int cells, int species) {
+    double number = 0.0;
+    for (int cell = 0; cell < cells; ++cell) {
+        const std::size_t index = static_cast<std::size_t>(species) * cells +
+                                  static_cast<std::size_t>(cell);
+        number += trial.s[index] + trial.t[index];
+    }
+    return number;
+}
+
+double fast_energy(const Grid& grid, const std::vector<double>& s,
+                   const std::vector<double>& t, int species) {
+    const int cells = grid.cells();
+    double energy = 0.0;
+    for (int cell = 0; cell < cells; ++cell) {
+        const std::size_t index = static_cast<std::size_t>(species) * cells +
+                                  static_cast<std::size_t>(cell);
+        energy += cell_center(grid, cell) * (s[index] + t[index]);
+    }
+    return energy;
+}
+
+double input_number(const Inputs& inputs, int species) {
+    double number = 0.0;
+    const int cells = inputs.grid.cells();
+    for (int cell = 0; cell < cells; ++cell) {
+        const std::size_t index = static_cast<std::size_t>(species) * cells +
+                                  static_cast<std::size_t>(cell);
+        number += inputs.old_s[index] + inputs.old_t[index];
+    }
+    return number;
+}
+
+bool same_array(const double* left, const double* right, std::size_t count) {
+    for (std::size_t i = 0; i < count; ++i)
+        if (left[i] != right[i]) return false;
+    return true;
+}
+
+bool same_ledger(const fusion_source_ledger_v1& left,
+                 const fusion_source_ledger_v1& right) {
+    return same_array(left.events_m3, right.events_m3, kChannels) &&
+           same_array(left.nuclear_born_number_m3,
+                      right.nuclear_born_number_m3, kSpecies) &&
+           same_array(left.nuclear_born_energy_J_m3,
+                      right.nuclear_born_energy_J_m3, kSpecies) &&
+           same_array(left.external_born_number_m3,
+                      right.external_born_number_m3, kSpecies) &&
+           same_array(left.external_born_energy_J_m3,
+                      right.external_born_energy_J_m3, kSpecies) &&
+           same_array(left.thermal_consumed_number_m3,
+                      right.thermal_consumed_number_m3, kSpecies) &&
+           same_array(left.thermal_consumed_energy_J_m3,
+                      right.thermal_consumed_energy_J_m3, kSpecies) &&
+           same_array(left.fast_consumed_number_m3,
+                      right.fast_consumed_number_m3, kSpecies) &&
+           same_array(left.fast_consumed_energy_J_m3,
+                      right.fast_consumed_energy_J_m3, kSpecies) &&
+           same_array(left.escaped_number_m3, right.escaped_number_m3,
+                      kSpecies) &&
+           same_array(left.escaped_energy_J_m3, right.escaped_energy_J_m3,
+                      kSpecies) &&
+           same_array(left.handed_off_number_m3,
+                      right.handed_off_number_m3, kSpecies) &&
+           same_array(left.handed_off_energy_J_m3,
+                      right.handed_off_energy_J_m3, kSpecies) &&
+           same_array(left.heat_to_bath_J_m3, right.heat_to_bath_J_m3,
+                      kSpecies * kBaths) &&
+           left.neutron_number_m3 == right.neutron_number_m3 &&
+           left.neutron_energy_J_m3 == right.neutron_energy_J_m3;
+}
+
+bool same_result(const fusion_coupled_thermal_v1& left,
+                 const fusion_coupled_thermal_v1& right) {
+    return same_ledger(left.ledger, right.ledger) &&
+           same_array(left.inert_ion_heat_J_m3, right.inert_ion_heat_J_m3,
+                      kSpecies) &&
+           left.electron_energy_J_m3 == right.electron_energy_J_m3 &&
+           left.ion_energy_J_m3 == right.ion_energy_J_m3 &&
+           same_array(left.particle_residual_m3, right.particle_residual_m3,
+                      kSpecies) &&
+           left.energy_residual_J_m3 == right.energy_residual_J_m3 &&
+           left.max_source_rate_discrepancy ==
+               right.max_source_rate_discrepancy &&
+           left.max_source_debit_discrepancy ==
+               right.max_source_debit_discrepancy &&
+           same_array(left.handoff_L1, right.handoff_L1, kSpecies) &&
+           same_array(left.handoff_mean_error, right.handoff_mean_error,
+                      kSpecies) &&
+           std::equal(std::begin(left.handoff_projected),
+                      std::end(left.handoff_projected),
+                      std::begin(right.handoff_projected));
+}
+
+void require_finite_trial(const Trial& trial, const std::string& label) {
+    for (double value : trial.thermal_number)
+        require(std::isfinite(value) && value >= 0.0,
+                label + " thermal output is finite/nonnegative");
+    for (double value : trial.s)
+        require(std::isfinite(value) && value >= 0.0,
+                label + " S output is finite/nonnegative");
+    for (double value : trial.t)
+        require(std::isfinite(value) && value >= 0.0,
+                label + " T output is finite/nonnegative");
+    const fusion_source_ledger_v1& ledger = trial.result.ledger;
+    for (double value : ledger.events_m3)
+        require(std::isfinite(value) && value >= 0.0,
+                label + " event ledger is finite/nonnegative");
+    for (double value : ledger.nuclear_born_number_m3)
+        require(std::isfinite(value) && value >= 0.0,
+                label + " nuclear number ledger is finite/nonnegative");
+    for (double value : ledger.nuclear_born_energy_J_m3)
+        require(std::isfinite(value) && value >= 0.0,
+                label + " nuclear energy ledger is finite/nonnegative");
+    for (double value : ledger.thermal_consumed_number_m3)
+        require(std::isfinite(value) && value >= 0.0,
+                label + " thermal number ledger is finite/nonnegative");
+    for (double value : ledger.thermal_consumed_energy_J_m3)
+        require(std::isfinite(value) && value >= 0.0,
+                label + " thermal energy ledger is finite/nonnegative");
+    for (double value : ledger.fast_consumed_number_m3)
+        require(std::isfinite(value) && value >= 0.0,
+                label + " fast number ledger is finite/nonnegative");
+    for (double value : ledger.fast_consumed_energy_J_m3)
+        require(std::isfinite(value) && value >= 0.0,
+                label + " fast energy ledger is finite/nonnegative");
+    require(std::isfinite(ledger.neutron_number_m3) &&
+                ledger.neutron_number_m3 >= 0.0,
+            label + " neutron number is finite/nonnegative");
+    require(std::isfinite(ledger.neutron_energy_J_m3) &&
+                ledger.neutron_energy_J_m3 >= 0.0,
+            label + " neutron energy is finite/nonnegative");
+    require(std::isfinite(trial.result.electron_energy_J_m3) &&
+                std::isfinite(trial.result.ion_energy_J_m3) &&
+                std::isfinite(trial.result.energy_residual_J_m3),
+            label + " thermal energy result is finite");
+}
+
+bool zero_result(const fusion_coupled_thermal_v1& result) {
+    fusion_coupled_thermal_v1 zero{};
+    return same_result(result, zero);
+}
+
+void require_cleared(const Trial& trial, const std::string& label) {
+    for (double value : trial.thermal_number)
+        require(value == 0.0, label + " clears thermal output");
+    for (double value : trial.s)
+        require(value == 0.0, label + " clears S output");
+    for (double value : trial.t)
+        require(value == 0.0, label + " clears T output");
+    require(zero_result(trial.result), label + " clears result");
+}
+
+void test_fast_dt_accounting_and_shared_components() {
+    Inputs inputs;
+    inputs.fast_options = make_fast_options({{0, 0, 0, 1, 0}});
+    const double dt = 1.0e-3;
+    const Species old_thermal = inputs.thermal_number;
+    const std::vector<double> old_s = inputs.old_s;
+    const std::vector<double> old_t = inputs.old_t;
+    const std::vector<double> old_external = inputs.external_birth;
+    const std::vector<double> old_escape = inputs.escape;
+    Trial trial = make_trial(inputs);
+    require(call_fast(inputs, dt, trial) == PB11_STATUS_OK,
+            "fast-only DT trial returns OK");
+    require_finite_trial(trial, "fast-only DT");
+
+    const fusion_source_ledger_v1& ledger = trial.result.ledger;
+    const double events = ledger.events_m3[FUSION_DT_ALPHAN];
+    require(events > 0.0, "fast-only DT has nonzero event amount");
+    for (int channel = 0; channel < kChannels; ++channel)
+        if (channel != FUSION_DT_ALPHAN)
+            require(ledger.events_m3[channel] == 0.0,
+                    "fast-only DT leaves disabled channels at zero");
+    require(ledger.fast_consumed_number_m3[FUSION_DEUTERON] > 0.0 &&
+                ledger.fast_consumed_energy_J_m3[FUSION_DEUTERON] > 0.0,
+            "fast deuteron consumption is explicit");
+    require(ledger.thermal_consumed_number_m3[FUSION_TRITON] > 0.0 &&
+                ledger.thermal_consumed_energy_J_m3[FUSION_TRITON] > 0.0,
+            "thermal triton consumption is explicit");
+    require(ledger.nuclear_born_number_m3[FUSION_HELIUM4] > 0.0 &&
+                ledger.nuclear_born_energy_J_m3[FUSION_HELIUM4] > 0.0 &&
+                ledger.neutron_number_m3 > 0.0 &&
+                ledger.neutron_energy_J_m3 > 0.0,
+            "fast-only DT records alpha and neutron products");
+
+    require(close_scaled(ledger.fast_consumed_number_m3[FUSION_DEUTERON],
+                         events, 5.0e-10, 1.0e-20),
+            "one fast deuteron is consumed per DT event");
+    require(close_scaled(ledger.thermal_consumed_number_m3[FUSION_TRITON],
+                         events, 5.0e-10, 1.0e-20),
+            "one thermal triton is consumed per DT event");
+    require(close_scaled(ledger.nuclear_born_number_m3[FUSION_HELIUM4],
+                         events, 5.0e-10, 1.0e-20),
+            "one alpha is born per DT event");
+    require(close_scaled(ledger.neutron_number_m3, events, 5.0e-10,
+                         1.0e-20),
+            "one neutron is born per DT event");
+
+    // The fast source is a nuclear birth and its external source ledger stays
+    // independent.  In this fixture there is no external source at all.
+    for (int species = 0; species < kSpecies; ++species)
+        require(ledger.external_born_number_m3[species] == 0.0 &&
+                    ledger.external_born_energy_J_m3[species] == 0.0,
+                "fast nuclear birth is not aliased as external birth");
+
+    fusion_nuclear_channel_v1 dt_channel{};
+    require(fusion_c_nuclear_channel(FUSION_DT_ALPHAN, &dt_channel) ==
+                PB11_STATUS_OK,
+            "DT channel metadata is available");
+    const double q_energy = events * dt_channel.q_J;
+    const double product_energy =
+        ledger.nuclear_born_energy_J_m3[FUSION_HELIUM4] +
+        ledger.neutron_energy_J_m3;
+    const double fuel_energy =
+        ledger.fast_consumed_energy_J_m3[FUSION_DEUTERON] +
+        ledger.thermal_consumed_energy_J_m3[FUSION_TRITON];
+    require(close_scaled(product_energy, fuel_energy + q_energy, 5.0e-8,
+                         1.0e-20),
+            "fast DT product/fuel energy closes Q budget");
+
+    const double old_fast_d = input_number(inputs, FUSION_DEUTERON);
+    const double new_fast_d = fast_number(trial, inputs.grid.cells(),
+                                           FUSION_DEUTERON);
+    require(close_scaled(new_fast_d, old_fast_d -
+                                      ledger.fast_consumed_number_m3[
+                                          FUSION_DEUTERON],
+                         5.0e-9, 1.0e-20),
+            "fast deuteron number inventory closes");
+    require(close_scaled(trial.thermal_number[FUSION_TRITON],
+                         old_thermal[FUSION_TRITON] -
+                             ledger.thermal_consumed_number_m3[
+                                 FUSION_TRITON],
+                         5.0e-9, 1.0e-20),
+            "thermal triton number inventory closes");
+    require(close_scaled(fast_number(trial, inputs.grid.cells(),
+                                     FUSION_HELIUM4),
+                         ledger.nuclear_born_number_m3[FUSION_HELIUM4],
+                         5.0e-8, 1.0e-20),
+            "alpha fast number inventory closes");
+
+    double old_fast_energy = 0.0;
+    double new_fast_energy = 0.0;
+    for (int species = 0; species < kSpecies; ++species) {
+        old_fast_energy +=
+            fast_energy(inputs.grid, inputs.old_s, inputs.old_t, species);
+        new_fast_energy +=
+            fast_energy(inputs.grid, trial.s, trial.t, species);
+    }
+    const double total_energy_change =
+        trial.result.electron_energy_J_m3 - inputs.electron_energy_J_m3 +
+        trial.result.ion_energy_J_m3 - inputs.ion_energy_J_m3 +
+        new_fast_energy - old_fast_energy + ledger.neutron_energy_J_m3;
+    require(close_scaled(total_energy_change, q_energy, 5.0e-7, 1.0e-18),
+            "fast DT total thermal/kinetic/neutron energy closes Q");
+    require(std::abs(trial.result.energy_residual_J_m3) <=
+                5.0e-8 * std::max(1.0, std::abs(q_energy)),
+            "fast DT coupled energy residual is small");
+
+    // The same hazard is applied to old S and T in a shared cell.  Both
+    // components therefore retain positive deuterium after the fast burn;
+    // this also guards the implementation against silently dropping T.
+    const int d_cell = nearest_cell(inputs.grid, 100.0 * kKeVJ);
+    const std::size_t d_index = static_cast<std::size_t>(FUSION_DEUTERON) *
+                                    inputs.grid.cells() +
+                                static_cast<std::size_t>(d_cell);
+    require(trial.s[d_index] > 0.0 && trial.t[d_index] > 0.0,
+            "shared fast D S/T components survive in their source cell");
+
+    require(inputs.thermal_number == old_thermal && inputs.old_s == old_s &&
+                inputs.old_t == old_t && inputs.external_birth == old_external &&
+                inputs.escape == old_escape,
+            "fast DT trial leaves all input populations unchanged");
+}
+
+void test_all_fast_disabled_exact_legacy_parity() {
+    Inputs inputs(/*thermal_dt=*/true);
+    const double dt = 1.0e-5;
+    Trial legacy = make_trial(inputs);
+    Trial additive = make_trial(inputs);
+    require(call_legacy(inputs, dt, legacy) == PB11_STATUS_OK,
+            "legacy DT fixture returns OK");
+    require(call_fast(inputs, dt, additive) == PB11_STATUS_OK,
+            "all-fast-disabled additive fixture returns OK");
+    require(legacy.thermal_number == additive.thermal_number &&
+                legacy.s == additive.s && legacy.t == additive.t &&
+                same_result(legacy.result, additive.result),
+            "all-fast-disabled API preserves exact legacy full output");
+}
+
+void test_invalid_fast_options_clear_outputs() {
+    const std::array<int, kChannels> good_channels{{0, 0, 0, 1, 0}};
+    for (int kind = 0; kind < 3; ++kind) {
+        Inputs inputs;
+        inputs.fast_options = make_fast_options(good_channels);
+        if (kind == 0) {
+            inputs.fast_options.channels[FUSION_DT_ALPHAN] = 2;
+        } else if (kind == 1) {
+            inputs.fast_options.angular_order = 3;
+        } else {
+            inputs.fast_options.angular_max_exponent =
+                std::numeric_limits<double>::quiet_NaN();
+        }
+        Trial trial = make_trial(inputs);
+        require(call_fast(inputs, 1.0e-4, trial) != PB11_STATUS_OK,
+                "invalid fast options are rejected");
+        require_cleared(trial, "invalid fast options");
+    }
+}
+
+void test_deterministic_retry_and_input_immutability() {
+    Inputs inputs;
+    inputs.fast_options = make_fast_options({{0, 0, 0, 1, 0}});
+    const Inputs before = inputs;
+    Trial first = make_trial(inputs);
+    Trial second = make_trial(inputs);
+    require(call_fast(inputs, 1.0e-3, first) == PB11_STATUS_OK,
+            "first fast retry trial returns OK");
+    require(call_fast(inputs, 1.0e-3, second) == PB11_STATUS_OK,
+            "second fast retry trial returns OK");
+    require(first.thermal_number == second.thermal_number &&
+                first.s == second.s && first.t == second.t &&
+                same_result(first.result, second.result),
+            "repeated fast trials are bitwise deterministic");
+    require(inputs.thermal_number == before.thermal_number &&
+                inputs.old_s == before.old_s && inputs.old_t == before.old_t &&
+                inputs.external_birth == before.external_birth &&
+                inputs.escape == before.escape &&
+                inputs.electron_energy_J_m3 == before.electron_energy_J_m3 &&
+                inputs.ion_energy_J_m3 == before.ion_energy_J_m3,
+            "repeated fast trials do not mutate caller inputs");
+}
+
+void test_source_state_atomic_acceptance() {
+    Inputs inputs;
+    inputs.fast_options = make_fast_options({{0, 0, 0, 1, 0}});
+    const double dt = 1.0e-3;
+    Trial trial = make_trial(inputs);
+    require(call_fast(inputs, dt, trial) == PB11_STATUS_OK,
+            "source-state fast trial returns OK");
+
+    fusion_source_state_v1* state = nullptr;
+    const std::uint64_t tag = UINT64_C(0x4631544153543031);
+    require(fusion_c_source_state_create(
+                inputs.grid.cells(), inputs.grid.edges.data(),
+                inputs.old_s.data(), inputs.old_t.data(), 2.0, tag, &state) ==
+                PB11_STATUS_OK &&
+                state != nullptr,
+            "source state accepts fast fixture creation");
+
+    std::vector<double> accepted_s(trial.s.size(), 0.0);
+    std::vector<double> accepted_t(trial.t.size(), 0.0);
+    fusion_source_ledger_v1 cumulative{};
+    double accepted_time = 0.0;
+    std::uint64_t epoch = 0;
+    require(fusion_c_source_state_snapshot(
+                state, accepted_s.data(), accepted_t.data(), &cumulative,
+                &accepted_time, &epoch) == PB11_STATUS_OK,
+            "source state snapshots initial fast state");
+    const std::vector<double> initial_s = accepted_s;
+    const std::vector<double> initial_t = accepted_t;
+    const fusion_source_ledger_v1 initial_ledger = cumulative;
+    const double initial_time = accepted_time;
+    const std::uint64_t initial_epoch = epoch;
+
+    // Stage is provisional: accepted arrays, cumulative ledger and epoch stay
+    // unchanged while a caller decides whether to discard or publish it.
+    std::uint64_t discard_ticket = 0;
+    require(fusion_c_source_state_begin(state, dt, &discard_ticket) ==
+                PB11_STATUS_OK,
+            "source state begins provisional fast trial");
+    require(fusion_c_source_state_stage(
+                state, discard_ticket, trial.s.data(), trial.t.data(),
+                &trial.result.ledger) == PB11_STATUS_OK,
+            "source state stages provisional fast ledger");
+    std::vector<double> pending_s(trial.s.size(), 0.0);
+    std::vector<double> pending_t(trial.t.size(), 0.0);
+    fusion_source_ledger_v1 pending_ledger{};
+    double pending_time = 0.0;
+    std::uint64_t pending_epoch = 0;
+    require(fusion_c_source_state_snapshot(
+                state, pending_s.data(), pending_t.data(), &pending_ledger,
+                &pending_time, &pending_epoch) == PB11_STATUS_OK &&
+                pending_s == initial_s && pending_t == initial_t &&
+                same_ledger(pending_ledger, initial_ledger) &&
+                pending_time == initial_time &&
+                pending_epoch == initial_epoch,
+            "staged fast trial leaves accepted source state unchanged");
+    require(fusion_c_source_state_discard(state, discard_ticket) ==
+                PB11_STATUS_OK,
+            "source state discards provisional fast trial");
+    require(fusion_c_source_state_snapshot(
+                state, pending_s.data(), pending_t.data(), &pending_ledger,
+                &pending_time, &pending_epoch) == PB11_STATUS_OK &&
+                pending_s == initial_s && pending_t == initial_t &&
+                same_ledger(pending_ledger, initial_ledger) &&
+                pending_time == initial_time &&
+                pending_epoch == initial_epoch,
+            "discarded fast trial leaves accepted source state unchanged");
+
+    std::uint64_t ticket = 0;
+    require(fusion_c_source_state_begin(state, dt, &ticket) == PB11_STATUS_OK,
+            "source state begins accepted fast trial");
+    require(fusion_c_source_state_stage(
+                state, ticket, trial.s.data(), trial.t.data(),
+                &trial.result.ledger) == PB11_STATUS_OK,
+            "source state stages complete fast ledger atomically");
+    require(fusion_c_source_state_commit(state, ticket) == PB11_STATUS_OK,
+            "source state commits complete fast ledger atomically");
+    require(fusion_c_source_state_snapshot(
+                state, accepted_s.data(), accepted_t.data(), &cumulative,
+                &accepted_time, &epoch) == PB11_STATUS_OK,
+            "source state snapshots accepted fast trial");
+    require(accepted_s == trial.s && accepted_t == trial.t &&
+                same_ledger(cumulative, trial.result.ledger),
+            "source state accepts exact fast populations and ledger");
+    require(accepted_time == 2.0 + dt && epoch == 1,
+            "source state advances fast trial clock once");
+
+    // A repeated commit is rejected and cannot advance the accepted state.
+    const std::vector<double> committed_s = accepted_s;
+    const std::vector<double> committed_t = accepted_t;
+    const fusion_source_ledger_v1 committed_ledger = cumulative;
+    const double committed_time = accepted_time;
+    const std::uint64_t committed_epoch = epoch;
+    require(fusion_c_source_state_commit(state, ticket) != PB11_STATUS_OK,
+            "source state rejects repeated fast commit");
+    require(fusion_c_source_state_snapshot(
+                state, accepted_s.data(), accepted_t.data(), &cumulative,
+                &accepted_time, &epoch) == PB11_STATUS_OK &&
+                accepted_s == committed_s && accepted_t == committed_t &&
+                same_ledger(cumulative, committed_ledger) &&
+                accepted_time == committed_time &&
+                epoch == committed_epoch,
+            "repeated fast commit leaves accepted state unchanged");
+    fusion_c_source_state_destroy(state);
+}
+
+void test_late_charged_spill_rejects_and_retains_inputs() {
+    Inputs inputs;
+    inputs.fast_options = make_fast_options({{0, 0, 0, 1, 0}});
+    // Keep the lower edge at zero but clip the charged alpha source above
+    // 2 MeV.  The DT alpha birth is around 3.5 MeV, so rejection occurs after
+    // the fast target/birth path has found a charged spill.
+    const int split_edge = 1 + 48;
+    for (int edge = split_edge + 1; edge <= inputs.grid.cells(); ++edge) {
+        const double fraction = static_cast<double>(edge - split_edge) /
+                                (inputs.grid.cells() - split_edge);
+        inputs.grid.edges[static_cast<std::size_t>(edge)] =
+            0.5 * kMeVJ + fraction * (2.0 * kMeVJ - 0.5 * kMeVJ);
+    }
+    const Inputs before = inputs;
+    Trial trial = make_trial(inputs);
+    require(call_fast(inputs, 1.0e-3, trial) != PB11_STATUS_OK,
+            "charged fast birth spill rejects complete trial");
+    require_cleared(trial, "late charged-spill failure");
+    require(inputs.thermal_number == before.thermal_number &&
+                inputs.old_s == before.old_s && inputs.old_t == before.old_t &&
+                inputs.external_birth == before.external_birth &&
+                inputs.escape == before.escape,
+            "late charged-spill failure retains caller inputs");
+}
+
+}  // namespace
+
+int main() {
+    try {
+        test_fast_dt_accounting_and_shared_components();
+        test_all_fast_disabled_exact_legacy_parity();
+        test_invalid_fast_options_clear_outputs();
+        test_deterministic_retry_and_input_immutability();
+        test_source_state_atomic_acceptance();
+        test_late_charged_spill_rejects_and_retains_inputs();
+        std::cout << "PASS: coupled fast DT accounting, parity, rollback, "
+                     "source-state acceptance and late spill tests\n";
+        return 0;
+    } catch (const std::exception& error) {
+        std::cerr << "FAIL: " << error.what() << '\n';
+        return 1;
+    }
+}

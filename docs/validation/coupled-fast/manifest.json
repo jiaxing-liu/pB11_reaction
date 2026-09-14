@@ -1,0 +1,380 @@
+[
+  {
+    "source": "/tmp/coupled-fast-root01/consumer-build.log",
+    "archive": "00-consumer-build.log.gz",
+    "sha256": "3c344150e97cefe3f469b021b197cefa4792a8a2b7b14089c0ac16ce184167be",
+    "archive_sha256": "51513cae4cac8922516b8dbab476ab7939d70241390430e1330b4c83135a0ab8",
+    "bytes": 302
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/consumer-c.log",
+    "archive": "01-consumer-c.log.gz",
+    "sha256": "167a85f76ebeac5f8e40fc84458a1d5d5fd07986c7108b73a226e875ce7273ce",
+    "archive_sha256": "8eacb67d6eb53b918d30508864b649c3d2f692d713d566b1439922cb458c38af",
+    "bytes": 56
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/consumer-configure.log",
+    "archive": "02-consumer-configure.log.gz",
+    "sha256": "a806778403f8576179cba2300c72e9d29e7c3fb53132c473e26fc666b9f30d78",
+    "archive_sha256": "a2acf2570335b2ad15b5cc4fb0f2c649193c6b0bab0123a1f24850f5a9bcb665",
+    "bytes": 834
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/consumer-fortran.log",
+    "archive": "03-consumer-fortran.log.gz",
+    "sha256": "c86875ce01fcd3980cb7db93c45d8b179932c5906462af65efc1d2ab1530b427",
+    "archive_sha256": "6c1eeca54c584f81485893f834f841659aea7ae24492e1ada8e8b6c4e6fd20d2",
+    "bytes": 41
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/gnu-build.log",
+    "archive": "04-gnu-build.log.gz",
+    "sha256": "1f337c1d5b8a5112e16359013d2e9d77e8a0013327467fe5d8b4b2322df0c904",
+    "archive_sha256": "d0c7502b4444fd895203f84ab1f583496abae75b105a1fbda80966fed0017286",
+    "bytes": 827
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/gnu-configure.log",
+    "archive": "05-gnu-configure.log.gz",
+    "sha256": "891c414c2864aab73bf5a94e30c863a29a649072ee7e47f2f3f1e904af0ed59c",
+    "archive_sha256": "47e9d4c750c809468a085438d125c289aa605f0cc0b88dd1a0d217e02db2c64f",
+    "bytes": 114
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/gnu-final-build.log",
+    "archive": "06-gnu-final-build.log.gz",
+    "sha256": "6ef9f5d4f81de700f12f37f2492bfa7392c5ccca86bb0e5881d70b8166f3ca72",
+    "archive_sha256": "93339aa6f3ae5a6ef8d7f668adb4a42f699287aab2f3a4486a6fd9f29d55e042",
+    "bytes": 1087
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/gnu-final-configure.log",
+    "archive": "07-gnu-final-configure.log.gz",
+    "sha256": "891c414c2864aab73bf5a94e30c863a29a649072ee7e47f2f3f1e904af0ed59c",
+    "archive_sha256": "47e9d4c750c809468a085438d125c289aa605f0cc0b88dd1a0d217e02db2c64f",
+    "bytes": 114
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/gnu-final-test.log",
+    "archive": "08-gnu-final-test.log.gz",
+    "sha256": "89ad8904cb5de1fd22cd5e0e6bb7945a3be5866b4fc1512a689496b8b9142f2f",
+    "archive_sha256": "15d21670afac60464c2133bb3c766ac9b31fab1ca0cefc6da4fcafc09f1f6d8e",
+    "bytes": 622
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/gnu-test.log",
+    "archive": "09-gnu-test.log.gz",
+    "sha256": "3d939ebead6aa623e5edb652243d23683523bcc30a492e434de3603ddc97d209",
+    "archive_sha256": "c95fb5b38fa317e40d49cd3c2f00fa91e55ee21233ed8de86c35abab2ba44c3c",
+    "bytes": 452
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/host-build.log",
+    "archive": "10-host-build.log.gz",
+    "sha256": "61a194dfb9e2ebd705dd145459133722ff8d708b2594ff23f0ba6d99ca0a02de",
+    "archive_sha256": "44b70db676a51a6fc8869a413662fd884f2afe97e86b9b7bb96be996f24eaae3",
+    "bytes": 3565
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/install.log",
+    "archive": "11-install.log.gz",
+    "sha256": "5fdb2bbaaa778401ff689793bc6154b94598f5e86625c6402f6b222eed9cbb76",
+    "archive_sha256": "3c43fd6fe593f72473b79c83c39675880b855885922ab11fe86afdb4e9272560",
+    "bytes": 8391
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/intel-build.log",
+    "archive": "12-intel-build.log.gz",
+    "sha256": "1f337c1d5b8a5112e16359013d2e9d77e8a0013327467fe5d8b4b2322df0c904",
+    "archive_sha256": "d0c7502b4444fd895203f84ab1f583496abae75b105a1fbda80966fed0017286",
+    "bytes": 827
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/intel-configure.log",
+    "archive": "13-intel-configure.log.gz",
+    "sha256": "5496e953d81bcb0537a58ca1e661b671920e70c266bc64392b283d296bcc2492",
+    "archive_sha256": "2e13195ac6de022d563683e97cb160c26f0af98e47f0821c17c423fc4590e892",
+    "bytes": 105
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/intel-env.log",
+    "archive": "14-intel-env.log.gz",
+    "sha256": "e6eb92119de581919a731f87e44c25b62bb362d377879d7ac99522f315bc4c18",
+    "archive_sha256": "dc57cf5e7b4a08e517c9cc9906475182bd94c6b167ef168f4a08e8a162c08654",
+    "bytes": 270
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/intel-final-build.log",
+    "archive": "15-intel-final-build.log.gz",
+    "sha256": "47eac46512e05f786a83d087a51559d9dc6bf3b74160391698b3d974bd921189",
+    "archive_sha256": "8ded3112b5da10b319c694ed47068c564894de9449beffbc6c5e95103ad6e3cd",
+    "bytes": 1804
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/intel-final-configure.log",
+    "archive": "16-intel-final-configure.log.gz",
+    "sha256": "5496e953d81bcb0537a58ca1e661b671920e70c266bc64392b283d296bcc2492",
+    "archive_sha256": "2e13195ac6de022d563683e97cb160c26f0af98e47f0821c17c423fc4590e892",
+    "bytes": 105
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/intel-final-env.log",
+    "archive": "17-intel-final-env.log.gz",
+    "sha256": "e6eb92119de581919a731f87e44c25b62bb362d377879d7ac99522f315bc4c18",
+    "archive_sha256": "dc57cf5e7b4a08e517c9cc9906475182bd94c6b167ef168f4a08e8a162c08654",
+    "bytes": 270
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/intel-final-test.log",
+    "archive": "18-intel-final-test.log.gz",
+    "sha256": "ee9a7ae47aa7ed64036d340b96d7afa940a54c01c8996e5cd4bedd055696c34a",
+    "archive_sha256": "fea03001d8280be4d43a6bb7957ff66f94db900c8688a7b43e3f5f28c3e14170",
+    "bytes": 613
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/intel-test.log",
+    "archive": "19-intel-test.log.gz",
+    "sha256": "749908b8ca16d92b227f08d004ec3887f1409f22811fdc162504854179479b67",
+    "archive_sha256": "802018b16dfd4f52515964da9bf2493fa00523f39767fcb848ff0b2008f0a156",
+    "bytes": 443
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/network-probe.log",
+    "archive": "20-network-probe.log.gz",
+    "sha256": "038fa425aa2cdd410f318c7239dd6282d574ead6a456f41fdd15874f0a645afe",
+    "archive_sha256": "bc2fc5e2405b955b71ccc9e21aae5907de74db10d2e4804bb6bf64f3c2c27b0d",
+    "bytes": 154
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/pb-diagnostic-low.log",
+    "archive": "21-pb-diagnostic-low.log.gz",
+    "sha256": "69f8c43976e9b0a6488ffe0ff3bc968cc9519bf70d382160f673835bcb269ee8",
+    "archive_sha256": "a9a81b8d4debb2b95b83bcde216a9f1c998f539764b80befc113adbc0ac99964",
+    "bytes": 119
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/pb-diagnostic.log",
+    "archive": "22-pb-diagnostic.log.gz",
+    "sha256": "5eb8e320f61ea4bc8d5898b877cc8a6dc225c305e68e6c78c89e5cecd48441cb",
+    "archive_sha256": "11b2c079e0cd5d1119cfccbc26b1fa1cd4fca8b592dcd6e35785d70789e0dbe3",
+    "bytes": 119
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/pb-probe-domain-failure.log",
+    "archive": "23-pb-probe-domain-failure.log.gz",
+    "sha256": "74aa5f510352e5728e3878dac2cbd4787ab842671a1aad7a11805387c82c792f",
+    "archive_sha256": "0be28626065174d165dd9b884b364f0f864b9f6415ced63bf4fff3953790c444",
+    "bytes": 65
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/pb-probe-microev-failure.log",
+    "archive": "24-pb-probe-microev-failure.log.gz",
+    "sha256": "74aa5f510352e5728e3878dac2cbd4787ab842671a1aad7a11805387c82c792f",
+    "archive_sha256": "0be28626065174d165dd9b884b364f0f864b9f6415ced63bf4fff3953790c444",
+    "bytes": 65
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/pb-probe-spill-failure.log",
+    "archive": "25-pb-probe-spill-failure.log.gz",
+    "sha256": "74aa5f510352e5728e3878dac2cbd4787ab842671a1aad7a11805387c82c792f",
+    "archive_sha256": "0be28626065174d165dd9b884b364f0f864b9f6415ced63bf4fff3953790c444",
+    "bytes": 65
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/pb-probe.log",
+    "archive": "26-pb-probe.log.gz",
+    "sha256": "3a31f2eb80e1edb05e2dd15457988159f61a4b83d33c2b3a7b6c624ac01f63c6",
+    "archive_sha256": "621d214a8ef433073f86e0ea67aaa97697d5e886c680d79e17fe1fc34f23d6c1",
+    "bytes": 222
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/probe.log",
+    "archive": "27-probe.log.gz",
+    "sha256": "310160bc02b2f30c29f36feae0ffd9056d00abade595b898bde9ff8bd74a24ef",
+    "archive_sha256": "66326f76ee019c5372baf2d465d7cc1d6ca865eb70c96e71d789a14ce31fa6b9",
+    "bytes": 154
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/table-probe.log",
+    "archive": "28-table-probe.log.gz",
+    "sha256": "038fa425aa2cdd410f318c7239dd6282d574ead6a456f41fdd15874f0a645afe",
+    "archive_sha256": "bc2fc5e2405b955b71ccc9e21aae5907de74db10d2e4804bb6bf64f3c2c27b0d",
+    "bytes": 154
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/legacy-new.bin",
+    "archive": "29-legacy-new.bin.gz",
+    "sha256": "7293135b3abc0f2aee2733aac239c3b8b936a37904b730e5d7ab9ba4a1850bc6",
+    "archive_sha256": "1adb60d92c92c54d5a76f4d066d2af4714a2650fcc4ed0d8aedcdac9cf98af4b",
+    "bytes": 51888
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/legacy-old.bin",
+    "archive": "30-legacy-old.bin.gz",
+    "sha256": "7293135b3abc0f2aee2733aac239c3b8b936a37904b730e5d7ab9ba4a1850bc6",
+    "archive_sha256": "1adb60d92c92c54d5a76f4d066d2af4714a2650fcc4ed0d8aedcdac9cf98af4b",
+    "bytes": 51888
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/legacy-parity.json",
+    "archive": "31-legacy-parity.json.gz",
+    "sha256": "376f8047593ed235bc918d09e009e420362d2307523fc67571072aa6b5bfe88c",
+    "archive_sha256": "3028d985d4daa2851a2dbe1a8086e68805da480c224b61f24836c016755f1b8e",
+    "bytes": 157
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/table-summary-parity.json",
+    "archive": "32-table-summary-parity.json.gz",
+    "sha256": "7a1a2293a7887e062d6fa4d430301b520353926dd62973e38b46a9228772e435",
+    "archive_sha256": "e7814d3dcb4b42417c6131819ad9ca1261cd64ff2d549929a8330c30ec8bc45a",
+    "bytes": 107
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/legacy.cpp",
+    "archive": "33-legacy.cpp.gz",
+    "sha256": "064b16082f90f4c4d38d809aeb6fda5c985e6ef036bb939f9dc2854ee775aacb",
+    "archive_sha256": "50ce19c5b98c5c94f6023d0efb89b6f2bb68fb7f7d82cf4ccf5b92478b25923e",
+    "bytes": 723
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/probe.cpp",
+    "archive": "34-probe.cpp.gz",
+    "sha256": "dad26bd96d49bba6b8a22ebf2d0d6dc60d21915d8ad94cb8d6803995926d1e74",
+    "archive_sha256": "33b0e38bb0e45d550e31528182ee7f5695f1ebfd89b90564ba6a00ca54c5c0d0",
+    "bytes": 1081
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/pb-probe.cpp",
+    "archive": "35-pb-probe.cpp.gz",
+    "sha256": "198b225278939208edfa5cbb5883e0e9ab3ab248e80674b35f14759c4cb87277",
+    "archive_sha256": "9fe3a559abe5c395906965e9d5c6751a4ac37bbf95a22f37f0f5966fd5479269",
+    "bytes": 1976
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/pb-probe-domain-failure.cpp",
+    "archive": "36-pb-probe-domain-failure.cpp.gz",
+    "sha256": "e284719f701618ca41e369ea12c627dd0b756857999f193819e992f1db10ceae",
+    "archive_sha256": "40bb213a3b0555aa03b6590b3b4960ca7561d75e639e0687ce0f739df11b8ce4",
+    "bytes": 1896
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/pb-probe-spill-failure.cpp",
+    "archive": "37-pb-probe-spill-failure.cpp.gz",
+    "sha256": "59eb4e539ce0d4a303709d499e4dec482e88f2438a0a2f741369810a31114e08",
+    "archive_sha256": "0cd6bc47505559405545db2c80ee35a7846020b53b17fb2155647525119d1fe0",
+    "bytes": 1938
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/pb-probe-microev-failure.cpp",
+    "archive": "38-pb-probe-microev-failure.cpp.gz",
+    "sha256": "75cc9d319e6c89a002f6f1dc93d986918bf474a953d8bcb9d37cddf92969521c",
+    "archive_sha256": "ce480e0d9587d6c7b2f7bd167e33f50bf9bb9eb9593ba2ce02039195655f8e07",
+    "bytes": 1975
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/pb-diagnostic.cpp",
+    "archive": "39-pb-diagnostic.cpp.gz",
+    "sha256": "4ce8891514c14dd945a17799400f1ac67c3262b86f2f9e6b38c78e27893e45a4",
+    "archive_sha256": "708402bf3f9409bf72b7687b193fe3bb224faaab4754e1ac844aef92ebd577aa",
+    "bytes": 29256
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/network-probe.cpp",
+    "archive": "40-network-probe.cpp.gz",
+    "sha256": "465d03fb50e995ce7badde39a09d9e6018f3f95656a381d8f105b20d7e6e3bee",
+    "archive_sha256": "ee055785f7f3d52ddde9b206e56f871b668d671e9fdbaab497a3bdcde0f5bf95",
+    "bytes": 1205
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/table-probe.cpp",
+    "archive": "41-table-probe.cpp.gz",
+    "sha256": "9f2c38b1d37df87b90a18586acb28a318155db21e1d1e6eb5135aac17d7f6b6f",
+    "archive_sha256": "fcd8fb201d9d9412c72e008e36b4d1aa2927176c4b807c43ba1b06963f1c635a",
+    "bytes": 1755
+  },
+  {
+    "source": "/tmp/coupled-fast-root01/prechange.cpp",
+    "archive": "42-prechange.cpp.gz",
+    "sha256": "ed1921ab4c0f55fd0619297bd075e9e720e033b5665e6292bd73a8a5ad4fd958",
+    "archive_sha256": "0db4e5d34bb2c6b7594007447cc7b21a8cf0a4623c537424e904dfec9d7b36a1",
+    "bytes": 20420
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/include/fusion_coupled_fast.h",
+    "archive": "43-fusion_coupled_fast.h.gz",
+    "sha256": "dc892ac97c569d9c1b52481d0844929a5d007a28c6fc267784f0ca1073892e1e",
+    "archive_sha256": "fddc44d4052e943d7b8aab3b3352763ba1562f27d809b4315fd6f134e515474f",
+    "bytes": 3579
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/src/fusion_coupled_thermal.cpp",
+    "archive": "44-fusion_coupled_thermal.cpp.gz",
+    "sha256": "2ae33047dc330618df75ee1924462df5e83ed3a6cf370d55ddef1780a0fd8a7f",
+    "archive_sha256": "71d64244867d59894430a7d0586f46823c0e6d776844276a023d38df662f6b27",
+    "bytes": 29037
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/fortran/fusion_coupled_fast_fortran.f90",
+    "archive": "45-fusion_coupled_fast_fortran.f90.gz",
+    "sha256": "8e27a36c863c27e0c4083b1bcbfd6aecdc29fa71eaef25a7600badd551c8099a",
+    "archive_sha256": "b27bbf0c132a7331fe63eb819ce8a6a261e5c9f87a2e1b0a8e9641ae3c269b98",
+    "bytes": 26562
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/tests/test_fusion_coupled_fast.cpp",
+    "archive": "46-test_fusion_coupled_fast.cpp.gz",
+    "sha256": "cd0ead873639c2694e9d26d774235838a9f99ee951dc107a48d7cae118f0f935",
+    "archive_sha256": "8be3c4cbfeee9f953cd6263c58970a1263ea1c7d62828a055c3deb623475a659",
+    "bytes": 32869
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/tests/test_fusion_coupled_fast_fortran.f90",
+    "archive": "47-test_fusion_coupled_fast_fortran.f90.gz",
+    "sha256": "fd018c0e385f779e1bed1c7b8610efe9bad7db73902abe128f67e44b4e96fb7e",
+    "archive_sha256": "4bed230036e49c76ab40edcca983d762f20d7c9f47b2d1196e578d2c55b05d09",
+    "bytes": 12708
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/tests/test_fusion_coupled_thermal.cpp",
+    "archive": "48-test_fusion_coupled_thermal.cpp.gz",
+    "sha256": "ce79f18058d61a61b849b040baa8f6c45a4e8d4a59d0dd816550f66c5db8522b",
+    "archive_sha256": "517ff67b2cf7e784c056b966b881ee3525f2d19449bfa70d1c168de2ede1fe34",
+    "bytes": 68131
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/CMakeLists.txt",
+    "archive": "49-CMakeLists.txt.gz",
+    "sha256": "b6a1c57ce97fbefd4bac374f4eb3b1fd3541fd041522f23e52b3cd976613a11f",
+    "archive_sha256": "88500258fd2b8916e0e5f553d8db1fe237581496bff5d1d1b54b5db1c05b8863",
+    "bytes": 52736
+  },
+  {
+    "source": "/home/cloud/research/pB11_reaction/docs/COUPLED_FAST.md",
+    "archive": "50-COUPLED_FAST.md.gz",
+    "sha256": "45ba6ed155d6752ad87a21d528b29a3150e725a0a83787f1c2c2d915ffd9fb0c",
+    "archive_sha256": "03f7a4ad0328c7106af73ad270860dadb9e39ec4c1561e9ac421bbd268bb339b",
+    "bytes": 6426
+  },
+  {
+    "source": "/tmp/coupled-fast-install01/consumer/CMakeLists.txt",
+    "archive": "51-CMakeLists.txt.gz",
+    "sha256": "af1dea1f609ffce213b8b7c0a58650297321e007853de50088876fc1b9282e09",
+    "archive_sha256": "7c8626a9508cfc8d726ef38f1af3ed840354fd5125bdf5d03c2a360b219da0df",
+    "bytes": 745
+  },
+  {
+    "source": "/tmp/coupled-fast-install01/consumer/consumer.c",
+    "archive": "52-consumer.c.gz",
+    "sha256": "d086e90f7b996a191c0c942f0a3bbcec9d889c59ab7d6e3a00055e8f817172f8",
+    "archive_sha256": "4f10b553387ac0170e7a4af0d516585d1c9bd2d016148a4caacd80079545e6a0",
+    "bytes": 268
+  },
+  {
+    "source": "/tmp/coupled-fast-install01/consumer/consumer.f90",
+    "archive": "53-consumer.f90.gz",
+    "sha256": "fd018c0e385f779e1bed1c7b8610efe9bad7db73902abe128f67e44b4e96fb7e",
+    "archive_sha256": "4bed230036e49c76ab40edcca983d762f20d7c9f47b2d1196e578d2c55b05d09",
+    "bytes": 12708
+  }
+]
