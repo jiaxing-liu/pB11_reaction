@@ -318,6 +318,16 @@ if(PB11_FORTRAN_AVAILABLE)
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>")
     target_link_libraries(fusion_source_state_fortran PUBLIC pb11::pb11)
 
+    add_library(fusion_source_state_numerical_fortran STATIC fortran/fusion_source_state_numerical_fortran.f90)
+    add_library(pb11::fusion_source_state_numerical_fortran ALIAS fusion_source_state_numerical_fortran)
+    set_target_properties(fusion_source_state_numerical_fortran PROPERTIES
+        Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fortran-mod"
+        EXPORT_NAME fusion_source_state_numerical_fortran)
+    target_include_directories(fusion_source_state_numerical_fortran INTERFACE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>")
+    target_link_libraries(fusion_source_state_numerical_fortran PUBLIC pb11::fusion_source_volume_fortran)
+
     add_library(fusion_source_volume_fortran STATIC fortran/fusion_source_volume_fortran.f90)
     add_library(pb11::fusion_source_volume_fortran ALIAS fusion_source_volume_fortran)
     set_target_properties(fusion_source_volume_fortran PROPERTIES
@@ -626,6 +636,10 @@ if(BUILD_TESTING)
     add_executable(test_fusion_source_volume tests/test_fusion_source_volume.cpp)
     target_link_libraries(test_fusion_source_volume PRIVATE pb11::pb11)
     add_test(NAME fusion_source_volume_tests COMMAND test_fusion_source_volume)
+    add_executable(test_fusion_numerical_increment tests/test_fusion_numerical_increment.cpp)
+    target_link_libraries(test_fusion_numerical_increment PRIVATE pb11::pb11)
+    add_test(NAME fusion_numerical_increment_tests COMMAND test_fusion_numerical_increment)
+
     add_executable(test_fusion_source_state_numerical tests/test_fusion_source_state_numerical.cpp)
     target_link_libraries(test_fusion_source_state_numerical PRIVATE pb11::pb11)
     add_test(NAME fusion_source_state_numerical_tests COMMAND test_fusion_source_state_numerical)
@@ -869,6 +883,13 @@ if(BUILD_TESTING)
                               POSITION_INDEPENDENT_CODE ON LINKER_LANGUAGE Fortran)
         target_link_libraries(test_fusion_kinetic_geometry_fortran PRIVATE pb11::fusion_kinetic_geometry_fortran)
         add_test(NAME fusion_kinetic_geometry_fortran_binding_tests COMMAND test_fusion_kinetic_geometry_fortran)
+        add_executable(test_fusion_source_state_numerical_fortran tests/test_fusion_source_state_numerical_fortran.f90)
+        set_target_properties(test_fusion_source_state_numerical_fortran PROPERTIES
+            LINKER_LANGUAGE Fortran
+            Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod")
+        target_link_libraries(test_fusion_source_state_numerical_fortran PRIVATE pb11::fusion_source_state_numerical_fortran)
+        add_test(NAME fusion_source_state_numerical_fortran_binding_tests COMMAND test_fusion_source_state_numerical_fortran)
+
         add_executable(test_fusion_source_volume_fortran tests/test_fusion_source_volume_fortran.f90)
         set_target_properties(test_fusion_source_volume_fortran PROPERTIES
                               POSITION_INDEPENDENT_CODE ON LINKER_LANGUAGE Fortran)
@@ -957,7 +978,7 @@ install(
 if(PB11_FORTRAN_AVAILABLE)
     install(
         TARGETS pb11_fortran fusion_fortran fusion_energy_work_fortran fusion_kinetics_fortran fusion_radial_transport_fortran
-                fusion_two_component_fortran fusion_handoff_fortran fusion_birth_floor_fortran fusion_thermal_burn_fortran fusion_nuclear_data_fortran fusion_source_state_fortran fusion_source_volume_fortran fusion_kinetic_geometry_fortran fusion_fast_moments_fortran
+                fusion_two_component_fortran fusion_handoff_fortran fusion_birth_floor_fortran fusion_thermal_burn_fortran fusion_nuclear_data_fortran fusion_source_state_fortran fusion_source_volume_fortran fusion_source_state_numerical_fortran fusion_kinetic_geometry_fortran fusion_fast_moments_fortran
                 fusion_beam_fortran fusion_rate_model_fortran fusion_target_burn_fortran fusion_target_network_fortran fusion_fsci_fortran fusion_pb_birth_fortran fusion_pb_population_fortran fusion_reaction_event_fortran
                 fusion_products_fortran fusion_thermal_birth_fortran fusion_beam_birth_fortran fusion_birth_table_fortran fusion_beam_birth_table_fortran fusion_coupled_thermal_fortran fusion_coupled_fast_fortran fusion_coupled_sources_fortran fusion_coupled_sources_floor_fortran
                 fusion_laboratory_fortran fusion_spectrum_fortran

@@ -63,8 +63,8 @@ Old source entry points retain their behavior. A packet that becomes a zero
 rate rejects; conversions are checked against measured source-scale IEEE rounding.
 
 This is still an experimental numerical boundary, not validated physical closure.
-The legacy source-state stage/snapshot APIs and fluid-increment helper
-do NOT own this additional correction. Explicit numerical-account state APIs
+The legacy source-state stage/snapshot APIs and legacy fluid-increment helper
+do NOT own this additional correction. Use the explicit numerical variants. Explicit numerical-account state APIs
 now preserve it through commit and restart (see NUMERICAL_SOURCE_STATE.md). Callers must not stage a nonzero-floor
 result through those legacy APIs or reinterpret the correction as heat. Full
 host integration and convergence are pending. A caller using

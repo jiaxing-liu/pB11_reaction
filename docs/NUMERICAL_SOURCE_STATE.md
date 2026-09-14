@@ -29,6 +29,13 @@ versions1/2/3 byte layouts. Old readers reject the new version numbers.
 
 The numerical state API does not calculate the correction or move host fluid
 energy. Callers pass the coupled floor ledger's correction exactly once and
-must commit/restore their ion/electron/geometry state at the same epoch. The
-BALDUR adapter, fluid-increment helper and new Fortran state bindings still need
-integration. This API is not full host rollback or physical convergence proof.
+must commit/restore their ion/electron/geometry state at the same epoch. The direct fusion_source_state_numerical_fortran binding and
+fusion_c_coupled_numerical_increment helper now expose these accounts. The
+BALDUR stage adapter can explicitly accept them; controller/driver propagation
+and full-host integration remain pending. This API is not full host rollback or physical convergence proof.
+
+The numerical increment helper adds all six corrections to raw physical terms
+in long double before converting the final ion increment to double. It preserves
+zero-correction legacy outputs and rejects missing/nonfinite/overflowing inputs
+with cleared output. It does not divide by time/volume or advance host state.
+Never include the same numerical amount in physical heat as well.

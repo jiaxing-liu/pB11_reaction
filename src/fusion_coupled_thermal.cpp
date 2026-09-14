@@ -440,11 +440,13 @@ extern "C" int fusion_c_coupled_thermal_table_trial_effective_charge_diagnosed(d
  return coupled_trial(dt,op,tables,true,true,n,edges,thermal,Ue,Ui,ne,charge2,ninert,inert,logs,old_s,old_t,external,escape,new_thermal,new_s,new_t,out,diagnostics,true);
 }
 
-extern "C" int fusion_c_coupled_thermal_increment(const fusion_source_ledger_v1*ledger,
- const double*inert,fusion_thermal_increment_v1*out){
+static int thermal_increment(const fusion_source_ledger_v1*ledger,
+ const double*inert,fusion_thermal_increment_v1*out,const double*numerical=nullptr,bool require_numerical=false){
  if(!out)return PB11_STATUS_NULL_OUTPUT;
  *out={};
  if(!ledger||!inert)return BAD;
+ if(require_numerical&&!numerical)return BAD;
+ if(numerical)for(int i=0;i<6;++i)if(!finite_value(numerical[i]))return BAD;
  auto copy=*ledger;
  // Check all ledger fields, treating only the documented heat fields as signed.
  for(double&h:copy.heat_to_bath_J_m3){if(!finite_value(h))return BAD;h=0;}
@@ -459,6 +461,7 @@ extern "C" int fusion_c_coupled_thermal_increment(const fusion_source_ledger_v1*
   ion+=inert[i];
   for(int j=1;j<7;++j)ion+=ledger->heat_to_bath_J_m3[i*7+j];
  }
+ if(numerical)for(int i=0;i<6;++i)ion+=numerical[i];
  if(!put(electron,result.electron_energy_J_m3)||!put(ion,result.ion_energy_J_m3))return NUM;
  *out=result;return PB11_STATUS_OK;
 }
@@ -534,4 +537,11 @@ extern "C" int fusion_c_coupled_sources_floor_trial(double dt,const fusion_coupl
  return coupled_trial(dt,op,tables,tables!=nullptr,effective_charge,n,edges,thermal,Ue,Ui,ne,charge2,
   ninert,inert,logs,old_s,old_t,external,escape,new_thermal,new_s,new_t,out,diagnostics,true,fastop,true,
   beam_count,beam_entries,usage,true,floor_limits,floor_ledger,true);
+}
+
+extern "C" int fusion_c_coupled_thermal_increment(const fusion_source_ledger_v1*ledger,
+ const double*inert,fusion_thermal_increment_v1*out){return thermal_increment(ledger,inert,out);}
+extern "C" int fusion_c_coupled_numerical_increment(const fusion_source_ledger_v1*ledger,
+ const double*inert,const double*numerical,fusion_thermal_increment_v1*out){
+ return thermal_increment(ledger,inert,out,numerical,true);
 }

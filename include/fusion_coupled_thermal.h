@@ -58,6 +58,15 @@ typedef struct fusion_thermal_increment_v1 {
 } fusion_thermal_increment_v1;
 int fusion_c_coupled_thermal_increment(const fusion_source_ledger_v1 *ledger,
  const double inert_heat_J_m3[6],fusion_thermal_increment_v1 *out);
+/* Explicit step numerical energy transfer TO the ion reservoir, six signed
+ * J/m3 amounts. Sum directly with raw physical terms before output rounding;
+ * never add to an already rounded legacy ion increment. Particle/electron
+ * increments unchanged. Required finite numerical array; output clears on
+ * failure. No dt/volume division or update of caller state. Pass separately
+ * preserved numerical-state/floor accounts; do not also include them in heat. */
+int fusion_c_coupled_numerical_increment(const fusion_source_ledger_v1 *ledger,
+ const double inert_heat_J_m3[6],const double numerical_ion_J_m3[6],
+ fusion_thermal_increment_v1 *out);
 /* Stateless local trial: common thermal-ion temperature, separate electrons.
  * Thermal ion energy includes the six network species AND explicit inert ions.
  * Inert densities do not evolve here. Electron density is supplied/frozen for
