@@ -1,0 +1,9 @@
+[ 93%] Built target pb11
+[100%] Built target test_fusion_fast_moments
+[ 88%] Built target pb11
+[ 94%] Built target fusion_fast_moments_fortran
+[100%] Building Fortran object CMakeFiles/test_fusion_fast_moments_fortran.dir/tests/test_fusion_fast_moments_fortran.f90.o
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[100%] Linking Fortran executable test_fusion_fast_moments_fortran
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[100%] Built target test_fusion_fast_moments_fortran

@@ -1,0 +1,21 @@
+[  6%] Building CXX object CMakeFiles/pb11.dir/src/fusion_fast_moments.cpp.o
+[  6%] Linking CXX static library libpb11.a
+[ 93%] Built target pb11
+[100%] Building CXX object CMakeFiles/test_fusion_fast_moments.dir/tests/test_fusion_fast_moments.cpp.o
+[100%] Linking CXX executable test_fusion_fast_moments
+[100%] Built target test_fusion_fast_moments
+[ 88%] Built target pb11
+[ 94%] Building Fortran object CMakeFiles/fusion_fast_moments_fortran.dir/fortran/fusion_fast_moments_fortran.f90.o
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[ 94%] Linking CXX static library libfusion_fast_moments_fortran.a
+[ 94%] Built target fusion_fast_moments_fortran
+[100%] Building Fortran object CMakeFiles/test_fusion_fast_moments_fortran.dir/tests/test_fusion_fast_moments_fortran.f90.o
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[100%] Linking CXX executable test_fusion_fast_moments_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: CMakeFiles/test_fusion_fast_moments_fortran.dir/tests/test_fusion_fast_moments_fortran.f90.o: relocation R_X86_64_32S against `.data' can not be used when making a PIE object; recompile with -fPIE
+/usr/bin/x86_64-linux-gnu-ld.bfd: failed to set dynamic section sizes: bad value
+collect2: error: ld returned 1 exit status
+gmake[3]: *** [CMakeFiles/test_fusion_fast_moments_fortran.dir/build.make:102: test_fusion_fast_moments_fortran] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:3946: CMakeFiles/test_fusion_fast_moments_fortran.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:3953: CMakeFiles/test_fusion_fast_moments_fortran.dir/rule] Error 2
+gmake: *** [Makefile:1609: test_fusion_fast_moments_fortran] Error 2

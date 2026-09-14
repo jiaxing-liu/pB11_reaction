@@ -1,0 +1,8 @@
+{
+  "include/fusion_fast_moments.h": "9d5929d66722003289a4cf0ac2ca41f4612b0efffd532fa78b04efa996be69e7",
+  "src/fusion_fast_moments.cpp": "167cbe59acfa3a727cce98b4752da1c0fe2e8b867557b18d2c087deb6f93801e",
+  "fortran/fusion_fast_moments_fortran.f90": "f1122c6cf6b18575d7a27c0ac4a5108ef6b30af400c305cc01c66114fbdb6e24",
+  "tests/test_fusion_fast_moments.cpp": "d7fa4fb1dd91de2d1d88d506edad12dbedf1d7cfde622e85f235e2d3add58d76",
+  "tests/test_fusion_fast_moments_fortran.f90": "759b7666620e365478585985b9d2afd072af2a26e5ac8b7e97e3385fe465c909",
+  "CMakeLists.txt": "206d905560b3c4b026cd2a53ca094a06d1cf2b3aec5b3ed91651555370360366"
+}

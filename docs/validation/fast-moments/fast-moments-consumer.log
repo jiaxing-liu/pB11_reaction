@@ -1,0 +1,9 @@
+['gcc', '-std=c11', '-Wall', '-Wextra', '-Werror', '-I/tmp/fast-moments-install/include', '-c', '/tmp/fast-moments-consumer.c', '-o', '/tmp/fast-moments-consumer.o']
+
+rc=0
+['g++', '/tmp/fast-moments-consumer.o', '/tmp/fast-moments-install/lib/libpb11.a', '-o', '/tmp/fast-moments-consumer']
+
+rc=0
+['/tmp/fast-moments-consumer']
+
+rc=0
