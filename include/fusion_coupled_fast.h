@@ -55,6 +55,37 @@ int fusion_c_coupled_fast_table_trial_effective_charge(double dt_s,
  const double *old_s_m3,const double *old_t_m3,const double *external_birth_m3_s,
  const double *escape_s_inv,double trial_thermal_number_m3[6],
  double *trial_s_m3,double *trial_t_m3,fusion_coupled_thermal_v1 *out);
+/* Diagnosed variants preserve the existing candidate/S-to-T observations.
+ * diagnostics is required and clears on any failure. */
+int fusion_c_coupled_fast_trial_diagnosed(double dt_s,
+ const fusion_coupled_thermal_options_v1 *options,
+ const fusion_fast_target_options_v1 *fast_options,int cells,const double *edges_J,
+ const double thermal_number_m3[6],double electron_energy_J_m3,double ion_energy_J_m3,
+ double electron_density_m3,const double thermal_charge_squared[6],
+ int inert_count,const fusion_inert_ion_v1 *inert,const double *coulomb_logs,
+ const double *old_s_m3,const double *old_t_m3,const double *external_birth_m3_s,
+ const double *escape_s_inv,double trial_thermal_number_m3[6],
+ double *trial_s_m3,double *trial_t_m3,fusion_coupled_thermal_v1 *out, fusion_handoff_diagnostics_v1 *diagnostics);
+int fusion_c_coupled_fast_table_trial_diagnosed(double dt_s,
+ const fusion_coupled_thermal_options_v1 *options,
+ const fusion_fast_target_options_v1 *fast_options,
+ const fusion_birth_table_v1 *const *tables,int cells,const double *edges_J,
+ const double thermal_number_m3[6],double electron_energy_J_m3,double ion_energy_J_m3,
+ double electron_density_m3,const double thermal_charge_squared[6],
+ int inert_count,const fusion_inert_ion_v1 *inert,const double *coulomb_logs,
+ const double *old_s_m3,const double *old_t_m3,const double *external_birth_m3_s,
+ const double *escape_s_inv,double trial_thermal_number_m3[6],
+ double *trial_s_m3,double *trial_t_m3,fusion_coupled_thermal_v1 *out, fusion_handoff_diagnostics_v1 *diagnostics);
+int fusion_c_coupled_fast_table_trial_effective_charge_diagnosed(double dt_s,
+ const fusion_coupled_thermal_options_v1 *options,
+ const fusion_fast_target_options_v1 *fast_options,
+ const fusion_birth_table_v1 *const *tables,int cells,const double *edges_J,
+ const double thermal_number_m3[6],double electron_energy_J_m3,double ion_energy_J_m3,
+ double electron_density_m3,const double thermal_charge_squared[6],
+ int inert_count,const fusion_inert_ion_v1 *inert,const double *coulomb_logs,
+ const double *old_s_m3,const double *old_t_m3,const double *external_birth_m3_s,
+ const double *escape_s_inv,double trial_thermal_number_m3[6],
+ double *trial_s_m3,double *trial_t_m3,fusion_coupled_thermal_v1 *out, fusion_handoff_diagnostics_v1 *diagnostics);
 #ifdef __cplusplus
 }
 #endif

@@ -14,6 +14,7 @@ module fusion_coupled_fast_fortran
   use fusion_coupled_thermal_fortran, only : &
        fusion_inert_ion_v1, fusion_coupled_thermal_options_v1, &
        fusion_coupled_thermal_v1, &
+       fusion_handoff_diagnostics_v1, &
        FUSION_COUPLED_THERMAL_SPECIES, FUSION_COUPLED_THERMAL_CHANNELS, &
        FUSION_COUPLED_THERMAL_MAX_CELLS, FUSION_COUPLED_THERMAL_MAX_INERT, &
        FUSION_COUPLED_THERMAL_BASE_BATHS, PB11_STATUS_OK, &
@@ -30,6 +31,7 @@ module fusion_coupled_fast_fortran
   public :: fusion_inert_ion_v1
   public :: fusion_coupled_thermal_options_v1
   public :: fusion_coupled_thermal_v1
+  public :: fusion_handoff_diagnostics_v1
   public :: FUSION_COUPLED_THERMAL_SPECIES
   public :: FUSION_COUPLED_THERMAL_CHANNELS
   public :: FUSION_COUPLED_THERMAL_MAX_CELLS
@@ -57,6 +59,9 @@ module fusion_coupled_fast_fortran
   public :: fusion_coupled_fast_trial
   public :: fusion_coupled_fast_table_trial
   public :: fusion_coupled_fast_table_trial_effective_charge
+  public :: fusion_coupled_fast_trial_diagnosed
+  public :: fusion_coupled_fast_table_trial_diagnosed
+  public :: fusion_coupled_fast_table_trial_effective_charge_diagnosed
 
   interface
      function c_fusion_c_coupled_fast_trial( &
@@ -157,6 +162,108 @@ module fusion_coupled_fast_fortran
        type(c_ptr), value :: out
        integer(c_int) :: status
      end function c_fusion_c_coupled_fast_table_trial_effective_charge
+
+     function c_fusion_c_coupled_fast_trial_diagnosed( &
+          dt_s, options, fast_options, cells, edges, thermal_number, &
+          electron_energy, ion_energy, electron_density, &
+          thermal_charge_squared, inert_count, inert, coulomb_logs, old_s, &
+          old_t, external_birth, escape, trial_thermal_number, trial_s, &
+          trial_t, out, diagnostics) bind(C, &
+          name="fusion_c_coupled_fast_trial_diagnosed") result(status)
+       import :: c_double, c_int, c_ptr
+       real(c_double), value :: dt_s
+       type(c_ptr), value :: options
+       type(c_ptr), value :: fast_options
+       integer(c_int), value :: cells
+       type(c_ptr), value :: edges
+       type(c_ptr), value :: thermal_number
+       real(c_double), value :: electron_energy
+       real(c_double), value :: ion_energy
+       real(c_double), value :: electron_density
+       type(c_ptr), value :: thermal_charge_squared
+       integer(c_int), value :: inert_count
+       type(c_ptr), value :: inert
+       type(c_ptr), value :: coulomb_logs
+       type(c_ptr), value :: old_s
+       type(c_ptr), value :: old_t
+       type(c_ptr), value :: external_birth
+       type(c_ptr), value :: escape
+       type(c_ptr), value :: trial_thermal_number
+       type(c_ptr), value :: trial_s
+       type(c_ptr), value :: trial_t
+       type(c_ptr), value :: out
+       type(c_ptr), value :: diagnostics
+       integer(c_int) :: status
+     end function c_fusion_c_coupled_fast_trial_diagnosed
+
+     function c_fusion_c_coupled_fast_table_trial_diagnosed( &
+          dt_s, options, fast_options, tables, cells, edges, thermal_number, &
+          electron_energy, ion_energy, electron_density, &
+          thermal_charge_squared, inert_count, inert, coulomb_logs, old_s, &
+          old_t, external_birth, escape, trial_thermal_number, trial_s, &
+          trial_t, out, diagnostics) bind(C, &
+          name="fusion_c_coupled_fast_table_trial_diagnosed") result(status)
+       import :: c_double, c_int, c_ptr
+       real(c_double), value :: dt_s
+       type(c_ptr), value :: options
+       type(c_ptr), value :: fast_options
+       type(c_ptr), value :: tables
+       integer(c_int), value :: cells
+       type(c_ptr), value :: edges
+       type(c_ptr), value :: thermal_number
+       real(c_double), value :: electron_energy
+       real(c_double), value :: ion_energy
+       real(c_double), value :: electron_density
+       type(c_ptr), value :: thermal_charge_squared
+       integer(c_int), value :: inert_count
+       type(c_ptr), value :: inert
+       type(c_ptr), value :: coulomb_logs
+       type(c_ptr), value :: old_s
+       type(c_ptr), value :: old_t
+       type(c_ptr), value :: external_birth
+       type(c_ptr), value :: escape
+       type(c_ptr), value :: trial_thermal_number
+       type(c_ptr), value :: trial_s
+       type(c_ptr), value :: trial_t
+       type(c_ptr), value :: out
+       type(c_ptr), value :: diagnostics
+       integer(c_int) :: status
+     end function c_fusion_c_coupled_fast_table_trial_diagnosed
+
+     function c_fusion_c_coupled_fast_table_trial_effective_charge_diagnosed( &
+          dt_s, options, fast_options, tables, cells, edges, thermal_number, &
+          electron_energy, ion_energy, electron_density, &
+          thermal_charge_squared, inert_count, inert, coulomb_logs, old_s, &
+          old_t, external_birth, escape, trial_thermal_number, trial_s, &
+          trial_t, out, diagnostics) bind(C, &
+          name="fusion_c_coupled_fast_table_trial_effective_charge_diagnosed") &
+          result(status)
+       import :: c_double, c_int, c_ptr
+       real(c_double), value :: dt_s
+       type(c_ptr), value :: options
+       type(c_ptr), value :: fast_options
+       type(c_ptr), value :: tables
+       integer(c_int), value :: cells
+       type(c_ptr), value :: edges
+       type(c_ptr), value :: thermal_number
+       real(c_double), value :: electron_energy
+       real(c_double), value :: ion_energy
+       real(c_double), value :: electron_density
+       type(c_ptr), value :: thermal_charge_squared
+       integer(c_int), value :: inert_count
+       type(c_ptr), value :: inert
+       type(c_ptr), value :: coulomb_logs
+       type(c_ptr), value :: old_s
+       type(c_ptr), value :: old_t
+       type(c_ptr), value :: external_birth
+       type(c_ptr), value :: escape
+       type(c_ptr), value :: trial_thermal_number
+       type(c_ptr), value :: trial_s
+       type(c_ptr), value :: trial_t
+       type(c_ptr), value :: out
+       type(c_ptr), value :: diagnostics
+       integer(c_int) :: status
+     end function c_fusion_c_coupled_fast_table_trial_effective_charge_diagnosed
   end interface
 
 contains
@@ -197,6 +304,17 @@ contains
     out%handoff_mean_error = 0.0_c_double
     out%handoff_projected = 0_c_int
   end subroutine clear_fast_output
+
+  subroutine clear_fast_diagnostics(diagnostics)
+    type(fusion_handoff_diagnostics_v1), intent(out) :: diagnostics
+
+    diagnostics%candidate_number_m3 = 0.0_c_double
+    diagnostics%candidate_energy_J_m3 = 0.0_c_double
+    diagnostics%transferred_number_m3 = 0.0_c_double
+    diagnostics%transferred_energy_J_m3 = 0.0_c_double
+    diagnostics%target_kT_J = 0.0_c_double
+    diagnostics%tested = 0_c_int
+  end subroutine clear_fast_diagnostics
 
   subroutine clear_fast_outputs(trial_thermal_number_m3, trial_s_m3, &
        trial_t_m3, out)
@@ -532,5 +650,220 @@ contains
             trial_t_m3, out)
     end if
   end subroutine fusion_coupled_fast_table_trial_effective_charge
+
+  subroutine fusion_coupled_fast_trial_diagnosed( &
+       dt_s, options, fast_options, cells, edges_J, thermal_number_m3, &
+       electron_energy_J_m3, ion_energy_J_m3, electron_density_m3, &
+       thermal_charge_squared, inert_count, inert, coulomb_logs, old_s_m3, &
+       old_t_m3, external_birth_m3_s, escape_s_inv, &
+       trial_thermal_number_m3, trial_s_m3, trial_t_m3, out, diagnostics, &
+       status)
+    real(c_double), intent(in) :: dt_s
+    type(fusion_coupled_thermal_options_v1), intent(in), target :: options
+    type(fusion_fast_target_options_v1), intent(in), target :: fast_options
+    integer(c_int), intent(in) :: cells
+    real(c_double), intent(in), target, contiguous :: edges_J(:)
+    real(c_double), intent(in), target, contiguous :: thermal_number_m3(:)
+    real(c_double), intent(in) :: electron_energy_J_m3
+    real(c_double), intent(in) :: ion_energy_J_m3
+    real(c_double), intent(in) :: electron_density_m3
+    real(c_double), intent(in), target, contiguous :: &
+         thermal_charge_squared(:)
+    integer(c_int), intent(in) :: inert_count
+    type(fusion_inert_ion_v1), intent(in), target, contiguous :: inert(:)
+    real(c_double), intent(in), target, contiguous :: coulomb_logs(:,:)
+    real(c_double), intent(in), target, contiguous :: old_s_m3(:,:)
+    real(c_double), intent(in), target, contiguous :: old_t_m3(:,:)
+    real(c_double), intent(in), target, contiguous :: external_birth_m3_s(:,:)
+    real(c_double), intent(in), target, contiguous :: escape_s_inv(:,:)
+    real(c_double), intent(out), target, contiguous :: &
+         trial_thermal_number_m3(:)
+    real(c_double), intent(out), target, contiguous :: trial_s_m3(:,:)
+    real(c_double), intent(out), target, contiguous :: trial_t_m3(:,:)
+    type(fusion_coupled_thermal_v1), intent(out), target :: out
+    type(fusion_handoff_diagnostics_v1), intent(out), target :: diagnostics
+    integer(c_int), intent(out) :: status
+
+    type(c_ptr) :: options_ptr, fast_options_ptr, edges_ptr
+    type(c_ptr) :: thermal_number_ptr, thermal_charge_squared_ptr, inert_ptr
+    type(c_ptr) :: coulomb_logs_ptr, old_s_ptr, old_t_ptr
+    type(c_ptr) :: external_birth_ptr, escape_ptr
+    type(c_ptr) :: trial_thermal_number_ptr, trial_s_ptr, trial_t_ptr
+    type(c_ptr) :: out_ptr, diagnostics_ptr, tables_ptr
+
+    call clear_fast_diagnostics(diagnostics)
+    call clear_fast_outputs(trial_thermal_number_m3, trial_s_m3, &
+         trial_t_m3, out)
+    call prepare_fast_arguments(options, fast_options, cells, edges_J, &
+         thermal_number_m3, thermal_charge_squared, inert_count, inert, &
+         coulomb_logs, old_s_m3, old_t_m3, external_birth_m3_s, escape_s_inv, &
+         trial_thermal_number_m3, trial_s_m3, trial_t_m3, options_ptr, &
+         fast_options_ptr, edges_ptr, thermal_number_ptr, &
+         thermal_charge_squared_ptr, inert_ptr, coulomb_logs_ptr, old_s_ptr, &
+         old_t_ptr, external_birth_ptr, escape_ptr, trial_thermal_number_ptr, &
+         trial_s_ptr, trial_t_ptr, tables_ptr, status)
+    if (status /= PB11_STATUS_OK) return
+
+    out_ptr = c_loc(out)
+    diagnostics_ptr = c_loc(diagnostics)
+    inert_ptr = c_null_ptr
+    if (inert_count > 0_c_int) inert_ptr = c_loc(inert(1))
+    status = c_fusion_c_coupled_fast_trial_diagnosed(dt_s, options_ptr, &
+         fast_options_ptr, cells, edges_ptr, thermal_number_ptr, &
+         electron_energy_J_m3, ion_energy_J_m3, electron_density_m3, &
+         thermal_charge_squared_ptr, inert_count, inert_ptr, &
+         coulomb_logs_ptr, old_s_ptr, old_t_ptr, external_birth_ptr, &
+         escape_ptr, trial_thermal_number_ptr, trial_s_ptr, trial_t_ptr, &
+         out_ptr, diagnostics_ptr)
+    if (status /= PB11_STATUS_OK) then
+       call clear_fast_outputs(trial_thermal_number_m3, trial_s_m3, &
+            trial_t_m3, out)
+       call clear_fast_diagnostics(diagnostics)
+    end if
+  end subroutine fusion_coupled_fast_trial_diagnosed
+
+  subroutine fusion_coupled_fast_table_trial_diagnosed( &
+       dt_s, options, fast_options, tables, cells, edges_J, &
+       thermal_number_m3, electron_energy_J_m3, ion_energy_J_m3, &
+       electron_density_m3, thermal_charge_squared, inert_count, inert, &
+       coulomb_logs, old_s_m3, old_t_m3, external_birth_m3_s, escape_s_inv, &
+       trial_thermal_number_m3, trial_s_m3, trial_t_m3, out, diagnostics, &
+       status)
+    real(c_double), intent(in) :: dt_s
+    type(fusion_coupled_thermal_options_v1), intent(in), target :: options
+    type(fusion_fast_target_options_v1), intent(in), target :: fast_options
+    type(c_ptr), intent(in), target, contiguous :: tables(:)
+    integer(c_int), intent(in) :: cells
+    real(c_double), intent(in), target, contiguous :: edges_J(:)
+    real(c_double), intent(in), target, contiguous :: thermal_number_m3(:)
+    real(c_double), intent(in) :: electron_energy_J_m3
+    real(c_double), intent(in) :: ion_energy_J_m3
+    real(c_double), intent(in) :: electron_density_m3
+    real(c_double), intent(in), target, contiguous :: &
+         thermal_charge_squared(:)
+    integer(c_int), intent(in) :: inert_count
+    type(fusion_inert_ion_v1), intent(in), target, contiguous :: inert(:)
+    real(c_double), intent(in), target, contiguous :: coulomb_logs(:,:)
+    real(c_double), intent(in), target, contiguous :: old_s_m3(:,:)
+    real(c_double), intent(in), target, contiguous :: old_t_m3(:,:)
+    real(c_double), intent(in), target, contiguous :: external_birth_m3_s(:,:)
+    real(c_double), intent(in), target, contiguous :: escape_s_inv(:,:)
+    real(c_double), intent(out), target, contiguous :: &
+         trial_thermal_number_m3(:)
+    real(c_double), intent(out), target, contiguous :: trial_s_m3(:,:)
+    real(c_double), intent(out), target, contiguous :: trial_t_m3(:,:)
+    type(fusion_coupled_thermal_v1), intent(out), target :: out
+    type(fusion_handoff_diagnostics_v1), intent(out), target :: diagnostics
+    integer(c_int), intent(out) :: status
+
+    type(c_ptr) :: options_ptr, fast_options_ptr, edges_ptr
+    type(c_ptr) :: thermal_number_ptr, thermal_charge_squared_ptr, inert_ptr
+    type(c_ptr) :: coulomb_logs_ptr, old_s_ptr, old_t_ptr
+    type(c_ptr) :: external_birth_ptr, escape_ptr
+    type(c_ptr) :: trial_thermal_number_ptr, trial_s_ptr, trial_t_ptr
+    type(c_ptr) :: out_ptr, diagnostics_ptr, tables_ptr
+
+    call clear_fast_diagnostics(diagnostics)
+    call clear_fast_outputs(trial_thermal_number_m3, trial_s_m3, &
+         trial_t_m3, out)
+    call prepare_fast_arguments(options, fast_options, cells, edges_J, &
+         thermal_number_m3, thermal_charge_squared, inert_count, inert, &
+         coulomb_logs, old_s_m3, old_t_m3, external_birth_m3_s, escape_s_inv, &
+         trial_thermal_number_m3, trial_s_m3, trial_t_m3, options_ptr, &
+         fast_options_ptr, edges_ptr, thermal_number_ptr, &
+         thermal_charge_squared_ptr, inert_ptr, coulomb_logs_ptr, old_s_ptr, &
+         old_t_ptr, external_birth_ptr, escape_ptr, trial_thermal_number_ptr, &
+         trial_s_ptr, trial_t_ptr, tables_ptr, status, tables=tables)
+    if (status /= PB11_STATUS_OK) return
+
+    out_ptr = c_loc(out)
+    diagnostics_ptr = c_loc(diagnostics)
+    inert_ptr = c_null_ptr
+    if (inert_count > 0_c_int) inert_ptr = c_loc(inert(1))
+    status = c_fusion_c_coupled_fast_table_trial_diagnosed( &
+         dt_s, options_ptr, fast_options_ptr, tables_ptr, cells, edges_ptr, &
+         thermal_number_ptr, electron_energy_J_m3, ion_energy_J_m3, &
+         electron_density_m3, thermal_charge_squared_ptr, inert_count, &
+         inert_ptr, coulomb_logs_ptr, old_s_ptr, old_t_ptr, external_birth_ptr, &
+         escape_ptr, trial_thermal_number_ptr, trial_s_ptr, trial_t_ptr, &
+         out_ptr, diagnostics_ptr)
+    if (status /= PB11_STATUS_OK) then
+       call clear_fast_outputs(trial_thermal_number_m3, trial_s_m3, &
+            trial_t_m3, out)
+       call clear_fast_diagnostics(diagnostics)
+    end if
+  end subroutine fusion_coupled_fast_table_trial_diagnosed
+
+  subroutine fusion_coupled_fast_table_trial_effective_charge_diagnosed( &
+       dt_s, options, fast_options, tables, cells, edges_J, &
+       thermal_number_m3, electron_energy_J_m3, ion_energy_J_m3, &
+       electron_density_m3, thermal_charge_squared, inert_count, inert, &
+       coulomb_logs, old_s_m3, old_t_m3, external_birth_m3_s, escape_s_inv, &
+       trial_thermal_number_m3, trial_s_m3, trial_t_m3, out, diagnostics, &
+       status)
+    real(c_double), intent(in) :: dt_s
+    type(fusion_coupled_thermal_options_v1), intent(in), target :: options
+    type(fusion_fast_target_options_v1), intent(in), target :: fast_options
+    type(c_ptr), intent(in), target, contiguous :: tables(:)
+    integer(c_int), intent(in) :: cells
+    real(c_double), intent(in), target, contiguous :: edges_J(:)
+    real(c_double), intent(in), target, contiguous :: thermal_number_m3(:)
+    real(c_double), intent(in) :: electron_energy_J_m3
+    real(c_double), intent(in) :: ion_energy_J_m3
+    real(c_double), intent(in) :: electron_density_m3
+    real(c_double), intent(in), target, contiguous :: &
+         thermal_charge_squared(:)
+    integer(c_int), intent(in) :: inert_count
+    type(fusion_inert_ion_v1), intent(in), target, contiguous :: inert(:)
+    real(c_double), intent(in), target, contiguous :: coulomb_logs(:,:)
+    real(c_double), intent(in), target, contiguous :: old_s_m3(:,:)
+    real(c_double), intent(in), target, contiguous :: old_t_m3(:,:)
+    real(c_double), intent(in), target, contiguous :: external_birth_m3_s(:,:)
+    real(c_double), intent(in), target, contiguous :: escape_s_inv(:,:)
+    real(c_double), intent(out), target, contiguous :: &
+         trial_thermal_number_m3(:)
+    real(c_double), intent(out), target, contiguous :: trial_s_m3(:,:)
+    real(c_double), intent(out), target, contiguous :: trial_t_m3(:,:)
+    type(fusion_coupled_thermal_v1), intent(out), target :: out
+    type(fusion_handoff_diagnostics_v1), intent(out), target :: diagnostics
+    integer(c_int), intent(out) :: status
+
+    type(c_ptr) :: options_ptr, fast_options_ptr, edges_ptr
+    type(c_ptr) :: thermal_number_ptr, thermal_charge_squared_ptr, inert_ptr
+    type(c_ptr) :: coulomb_logs_ptr, old_s_ptr, old_t_ptr
+    type(c_ptr) :: external_birth_ptr, escape_ptr
+    type(c_ptr) :: trial_thermal_number_ptr, trial_s_ptr, trial_t_ptr
+    type(c_ptr) :: out_ptr, diagnostics_ptr, tables_ptr
+
+    call clear_fast_diagnostics(diagnostics)
+    call clear_fast_outputs(trial_thermal_number_m3, trial_s_m3, &
+         trial_t_m3, out)
+    call prepare_fast_arguments(options, fast_options, cells, edges_J, &
+         thermal_number_m3, thermal_charge_squared, inert_count, inert, &
+         coulomb_logs, old_s_m3, old_t_m3, external_birth_m3_s, escape_s_inv, &
+         trial_thermal_number_m3, trial_s_m3, trial_t_m3, options_ptr, &
+         fast_options_ptr, edges_ptr, thermal_number_ptr, &
+         thermal_charge_squared_ptr, inert_ptr, coulomb_logs_ptr, old_s_ptr, &
+         old_t_ptr, external_birth_ptr, escape_ptr, trial_thermal_number_ptr, &
+         trial_s_ptr, trial_t_ptr, tables_ptr, status, tables=tables)
+    if (status /= PB11_STATUS_OK) return
+
+    out_ptr = c_loc(out)
+    diagnostics_ptr = c_loc(diagnostics)
+    inert_ptr = c_null_ptr
+    if (inert_count > 0_c_int) inert_ptr = c_loc(inert(1))
+    status = c_fusion_c_coupled_fast_table_trial_effective_charge_diagnosed( &
+         dt_s, options_ptr, fast_options_ptr, tables_ptr, cells, edges_ptr, &
+         thermal_number_ptr, electron_energy_J_m3, ion_energy_J_m3, &
+         electron_density_m3, thermal_charge_squared_ptr, inert_count, &
+         inert_ptr, coulomb_logs_ptr, old_s_ptr, old_t_ptr, external_birth_ptr, &
+         escape_ptr, trial_thermal_number_ptr, trial_s_ptr, trial_t_ptr, &
+         out_ptr, diagnostics_ptr)
+    if (status /= PB11_STATUS_OK) then
+       call clear_fast_outputs(trial_thermal_number_m3, trial_s_m3, &
+            trial_t_m3, out)
+       call clear_fast_diagnostics(diagnostics)
+    end if
+  end subroutine fusion_coupled_fast_table_trial_effective_charge_diagnosed
 
 end module fusion_coupled_fast_fortran

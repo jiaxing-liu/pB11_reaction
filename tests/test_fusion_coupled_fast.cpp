@@ -694,10 +694,71 @@ void test_late_charged_spill_rejects_and_retains_inputs() {
             "late charged-spill failure retains caller inputs");
 }
 
+
+void test_diagnosed_fast_interfaces() {
+ Inputs inputs;inputs.fast_options=make_fast_options({{0,0,0,1,0}});inputs.fast_options.angular_order=16;
+ const double dt_s=1e-3;
+ Trial baseline=make_trial(inputs);
+ require(call_fast(inputs,dt_s,baseline)==0,"undiagnosed fast reference succeeds");
+ const fusion_birth_table_v1* tables[5]{};
+ auto evaluate=[&](int mode,Trial&trial,fusion_handoff_diagnostics_v1*diagnostics)->int {
+ if(mode==0){
+    return fusion_c_coupled_fast_trial_diagnosed(
+        dt_s, &inputs.options, &inputs.fast_options, inputs.grid.cells(),
+        inputs.grid.edges.data(), inputs.thermal_number.data(),
+        inputs.electron_energy_J_m3, inputs.ion_energy_J_m3,
+        inputs.electron_density_m3, inputs.thermal_charge_squared.data(),
+        inputs.inert_count, nullptr, inputs.coulomb_logs.data(),
+        inputs.old_s.data(), inputs.old_t.data(), inputs.external_birth.data(),
+        inputs.escape.data(), trial.thermal_number.data(), trial.s.data(),
+        trial.t.data(), &trial.result,diagnostics);
+ }
+ if(mode==1){
+    return fusion_c_coupled_fast_table_trial_diagnosed(
+        dt_s, &inputs.options, &inputs.fast_options, tables, inputs.grid.cells(),
+        inputs.grid.edges.data(), inputs.thermal_number.data(),
+        inputs.electron_energy_J_m3, inputs.ion_energy_J_m3,
+        inputs.electron_density_m3, inputs.thermal_charge_squared.data(),
+        inputs.inert_count, nullptr, inputs.coulomb_logs.data(),
+        inputs.old_s.data(), inputs.old_t.data(), inputs.external_birth.data(),
+        inputs.escape.data(), trial.thermal_number.data(), trial.s.data(),
+        trial.t.data(), &trial.result,diagnostics);
+ }
+ {
+    return fusion_c_coupled_fast_table_trial_effective_charge_diagnosed(
+        dt_s, &inputs.options, &inputs.fast_options, tables, inputs.grid.cells(),
+        inputs.grid.edges.data(), inputs.thermal_number.data(),
+        inputs.electron_energy_J_m3, inputs.ion_energy_J_m3,
+        inputs.electron_density_m3, inputs.thermal_charge_squared.data(),
+        inputs.inert_count, nullptr, inputs.coulomb_logs.data(),
+        inputs.old_s.data(), inputs.old_t.data(), inputs.external_birth.data(),
+        inputs.escape.data(), trial.thermal_number.data(), trial.s.data(),
+        trial.t.data(), &trial.result,diagnostics);
+ }
+ };
+ for(int mode=0;mode<3;++mode){
+  Trial trial=make_trial(inputs);fusion_handoff_diagnostics_v1 d{};
+  require(evaluate(mode,trial,&d)==0,"diagnosed fast interface succeeds");
+  require(trial.s==baseline.s&&trial.t==baseline.t&&trial.thermal_number==baseline.thermal_number&&same_result(trial.result,baseline.result),"diagnosed fast output parity");
+  for(int id=0;id<6;++id){long double sum=0;for(int j=0;j<inputs.grid.cells();++j)sum+=trial.t[id*inputs.grid.cells()+j];
+   require(std::abs(sum-d.candidate_number_m3[id])<=1e-14L*std::max(sum,static_cast<long double>(d.candidate_number_m3[id])),"diagnostic candidate matches pre-handoff T");
+   require(d.tested[id]==0&&d.target_kT_J[id]==0,"disabled handoff diagnostics remain explicit");
+  }
+  require(d.transferred_number_m3[FUSION_DEUTERON]>0,"S-to-T diagnostic retained");
+  require(evaluate(mode,trial,nullptr)==PB11_STATUS_NULL_OUTPUT&&same_result(trial.result,fusion_coupled_thermal_v1{}),"null diagnostic rejects and clears");
+  inputs.fast_options.angular_order=3;
+  for(int id=0;id<6;++id){d.candidate_number_m3[id]=1;d.candidate_energy_J_m3[id]=1;d.transferred_number_m3[id]=1;d.transferred_energy_J_m3[id]=1;d.target_kT_J[id]=1;d.tested[id]=1;}
+  require(evaluate(mode,trial,&d)!=0,"bad fast options reject diagnostics");
+  for(int id=0;id<6;++id)require(d.candidate_number_m3[id]==0&&d.candidate_energy_J_m3[id]==0&&d.transferred_number_m3[id]==0&&d.transferred_energy_J_m3[id]==0&&d.target_kT_J[id]==0&&d.tested[id]==0,"all diagnostics clear on failure");
+  inputs.fast_options.angular_order=16;
+ }
+}
+
 }  // namespace
 
 int main() {
     try {
+        test_diagnosed_fast_interfaces();
         test_fast_dt_accounting_and_shared_components();
         test_all_fast_disabled_exact_legacy_parity();
         test_invalid_fast_options_clear_outputs();

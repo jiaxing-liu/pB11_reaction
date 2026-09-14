@@ -99,3 +99,23 @@ Full Intel BALDUR build passes. Standalone installed Fortran runs the same
 nonzero-fast fixture through the exported target; strict C11 validates the
 installed header, symbol and null-output contract. These do not activate the
 new source owner in a BALDUR production input.
+
+
+## Diagnosed entry points (D079)
+
+The three existing fast trial names also have additive `_diagnosed` C entry
+points with a required final `fusion_handoff_diagnostics_v1 *` argument.
+The Fortran counterparts place diagnostics before status. They expose the same
+candidate S-to-T transfer/thermal handoff observations as the existing thermal
+operator; they do not add state, change physics, or alter acceptance ownership.
+Null diagnostics is an error; diagnostics and trial outputs clear on failure,
+including Fortran extent validation. Existing non-diagnosed interfaces remain.
+
+The C++ test exercises all three diagnosed routes with nonzero fast DT,
+compares complete output arrays/results to their non-diagnosed counterpart,
+and checks candidate/transfer observations plus null/invalid clearing.
+GNU and Intel/r8 selected C++/Fortran suites pass 2/2 each. BALDUR's D079
+controller fixture additionally exercises diagnosed standard/effective-charge
+Fortran dispatch and atomic zone rejection/retry. Host evidence is in
+`docs/exl50u-program/controller-fast/`; this is not production driver activation
+or a dense multi-step performance certificate.
