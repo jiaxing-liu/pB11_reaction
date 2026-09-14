@@ -59,8 +59,19 @@ It returns the separate floor ledger alongside the physical source ledger. The
 ion correction updates the trial reservoir before collision baths are assembled;
 its temperature gate explicitly uses post-reactant-debit PRE-correction kTi.
 Upper spill remains subject to the existing strict representability bound.
-Old source entry points retain their behavior. A packet that becomes a zero
-rate rejects; conversions are checked against measured source-scale IEEE rounding.
+Old source entry points retain their behavior. Positive mapped floor packets
+still reject if their source rate becomes zero. For other per-cell birth packets,
+the opt-in path permits natural binary64 rounding to zero only when BOTH the
+packet amount (m^-3) and its source rate (m^-3 s^-1) are strictly below half the
+smallest binary64 subnormal. Representable packets or rates are never clipped.
+Across all species and cells in a trial, upward-rounded bounds on missing
+particle amount and center-weighted energy must each remain strictly below
+half the binary64 subnormal quantum in their respective SI units (m^-3 and
+J m^-3); reaching either bound rejects. These are per-trial conversion bounds,
+not cumulative restart counters or a physical convergence certificate.
+Conversions retain the source-scale reconstruction bound, independent of old
+inventory. Physical nuclear, external-source and numerical floor ledgers are
+unchanged, as are collision and final conservation gates.
 
 This is still an experimental numerical boundary, not validated physical closure.
 The legacy source-state stage/snapshot APIs and legacy fluid-increment helper

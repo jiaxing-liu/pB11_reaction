@@ -555,6 +555,10 @@ if(BUILD_TESTING)
     target_link_libraries(test_fusion_handoff PRIVATE pb11::pb11)
     add_test(NAME fusion_handoff_tests COMMAND test_fusion_handoff)
 
+    add_executable(test_fusion_source_rounding tests/test_fusion_source_rounding.cpp)
+    target_link_libraries(test_fusion_source_rounding PRIVATE pb11::pb11)
+    add_test(NAME fusion_source_rounding_tests COMMAND test_fusion_source_rounding)
+
     add_executable(test_fusion_coupled_floor tests/test_fusion_coupled_floor.cpp)
     target_link_libraries(test_fusion_coupled_floor PRIVATE pb11::pb11)
     add_test(NAME fusion_coupled_floor_tests COMMAND test_fusion_coupled_floor)

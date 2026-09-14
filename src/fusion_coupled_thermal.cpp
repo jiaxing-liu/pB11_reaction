@@ -1,3 +1,4 @@
+#include "fusion_source_rounding_internal.h"
 #include "fusion_coupled_sources.h"
 #include "fusion_beam_birth_table_internal.h"
 #include "fusion_beam_birth.h"
@@ -21,16 +22,8 @@ constexpr double MeV=1.602176634e-13;
 bool finite_value(double x){return std::isfinite(x);}
 bool nonnegative(double x){return finite_value(x)&&x>=0;}
 bool put(R x,double& d){if(!std::isfinite(x)||std::abs(x)>std::numeric_limits<double>::max())return false;d=double(x);return true;}
-// A nonzero packet must never become a zero FP source. Measured binary64
-// conversion error is checked against source-scale rounding, not old inventory.
-bool floor_source_rate(R amount,double dt,double& rate){
- if(amount<0||!std::isfinite(amount)||!std::isfinite(dt)||dt<=0)return false;
- if(!put(amount/R(dt),rate)||(amount>0&&rate==0))return false;
- const R recovered=R(rate)*dt;
- const R allowance=2*std::numeric_limits<double>::epsilon()*std::abs(amount)+
-    R(std::numeric_limits<double>::denorm_min())*dt;
- return std::isfinite(recovered)&&std::abs(recovered-amount)<=allowance;
-}
+using fusion_detail::source_rounding::floor_source_rate;
+using fusion_detail::source_rounding::source_roundoff_accumulate;
 bool close(std::initializer_list<R> terms,R roundoff=0){R value=0,scale=0;for(R x:terms){if(!std::isfinite(x))return false;value+=x;scale+=std::abs(x);}return std::abs(value)<=1e-10L*scale+roundoff;}
 template<class F>void ledger_fields(fusion_source_ledger_v1&l,F f){
  for(double&x:l.events_m3)f(x);
@@ -320,7 +313,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
    bool active=false;for(int i=0;i<6;++i){active=active||N[i]>0;ionU+=floor_result.ion_energy_correction_J_m3[i];}
    if(active&&(!put(ionU/(1.5L*Npool),Ti)||Ti<=0))return NUM;
   }
-  std::vector<double> birth(6*n),s(6*n),t(6*n);R Q=0,neutronN=fast_neutronN,neutronE=fast_neutronE;
+  std::vector<double> birth(6*n),s(6*n),t(6*n);R unrepresentedN=0,unrepresentedE=0;R Q=0,neutronN=fast_neutronN,neutronE=fast_neutronE;
   for(int ch=0;ch<5;++ch){if(!put(R(burn.events_m3[ch])+fast_events[ch],l.events_m3[ch]))return NUM;Q+=R(l.events_m3[ch])*reactions[ch].q_J;}
   for(int i=0;i<6;++i){R bornN=0,bornE=0,extN=0,extE=0;
    for(int j=0;j<n;++j){R amount=fast_birth.empty()?0:fast_birth[i*n+j];
@@ -328,7 +321,10 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
     bornN+=amount;bornE+=amount*centers[j];
     if(floor_limits&&j==0)amount+=floor_result.mapped_number_m3[i];
     R ex=R(dt)*external[i*n+j];extN+=ex;extE+=ex*centers[j];
-    if(floor_limits){if(!floor_source_rate(amount+ex,dt,birth[i*n+j]))return NUM;}
+    if(floor_limits){
+     R lost=0;if(!floor_source_rate(amount+ex,dt,birth[i*n+j],&lost))return NUM;
+     if(!source_roundoff_accumulate(lost,centers[j],unrepresentedN,unrepresentedE))return NUM;
+    }
     else if(!put((amount+ex)/dt,birth[i*n+j]))return NUM;
    }
    if(floor_limits){bornN+=floor_result.born_number_m3[i];bornE+=floor_result.born_energy_J_m3[i];}
