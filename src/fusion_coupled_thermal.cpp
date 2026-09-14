@@ -11,6 +11,7 @@
 #include <array>
 #include <cmath>
 #include <limits>
+#include <new>
 #include <vector>
 namespace {
 using R=long double;
@@ -120,7 +121,15 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
   std::array<R,5> fast_events{};
   bool fast_enabled=false;if(fastop)for(int ch=0;ch<5;++ch)fast_enabled=fast_enabled||fastop->channels[ch];
   if(fast_enabled){
-   struct EdgeMeta{int channel,slot,index;};
+   struct EdgeMeta{int channel,slot,index,cached;};
+   struct CachedBeam{fusion_beam_birth_v1 value;std::vector<double> spectrum;};
+   std::vector<CachedBeam> cache;
+   // Exact intra-trial reuse only: neither backgrounds nor accepted steps share
+   // cached values. Bound spectrum payload, and recompute after the cap or an
+   // allocation failure. No interpolation, truncation or moment-only surrogate.
+   constexpr std::size_t cache_payload_limit=32*1024*1024;
+   const std::size_t spectrum_bytes=std::size_t(7)*n*sizeof(double);
+   bool cache_allocation_ok=true;
    std::vector<fusion_target_network_edge_v1> links;std::vector<EdgeMeta> meta;
    std::vector<double> fast_initial(6*n),fast_energy(6*n),spectrum(7*n);
    for(int i=0;i<6;++i)for(int j=0;j<n;++j){int k=i*n+j;if(!put(R(old_s[k])+old_t[k],fast_initial[k]))return NUM;fast_energy[k]=double(centers[j]);}
@@ -159,7 +168,12 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
     const auto&r=reactions[ch];if(slot==1&&r.reactant_ids[0]==r.reactant_ids[1])continue;
     int projectile=r.reactant_ids[slot],target=r.reactant_ids[1-slot];if(trialNi[target]==0)continue;
     for(int j=0;j<n;++j){int k=projectile*n+j;if(fast_initial[k]==0)continue;fusion_beam_birth_v1 value{};st=sample(ch,slot,k,value,true);if(st)return st;
-     links.push_back({k,target,value.spectrum.reactivity_m3_s,value.spectrum.reactant_energy_moment_J_m3_s[1-slot]});meta.push_back({ch,slot,k});
+     int cached=-1;
+     if(cache_allocation_ok&&value.spectrum.reactivity_m3_s>0&&cache.size()<cache_payload_limit/spectrum_bytes){
+      try{cache.push_back({value,spectrum});cached=int(cache.size()-1);}
+      catch(const std::bad_alloc&){cache_allocation_ok=false;}
+     }
+     links.push_back({k,target,value.spectrum.reactivity_m3_s,value.spectrum.reactant_energy_moment_J_m3_s[1-slot]});meta.push_back({ch,slot,k,cached});
     }
    }
    // Permit only spill whose conservative full-consumption bounds, including
@@ -188,7 +202,9 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
     fp_s=surviving_s.data();fp_t=surviving_t.data();fast_birth.assign(6*n,0);
     std::array<R,6> fastNremoved{},fastEremoved{},targetNremoved{},targetEremoved{};
     for(size_t e=0;e<links.size();++e){if(loss[e]==0)continue;const auto&m=meta[e];const auto&link=links[e];if(link.reactivity_m3_s<=0)return NUM;
-     fusion_beam_birth_v1 value{};st=sample(m.channel,m.slot,m.index,value,false);if(st)return st;
+     fusion_beam_birth_v1 value{};
+     if(m.cached>=0){value=cache[m.cached].value;spectrum=cache[m.cached].spectrum;}
+     else {st=sample(m.channel,m.slot,m.index,value,false);if(st)return st;}
      const auto&r=value.spectrum;if(r.reactivity_m3_s!=link.reactivity_m3_s||r.reactant_energy_moment_J_m3_s[1-m.slot]!=link.target_energy_reactivity_J_m3_s)return NUM;
      R amount=loss[e],scale=amount/link.reactivity_m3_s;int projectile=m.index/n;
      fast_events[m.channel]+=amount;fastNremoved[projectile]+=amount;fastEremoved[projectile]+=amount*centers[m.index%n];
