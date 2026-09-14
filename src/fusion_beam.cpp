@@ -241,7 +241,12 @@ static int beam_segment(int ch,double ma_in,double mb_in,
         const Real escale=static_cast<Real>(result.projectile_energy_reactivity_J_m3_s)+
             result.target_energy_reactivity_J_m3_s+result.relative_energy_reactivity_J_m3_s+
             result.cm_energy_reactivity_J_m3_s;
-        if(!put(residual,result.energy_identity_error_J_m3_s) || std::abs(residual)>1e-9L*escale ||
+        // Each of the four public double energy moments can round by up to
+        // half denorm_min in the subnormal range. Preserve the relative gate
+        // for normal values and allow only that representational absolute
+        // bound; do not zero a tail or reconstruct one moment from the others.
+        const Real subnormal_roundoff=2*static_cast<Real>(std::numeric_limits<double>::denorm_min());
+        if(!put(residual,result.energy_identity_error_J_m3_s) || std::abs(residual)>1e-9L*escale+subnormal_roundoff ||
            (!population && std::abs(result.resolved_pair_probability+result.unresolved_pair_probability-1)>1e-9) ||
            (rate>0 && rate_error>1e-8*rate)) return PB11_STATUS_NUMERICAL_FAILURE;
         *out=result;

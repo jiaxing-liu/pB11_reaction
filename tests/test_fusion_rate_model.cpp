@@ -434,6 +434,50 @@ void fast_beam_check(
             "fast beam has a resolved reaction rate");
 }
 
+void beam_subnormal_tail_regression(
+    const std::array<double, FUSION_SPECIES_COUNT> &masses) {
+    constexpr double projectile_energy = 483.993402 * kev;
+    constexpr double target_kT = 10 * kev;
+    fusion_rate_model_v1 result{};
+    require(fusion_c_beam_maxwellian_model(
+                FUSION_DT_ALPHAN, FUSION_ENDPOINT_S, FUSION_PB_LOW_TB,
+                masses[FUSION_DEUTERON], masses[FUSION_TRITON],
+                projectile_energy, target_kT, &result) == PB11_STATUS_OK,
+            "canonical DT subnormal-tail model status");
+    check_window(result.total, "canonical DT subnormal-tail total");
+    check_window(result.fit, "canonical DT subnormal-tail fit");
+    check_window(result.below, "canonical DT subnormal-tail below");
+    check_window(result.above, "canonical DT subnormal-tail above");
+
+    require(result.total.resolved_reactivity_m3_s > 0 &&
+                std::isfinite(result.total.resolved_reactivity_m3_s),
+            "canonical DT subnormal-tail total is finite and positive");
+    require(result.above.resolved_reactivity_m3_s > 0 &&
+                std::fpclassify(result.above.resolved_reactivity_m3_s) ==
+                    FP_SUBNORMAL &&
+                result.above.resolved_reactivity_m3_s <
+                    result.fit.resolved_reactivity_m3_s * 1e-200,
+            "canonical DT above-fit tail remains a positive tiny rate");
+
+    const long double energy_scale =
+        static_cast<long double>(result.above.projectile_energy_reactivity_J_m3_s) +
+        result.above.target_energy_reactivity_J_m3_s +
+        result.above.relative_energy_reactivity_J_m3_s +
+        result.above.cm_energy_reactivity_J_m3_s;
+    const long double original_relative = 1e-9L * energy_scale;
+    require(std::abs(static_cast<long double>(result.above.energy_identity_error_J_m3_s)) > original_relative,
+            "subnormal fixture exercises the old relative-only failure");
+    const long double subnormal_roundoff =
+        2 * static_cast<long double>(std::numeric_limits<double>::denorm_min());
+    require(std::abs(static_cast<long double>(
+                result.above.energy_identity_error_J_m3_s)) <=
+                original_relative + subnormal_roundoff,
+            "canonical DT above-fit energy identity uses only subnormal roundoff");
+    require_near(result.total.resolved_reactivity_m3_s,
+                 result.fit.resolved_reactivity_m3_s,
+                 "canonical DT total remains fit-dominated", 1e-9);
+}
+
 void fill_model(fusion_rate_model_v1 &x, double value) {
     x.total.resolved_reactivity_m3_s = value;
     x.fit.resolved_reactivity_m3_s = value;
@@ -589,6 +633,7 @@ int main() {
         cold_beam_boundaries();
         unequal_temperature_swap(masses);
         fast_beam_check(masses);
+        beam_subnormal_tail_regression(masses);
         invalid_inputs();
         std::cout << "All fusion rate-model tests passed\n";
         return 0;
