@@ -63,10 +63,11 @@ Old source entry points retain their behavior. A packet that becomes a zero
 rate rejects; conversions are checked against measured source-scale IEEE rounding.
 
 This is still an experimental numerical boundary, not validated physical closure.
-The existing source-state stage/snapshot/restart APIs and fluid-increment helper
-do NOT own this additional correction. Callers must not stage a nonzero-floor
+The legacy source-state stage/snapshot APIs and fluid-increment helper
+do NOT own this additional correction. Explicit numerical-account state APIs
+now preserve it through commit and restart (see NUMERICAL_SOURCE_STATE.md). Callers must not stage a nonzero-floor
 result through those legacy APIs or reinterpret the correction as heat. Full
-state-owner/host integration and convergence are pending. A caller using
+host integration and convergence are pending. A caller using
 this pure trial owns atomic publication of ALL returned accounts.
 
 The coupled-floor C++ test uses a deliberately artificial local plasma to make

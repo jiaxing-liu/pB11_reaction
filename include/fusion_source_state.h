@@ -9,7 +9,8 @@ extern "C" {
 typedef struct fusion_source_state_v1 fusion_source_state_v1;
 /* Step AMOUNTS: number m^-3, energy J/m^3. Species order is the six-species
  * network. Seven baths: electron, then the six thermal ion species. Heat is
- * fast-species-major [6][7], positive to bath, and is the only signed field.
+ * fast-species-major [6][7], positive to bath, and is the only signed field in this base ledger. Separate numerical
+ * transfers are passed through the explicit numerical-account APIs below.
  * Nuclear birth, external birth and removed fuel are separate. Products are
  * born fast; handoff is a later, separately accounted transfer to the host.
  * No implicit thermalization of grid spill or conversion of missing data.
@@ -102,7 +103,7 @@ int fusion_c_source_state_stage(fusion_source_state_v1 *state,uint64_t ticket,
  * format, even if all six amounts are zero. Discard/rejected trials do not.
  * Old snapshot rejects promoted contexts rather than silently omit accounts;
  * snapshot_inert works for both formats and returns zero heat for legacy state.
- * On snapshot failure, scalar/ledger/inert outputs are cleared when nonnull;
+ * On stationary snapshot failure, scalar/ledger/inert outputs are cleared when nonnull;
  * kinetic arrays are untouched. Output arrays must not overlap any inputs.
  */
 int fusion_c_source_state_stage_inert(fusion_source_state_v1 *state,uint64_t ticket,
@@ -129,7 +130,8 @@ int fusion_c_source_state_discard(fusion_source_state_v1 *state,uint64_t ticket)
  * checksum. Legacy contexts retain byte-compatible version 1; extended
  * contexts write version 2 with six additional heat words after the ledger.
  * Volume-aware contexts write version 3, including reference/accepted volumes
- * and extensive spatial/work/domain ledgers. Unpack reads all three versions;
+ * and extensive spatial/work/domain ledgers. Numerical-account versions4/5 additionally preserve separate signed transfers;
+ * unpack reads versions1..5;
  * old readers reject unsupported versions. Legacy v1/v2 bytes stay unchanged.
  * Pack rejects pending trials; no unaccepted result enters restart.
  * Unpack creates a NEW context, checks tag, dimensions, all ledgers and total
@@ -142,6 +144,27 @@ int fusion_c_source_state_pack(const fusion_source_state_v1 *state,
  unsigned char *buffer,size_t capacity,size_t *bytes_written);
 int fusion_c_source_state_unpack(const unsigned char *buffer,size_t length,
  uint64_t expected_model_tag,fusion_source_state_v1 **out);
+
+/* Separate signed numerical energy transferred TO the ion reservoir per fast
+ * species, J/m3. Positive means energy leaves kinetics, negative enters kinetics.
+ * Not nuclear Q or physical heat. New stages require explicit inert/numerical
+ * arrays, and promote only on commit (including zero numerical amounts).
+ * Promoted contexts reject old stage/snapshot APIs to prevent omitted accounts.
+ * Numerical snapshots also read legacy contexts and return zero corrections.
+ * Moving corrections scale by source_volume/reference_volume exactly as source
+ * and inert accounts. Failure invalidates staged trial; accepted state is intact.
+ * Restart versions4(stationary) and5(moving) append six numerical words after
+ * inert heat; versions1..3 bytes unchanged for unpromoted contexts. */
+int fusion_c_source_state_stage_numerical(fusion_source_state_v1*,uint64_t,
+ const double*,const double*,const fusion_source_ledger_v1*,const double*,const double*);
+int fusion_c_source_state_stage_volume_numerical(fusion_source_state_v1*,uint64_t,
+ const double*,const double*,double,double,const fusion_source_ledger_v1*,const double*,
+ const fusion_transport_ledger_v1*,const double*);
+int fusion_c_source_state_snapshot_numerical(const fusion_source_state_v1*,double*,double*,
+ fusion_source_ledger_v1*,double*,double*,double*,uint64_t*);
+int fusion_c_source_state_snapshot_volume_numerical(const fusion_source_state_v1*,double*,double*,
+ fusion_source_ledger_v1*,double*,fusion_transport_ledger_v1*,double*,double*,double*,uint64_t*,double*);
+
 #ifdef __cplusplus
 }
 #endif

@@ -130,7 +130,7 @@ bool rescale_inventory(Moments& n,Moments& u,double volume,double reference){
 }
 bool inventory_balance(const Moments& old_n,const Moments& old_u,
  const Moments& n,const Moments& u,const fusion_source_ledger_v1& x,
- const std::array<double,6>& inert,const fusion_transport_ledger_v1* transport=nullptr,double reference=1){
+ const std::array<double,6>& inert,const fusion_transport_ledger_v1* transport=nullptr,double reference=1,const double* numerical=nullptr){
  const fusion_transport_ledger_v1 empty{};const auto& m=transport?*transport:empty;
  for(int s=0;s<6;++s){long double heat=inert[s],heat_scale=std::abs(inert[s]);
   for(int b=0;b<7;++b){heat+=x.heat_to_bath_J_m3[7*s+b];heat_scale+=std::abs(x.heat_to_bath_J_m3[7*s+b]);}
@@ -142,7 +142,7 @@ bool inventory_balance(const Moments& old_n,const Moments& old_u,
   // Keep the absolute bath terms in the scale even if different baths cancel.
   if(!balance({u[s],-old_u[s],-static_cast<long double>(x.nuclear_born_energy_J_m3[s]),
     -static_cast<long double>(x.external_born_energy_J_m3[s]),x.fast_consumed_energy_J_m3[s],
-    x.escaped_energy_J_m3[s],x.handed_off_energy_J_m3[s],(heat_scale+heat)/2,-(heat_scale-heat)/2,
+    x.escaped_energy_J_m3[s],x.handed_off_energy_J_m3[s],numerical?numerical[s]:0.,(heat_scale+heat)/2,-(heat_scale-heat)/2,
     -static_cast<long double>(m.spatial_energy_J[s])/reference,-static_cast<long double>(m.work_J[s])/reference,
     static_cast<long double>(m.lower_energy_J[s])/reference,static_cast<long double>(m.upper_energy_J[s])/reference}))return false;
  }
@@ -153,7 +153,8 @@ struct fusion_source_state_v1 {
  std::vector<double> edges,s,t,trial_s,trial_t;
  Moments initial_n{},initial_u{};
  fusion_source_ledger_v1 cumulative{},staged_cumulative{};
- std::array<double,6> inert{},staged_inert{};
+ std::array<double,6> inert{},staged_inert{},numerical{},staged_numerical{};
+ bool numeric=false,staged_numeric=false;
  bool extended=false,staged_extended=false,moving=false;
  double reference_volume=1,volume=1,staged_volume=1;
  fusion_transport_ledger_v1 transport{},staged_transport{};
@@ -201,15 +202,17 @@ extern "C" int fusion_c_source_state_cells(const fusion_source_state_v1* p,int* 
 namespace {
 int snapshot(const fusion_source_state_v1* p,double* s,double* t,
  fusion_source_ledger_v1* ledger,double* inert,double* time,uint64_t* epoch,
- bool extended_output){
+ bool extended_output,double* numerical=nullptr){
+ if(numerical)std::fill(numerical,numerical+6,0.);
  if(ledger)*ledger={};
  if(inert)std::fill(inert,inert+6,0.);
  if(time)*time=0;
  if(epoch)*epoch=0;
  if(!p||!s||!t||!ledger||!time||!epoch||
-    p->moving||(extended_output&&!inert)||(!extended_output&&p->extended))return BAD;
+    p->moving||(p->numeric&&!numerical)||(extended_output&&!inert)||(!extended_output&&p->extended))return BAD;
  std::copy(p->s.begin(),p->s.end(),s);std::copy(p->t.begin(),p->t.end(),t);
  if(inert)std::copy(p->inert.begin(),p->inert.end(),inert);
+ if(numerical)std::copy(p->numerical.begin(),p->numerical.end(),numerical);
  *ledger=p->cumulative;*time=p->time;*epoch=p->epoch;return OK;
 }
 }
@@ -221,9 +224,10 @@ extern "C" int fusion_c_source_state_snapshot_inert(const fusion_source_state_v1
  double* s,double* t,fusion_source_ledger_v1* ledger,double* inert,double* time,uint64_t* epoch){
  return snapshot(p,s,t,ledger,inert,time,epoch,true);
 }
-extern "C" int fusion_c_source_state_snapshot_volume(const fusion_source_state_v1* p,
+static int snapshot_volume(const fusion_source_state_v1* p,
  double* s,double* t,fusion_source_ledger_v1* ledger,double* inert,
- fusion_transport_ledger_v1* movement,double* reference,double* volume,double* time,uint64_t* epoch){
+ fusion_transport_ledger_v1* movement,double* reference,double* volume,double* time,uint64_t* epoch,double* numerical=nullptr){
+ if(numerical)std::fill(numerical,numerical+6,0.);
  if(ledger)*ledger={};
  if(movement)*movement={};
  if(inert)std::fill(inert,inert+6,0.);
@@ -232,9 +236,11 @@ extern "C" int fusion_c_source_state_snapshot_volume(const fusion_source_state_v
  if(time)*time=0;
  if(epoch)*epoch=0;
  if(p){if(s)std::fill(s,s+p->s.size(),0.);if(t)std::fill(t,t+p->t.size(),0.);}
- if(!p||!p->moving||!s||!t||!ledger||!inert||!movement||!reference||!volume||!time||!epoch)return BAD;
+ if(!p||!p->moving||(p->numeric&&!numerical)||!s||!t||!ledger||!inert||!movement||!reference||!volume||!time||!epoch)return BAD;
  std::copy(p->s.begin(),p->s.end(),s);std::copy(p->t.begin(),p->t.end(),t);
- std::copy(p->inert.begin(),p->inert.end(),inert);*ledger=p->cumulative;*movement=p->transport;
+ std::copy(p->inert.begin(),p->inert.end(),inert);
+ if(numerical)std::copy(p->numerical.begin(),p->numerical.end(),numerical);
+ *ledger=p->cumulative;*movement=p->transport;
  *reference=p->reference_volume;*volume=p->volume;*time=p->time;*epoch=p->epoch;return OK;
 }
 extern "C" int fusion_c_source_state_begin(fusion_source_state_v1* p,double dt,uint64_t* ticket){
@@ -250,17 +256,24 @@ extern "C" int fusion_c_source_state_begin(fusion_source_state_v1* p,double dt,u
 namespace {
 int stage(fusion_source_state_v1* p,uint64_t ticket,
  const double* s,const double* t,const fusion_source_ledger_v1* step,
- const double* inert,bool extended_step,double trial_volume=1,const fusion_transport_ledger_v1* movement=nullptr){
+ const double* inert,bool extended_step,double trial_volume=1,const fusion_transport_ledger_v1* movement=nullptr,const double* numerical=nullptr,bool numeric_step=false){
  if(!p||!p->pending||ticket!=p->counter)return BAD;
  p->staged=false;
  try{
-  if(p->moving!=(movement!=nullptr)||!step||!ledger_valid(*step)||(extended_step&&!inert))return BAD;
+  if((numeric_step&&!numerical)||(p->numeric&&!numeric_step)||p->moving!=(movement!=nullptr)||!step||!ledger_valid(*step)||(extended_step&&!inert))return BAD;
   fusion_transport_ledger_v1 cumulative_transport{};
   if(movement){
    if(!std::isfinite(trial_volume)||trial_volume<=0||!transport_valid(*movement,p->edges)||
       !add_transport(p->transport,*movement,cumulative_transport)||!transport_valid(cumulative_transport,p->edges))return BAD;
   }
-  std::array<double,6> step_inert{},cumulative_inert{};
+  std::array<double,6> step_inert{},cumulative_inert{},step_numerical{},cumulative_numerical{};
+  for(int i=0;i<6;++i){
+   if(numerical)step_numerical[i]=numerical[i];
+   if(!std::isfinite(step_numerical[i]))return BAD;
+   const long double x=static_cast<long double>(p->numerical[i])+step_numerical[i];
+   if(!representable(x)||(x!=0&&static_cast<double>(x)==0))return NUM;
+   cumulative_numerical[i]=static_cast<double>(x);
+  }
   for(int i=0;i<6;++i){
    if(inert)step_inert[i]=inert[i];
    if(!std::isfinite(step_inert[i]))return BAD;
@@ -272,15 +285,16 @@ int stage(fusion_source_state_v1* p,uint64_t ticket,
   if(!inventory(p->edges,s,t,n,u)||!inventory(p->edges,p->s.data(),p->t.data(),old_n,old_u))return BAD;
   if(p->moving&&(!rescale_inventory(old_n,old_u,p->volume,p->reference_volume)||
      !rescale_inventory(n,u,trial_volume,p->reference_volume)))return NUM;
-  if(!inventory_balance(old_n,old_u,n,u,*step,step_inert,movement,p->reference_volume))return NUM;
+  if(!inventory_balance(old_n,old_u,n,u,*step,step_inert,movement,p->reference_volume,step_numerical.data()))return NUM;
   fusion_source_ledger_v1 cumulative{};
   if(!add_ledger(p->cumulative,*step,cumulative)||
      !inventory_balance(p->initial_n,p->initial_u,n,u,cumulative,cumulative_inert,
-       movement?&cumulative_transport:nullptr,p->reference_volume))return NUM;
+       movement?&cumulative_transport:nullptr,p->reference_volume,cumulative_numerical.data()))return NUM;
   // Allocations complete before the valid-stage flag changes.
   std::vector<double> ts(s,s+p->s.size()),tt(t,t+p->t.size());
   p->trial_s.swap(ts);p->trial_t.swap(tt);p->staged_cumulative=cumulative;
   p->staged_inert=cumulative_inert;p->staged_extended=p->extended||extended_step;
+  p->staged_numerical=cumulative_numerical;p->staged_numeric=p->numeric||numeric_step;
   p->staged_transport=cumulative_transport;p->staged_volume=trial_volume;
   p->staged=true;return OK;
  }catch(...){return EXC;}
@@ -294,26 +308,34 @@ extern "C" int fusion_c_source_state_stage_inert(fusion_source_state_v1* p,uint6
  const double* s,const double* t,const fusion_source_ledger_v1* step,const double* inert){
  return stage(p,ticket,s,t,step,inert,true);
 }
-extern "C" int fusion_c_source_state_stage_volume(fusion_source_state_v1* p,uint64_t ticket,
+static int stage_volume(fusion_source_state_v1* p,uint64_t ticket,
  const double* s,const double* t,double trial_volume,double source_volume,
- const fusion_source_ledger_v1* source,const double* inert,const fusion_transport_ledger_v1* movement){
+ const fusion_source_ledger_v1* source,const double* inert,const fusion_transport_ledger_v1* movement,
+ const double* numerical=nullptr,bool numeric_step=false){
  if(!p||!p->pending||ticket!=p->counter)return BAD;
  p->staged=false;
- if(!p->moving||!source||!inert||!movement||!std::isfinite(source_volume)||source_volume<=0)return BAD;
+ if((numeric_step&&!numerical)||(p->numeric&&!numeric_step)||!p->moving||!source||!inert||!movement||!std::isfinite(source_volume)||source_volume<=0)return BAD;
  if(!ledger_valid(*source))return BAD;
  for(int j=0;j<6;++j)if(!std::isfinite(inert[j]))return BAD;
- fusion_source_ledger_v1 scaled=*source;std::array<double,6> scaled_inert{};
+ fusion_source_ledger_v1 scaled=*source;std::array<double,6> scaled_inert{},scaled_numerical{};
  bool valid=true;const long double factor=static_cast<long double>(source_volume)/p->reference_volume;
  fields(scaled,[&](double& v){const long double x=v*factor;if(!representable(x)||(x!=0&&static_cast<double>(x)==0)){valid=false;v=0;}else v=static_cast<double>(x);});
  for(int j=0;j<6;++j){const long double x=inert[j]*factor;if(!representable(x)||(x!=0&&static_cast<double>(x)==0))valid=false;else scaled_inert[j]=static_cast<double>(x);}
+ if(numerical)for(int j=0;j<6;++j){
+  if(!std::isfinite(numerical[j]))return BAD;
+  const long double x=numerical[j]*factor;
+  if(!representable(x)||(x!=0&&static_cast<double>(x)==0))valid=false;else scaled_numerical[j]=static_cast<double>(x);
+ }
  if(!valid)return NUM;
- return stage(p,ticket,s,t,&scaled,scaled_inert.data(),true,trial_volume,movement);
+ return stage(p,ticket,s,t,&scaled,scaled_inert.data(),true,trial_volume,movement,
+   numeric_step?scaled_numerical.data():nullptr,numeric_step);
 }
 namespace {
 // Only swaps and trivially copyable fields: no allocation after validation.
 void publish(fusion_source_state_v1* p) noexcept {
  p->s.swap(p->trial_s);p->t.swap(p->trial_t);p->cumulative=p->staged_cumulative;
  p->inert=p->staged_inert;p->extended=p->staged_extended;
+ p->numerical=p->staged_numerical;p->numeric=p->staged_numeric;
  p->volume=p->staged_volume;p->transport=p->staged_transport;
  p->time=p->trial_time;++p->epoch;p->pending=false;p->staged=false;
 }
@@ -346,7 +368,7 @@ extern "C" int fusion_c_source_state_discard(fusion_source_state_v1* p,uint64_t 
 namespace {
 constexpr uint64_t magic=UINT64_C(0x3154535346554250); // PB UFSST1, opaque schema magic
 constexpr size_t fixed_words=8+12+ledger_count+1; // header8, anchors12, ledger, checksum
-size_t packed_size(size_t cells,bool extended=false,bool moving=false){return 8*(fixed_words+13*cells+1+(extended?6:0)+(moving?44:0));}
+size_t packed_size(size_t cells,bool extended=false,bool moving=false,bool numeric=false){return 8*(fixed_words+13*cells+1+(extended?6:0)+(moving?44:0)+(numeric?6:0));}
 uint64_t checksum(const unsigned char* p,size_t n){uint64_t h=UINT64_C(14695981039346656037);
  for(size_t i=0;i<n;++i){h^=p[i];h*=UINT64_C(1099511628211);}return h;}
 void write_u64(unsigned char*& p,uint64_t x){for(int i=0;i<8;++i){*p++=static_cast<unsigned char>(x&255);x>>=8;}}
@@ -358,23 +380,24 @@ static_assert(sizeof(double)==8&&std::numeric_limits<double>::is_iec559,"restart
 extern "C" int fusion_c_source_state_pack_size(const fusion_source_state_v1* p,size_t* required){
  if(!required)return PB11_STATUS_NULL_OUTPUT;
  *required=0;if(!p||p->pending)return BAD;
- *required=packed_size(p->edges.size()-1,p->extended,p->moving);return OK;
+ *required=packed_size(p->edges.size()-1,p->extended,p->moving,p->numeric);return OK;
 }
 extern "C" int fusion_c_source_state_pack(const fusion_source_state_v1* p,unsigned char* buffer,
  size_t capacity,size_t* written){
  if(!written)return PB11_STATUS_NULL_OUTPUT;
  *written=0;
  if(!p||p->pending||!buffer)return BAD;
- size_t size=packed_size(p->edges.size()-1,p->extended,p->moving);
+ size_t size=packed_size(p->edges.size()-1,p->extended,p->moving,p->numeric);
  if(capacity<size)return BAD;
  auto cursor=buffer;
- write_u64(cursor,magic);write_u64(cursor,p->moving?3:p->extended?2:1);write_u64(cursor,p->edges.size()-1);
+ write_u64(cursor,magic);write_u64(cursor,p->numeric?(p->moving?5:4):(p->moving?3:p->extended?2:1));write_u64(cursor,p->edges.size()-1);
  write_u64(cursor,p->tag);write_u64(cursor,p->epoch);write_u64(cursor,p->counter);
  write_double(cursor,p->time);write_double(cursor,p->initial_time);
  for(auto v:p->initial_n)write_double(cursor,static_cast<double>(v));
  for(auto v:p->initial_u)write_double(cursor,static_cast<double>(v));
  fields(p->cumulative,[&](double v){write_double(cursor,v);});
  if(p->extended)for(double v:p->inert)write_double(cursor,v);
+ if(p->numeric)for(double v:p->numerical)write_double(cursor,v);
  if(p->moving){write_double(cursor,p->reference_volume);write_double(cursor,p->volume);
   transport_fields(p->transport,[&](double v){write_double(cursor,v);});}
  for(auto v:p->edges)write_double(cursor,v);
@@ -391,12 +414,13 @@ extern "C" int fusion_c_source_state_unpack(const unsigned char* buffer,size_t l
   const unsigned char* cursor=buffer;
   if(read_u64(cursor)!=magic)return BAD;
   const uint64_t version=read_u64(cursor);
-  if(version!=1&&version!=2&&version!=3)return BAD;
+  if(version<1||version>5)return BAD;
+  const bool moving=version==3||version==5,numeric=version>=4;
   uint64_t cells=read_u64(cursor);
-  if(cells<1||cells>1000000||length!=packed_size(size_t(cells),version>=2,version==3))return BAD;
+  if(cells<1||cells>1000000||length!=packed_size(size_t(cells),version>=2,moving,numeric))return BAD;
   const unsigned char* end=buffer+length-8;
   if(read_u64(end)!=checksum(buffer,length-8))return BAD;
-  auto p=std::make_unique<fusion_source_state_v1>();p->extended=version>=2;p->moving=version==3;p->tag=read_u64(cursor);
+  auto p=std::make_unique<fusion_source_state_v1>();p->extended=version>=2;p->moving=moving;p->numeric=numeric;p->tag=read_u64(cursor);
   if(p->tag!=tag)return BAD;
  p->epoch=read_u64(cursor);p->counter=read_u64(cursor);
   p->time=read_double(cursor);p->initial_time=read_double(cursor);
@@ -412,6 +436,10 @@ extern "C" int fusion_c_source_state_unpack(const unsigned char* buffer,size_t l
    // have version 3 immediately on creation.
    if(p->epoch==0&&!p->moving)return BAD;
    for(double& v:p->inert){v=read_double(cursor);if(!std::isfinite(v))return BAD;}
+  }
+  if(p->numeric){
+   if(p->epoch==0)return BAD;
+   for(double& v:p->numerical){v=read_double(cursor);if(!std::isfinite(v))return BAD;}
   }
   if(p->moving){p->reference_volume=read_double(cursor);p->volume=read_double(cursor);
    if(!std::isfinite(p->reference_volume)||p->reference_volume<=0||!std::isfinite(p->volume)||p->volume<=0)return BAD;
@@ -437,7 +465,42 @@ extern "C" int fusion_c_source_state_unpack(const unsigned char* buffer,size_t l
   if(!inventory(p->edges,p->s.data(),p->t.data(),n,u))return BAD;
   if(p->moving&&(!transport_valid(p->transport,p->edges)||!rescale_inventory(n,u,p->volume,p->reference_volume)))return BAD;
   if(!inventory_balance(p->initial_n,p->initial_u,n,u,p->cumulative,p->inert,
-      p->moving?&p->transport:nullptr,p->reference_volume))return BAD;
+      p->moving?&p->transport:nullptr,p->reference_volume,p->numerical.data()))return BAD;
   *out=p.release();return OK;
  }catch(...){return EXC;}
+}
+
+extern "C" int fusion_c_source_state_stage_numerical(fusion_source_state_v1*p,uint64_t ticket,
+ const double*s,const double*t,const fusion_source_ledger_v1*ledger,const double*inert,const double*numerical){
+ return stage(p,ticket,s,t,ledger,inert,true,1,nullptr,numerical,true);
+}
+extern "C" int fusion_c_source_state_stage_volume(fusion_source_state_v1*p,uint64_t ticket,
+ const double*s,const double*t,double trial_volume,double source_volume,
+ const fusion_source_ledger_v1*ledger,const double*inert,const fusion_transport_ledger_v1*movement){
+ return stage_volume(p,ticket,s,t,trial_volume,source_volume,ledger,inert,movement);
+}
+extern "C" int fusion_c_source_state_stage_volume_numerical(fusion_source_state_v1*p,uint64_t ticket,
+ const double*s,const double*t,double trial_volume,double source_volume,
+ const fusion_source_ledger_v1*ledger,const double*inert,const fusion_transport_ledger_v1*movement,const double*numerical){
+ return stage_volume(p,ticket,s,t,trial_volume,source_volume,ledger,inert,movement,numerical,true);
+}
+extern "C" int fusion_c_source_state_snapshot_volume(const fusion_source_state_v1*p,
+ double*s,double*t,fusion_source_ledger_v1*ledger,double*inert,fusion_transport_ledger_v1*movement,
+ double*reference,double*volume,double*time,uint64_t*epoch){
+ return snapshot_volume(p,s,t,ledger,inert,movement,reference,volume,time,epoch);
+}
+extern "C" int fusion_c_source_state_snapshot_numerical(const fusion_source_state_v1*p,
+ double*s,double*t,fusion_source_ledger_v1*ledger,double*inert,double*numerical,double*time,uint64_t*epoch){
+ // A missing new output must not silently fall back to an older snapshot.
+ if(!numerical){snapshot(nullptr,s,t,ledger,inert,time,epoch,true);return BAD;}
+ return snapshot(p,s,t,ledger,inert,time,epoch,true,numerical);
+}
+extern "C" int fusion_c_source_state_snapshot_volume_numerical(const fusion_source_state_v1*p,
+ double*s,double*t,fusion_source_ledger_v1*ledger,double*inert,fusion_transport_ledger_v1*movement,
+ double*reference,double*volume,double*time,uint64_t*epoch,double*numerical){
+ if(!numerical){
+  if(p){if(s)std::fill(s,s+p->s.size(),0.);if(t)std::fill(t,t+p->t.size(),0.);}
+  snapshot_volume(nullptr,s,t,ledger,inert,movement,reference,volume,time,epoch);return BAD;
+ }
+ return snapshot_volume(p,s,t,ledger,inert,movement,reference,volume,time,epoch,numerical);
 }
