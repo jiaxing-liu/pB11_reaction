@@ -1,0 +1,7 @@
+[ 50%] Building Fortran object CMakeFiles/fortran_test.dir/main.f90.o
+[ 50%] Building C object CMakeFiles/c11.dir/main.c.o
+[ 75%] Linking CXX executable c11
+[100%] Linking Fortran executable fortran_test
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[100%] Built target c11
+[100%] Built target fortran_test

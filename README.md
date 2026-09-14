@@ -10,6 +10,7 @@ cross section and Maxwellian reactivity are described by:
 
 The public API uses `double` precision. Implemented modules include:
 
+- [Conservative thermal birth tables](docs/THERMAL_BIRTH_TABLE.md), with sampled direct-integral error gates and an explicit table-backed coupled trial.
 - [Local coupled thermal burn and evolving fast-particle feedback](docs/COUPLED_THERMAL.md), including separate inert-ion heat and trial/accept ownership requirements.
 - [Distribution-integrated thermal laboratory births](docs/THERMAL_BIRTH.md), with explicit common-temperature/isotropic closure, finite tails, pB remainder proxies and Fortran bindings.
 

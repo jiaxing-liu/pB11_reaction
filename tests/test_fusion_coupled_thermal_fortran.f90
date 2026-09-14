@@ -1,5 +1,6 @@
 program test_fusion_coupled_thermal_fortran
-  use, intrinsic :: iso_c_binding, only : c_double, c_int, c_size_t, c_sizeof
+  use, intrinsic :: iso_c_binding, only : c_double, c_int, c_null_ptr, c_ptr, &
+       c_size_t, c_sizeof
   use fusion_coupled_thermal_fortran
   use fusion_thermal_birth_fortran, only : &
        fusion_thermal_birth_options_v1, FUSION_ENDPOINT_S, FUSION_PB_LOW_TB
@@ -18,6 +19,9 @@ program test_fusion_coupled_thermal_fortran
   call verify_no_reaction_with_inert()
   call verify_no_inert_null_pointer()
   call verify_wrong_extents_clear_outputs()
+  call verify_table_wrong_extent_clear_outputs()
+  call verify_table_all_channels_closed_identity()
+  call verify_table_dt_null_rejected()
 
   if (failures /= 0) then
      write(*, '(I0, A)') failures, &
@@ -149,6 +153,12 @@ contains
     options%channels = 0_c_int
     options%handoff_enabled = 0_c_int
   end subroutine make_options
+
+  subroutine make_null_tables(tables)
+    type(c_ptr), intent(out) :: tables(:)
+
+    tables = c_null_ptr
+  end subroutine make_null_tables
 
   subroutine make_common_inputs(edges, thermal_number, charge_squared, &
        inert, logs, old_s, old_t, external_birth, escape, trial_thermal, &
@@ -383,5 +393,120 @@ contains
          coupled_is_zero(out), &
          'wrong fast-trial extent clears every actual output')
   end subroutine verify_wrong_extents_clear_outputs
+
+  subroutine verify_table_wrong_extent_clear_outputs()
+    real(c_double), target :: edges(cells + 1)
+    real(c_double), target :: thermal_number(6), charge_squared(6)
+    type(fusion_inert_ion_v1), target :: inert(1)
+    real(c_double), target :: logs(8,6)
+    real(c_double), target :: old_s(cells,6), old_t(cells,6)
+    real(c_double), target :: external_birth(cells,6), escape(cells,6)
+    real(c_double), target :: trial_thermal(6), trial_s(cells,6), trial_t(cells,6)
+    type(c_ptr), target :: tables(4)
+    type(fusion_coupled_thermal_options_v1), target :: options
+    type(fusion_coupled_thermal_v1), target :: out
+    real(c_double) :: electron_energy, ion_energy, electron_density
+    integer(c_int) :: status
+
+    call make_options(options)
+    call make_common_inputs(edges, thermal_number, charge_squared, inert, logs, &
+         old_s, old_t, external_birth, escape, trial_thermal, trial_s, trial_t, &
+         electron_energy, ion_energy, electron_density)
+    call make_null_tables(tables)
+    call fill_coupled(out, -11.0_c_double)
+
+    call fusion_coupled_thermal_table_trial(1.0e-6_c_double, options, tables, &
+         cells, edges, thermal_number, electron_energy, ion_energy, &
+         electron_density, charge_squared, 1_c_int, inert, logs, old_s, old_t, &
+         external_birth, escape, trial_thermal, trial_s, trial_t, out, status)
+
+    call check(status == PB11_STATUS_INVALID_ARGUMENT, &
+         'table trial rejects a handle array with the wrong extent')
+    call check(all(trial_thermal == 0.0_c_double) .and. &
+         all(trial_s == 0.0_c_double) .and. all(trial_t == 0.0_c_double) .and. &
+         coupled_is_zero(out), &
+         'wrong table extent clears all trial arrays and result fields')
+  end subroutine verify_table_wrong_extent_clear_outputs
+
+  subroutine verify_table_all_channels_closed_identity()
+    real(c_double), target :: edges(cells + 1)
+    real(c_double), target :: thermal_number(6), charge_squared(6)
+    type(fusion_inert_ion_v1), target :: inert(1)
+    real(c_double), target :: logs(8,6)
+    real(c_double), target :: old_s(cells,6), old_t(cells,6)
+    real(c_double), target :: external_birth(cells,6), escape(cells,6)
+    real(c_double), target :: trial_thermal(6), trial_s(cells,6), trial_t(cells,6)
+    type(c_ptr), target :: tables(5)
+    type(fusion_coupled_thermal_options_v1), target :: options
+    type(fusion_coupled_thermal_v1), target :: out
+    real(c_double) :: electron_energy, ion_energy, electron_density
+    integer(c_int) :: status
+
+    call make_options(options)
+    call make_common_inputs(edges, thermal_number, charge_squared, inert, logs, &
+         old_s, old_t, external_birth, escape, trial_thermal, trial_s, trial_t, &
+         electron_energy, ion_energy, electron_density)
+    call make_null_tables(tables)
+    call fill_coupled(out, -12.0_c_double)
+
+    call fusion_coupled_thermal_table_trial(1.0e-6_c_double, options, tables, &
+         cells, edges, thermal_number, electron_energy, ion_energy, &
+         electron_density, charge_squared, 1_c_int, inert, logs, old_s, old_t, &
+         external_birth, escape, trial_thermal, trial_s, trial_t, out, status)
+
+    call check(status == PB11_STATUS_OK, &
+         'all-disabled table trial with five null handles returns OK')
+    call check(all(trial_thermal == thermal_number) .and. &
+         all(trial_s == 0.0_c_double) .and. all(trial_t == 0.0_c_double), &
+         'all-disabled table trial preserves the thermal/kinetic identity state')
+    call check(near(out%electron_energy_J_m3, electron_energy) .and. &
+         near(out%ion_energy_J_m3, ion_energy) .and. &
+         coupled_is_zero_except_energy(out), &
+         'all-disabled table trial preserves both energies and empty ledgers')
+  end subroutine verify_table_all_channels_closed_identity
+
+  subroutine verify_table_dt_null_rejected()
+    real(c_double), target :: edges(cells + 1)
+    real(c_double), target :: thermal_number(6), charge_squared(6)
+    type(fusion_inert_ion_v1), target :: inert(1)
+    real(c_double), target :: logs(8,6)
+    real(c_double), target :: old_s(cells,6), old_t(cells,6)
+    real(c_double), target :: external_birth(cells,6), escape(cells,6)
+    real(c_double), target :: trial_thermal(6), trial_s(cells,6), trial_t(cells,6)
+    type(c_ptr), target :: tables(5)
+    type(fusion_coupled_thermal_options_v1), target :: options
+    type(fusion_coupled_thermal_v1), target :: out
+    real(c_double) :: electron_energy, ion_energy, electron_density
+    integer(c_int) :: status
+
+    call make_options(options)
+    call make_common_inputs(edges, thermal_number, charge_squared, inert, logs, &
+         old_s, old_t, external_birth, escape, trial_thermal, trial_s, trial_t, &
+         electron_energy, ion_energy, electron_density)
+    call make_null_tables(tables)
+    options%channels = 0_c_int
+    options%channels(4) = 1_c_int
+    thermal_number = 0.0_c_double
+    thermal_number(2) = 1.0e19_c_double
+    thermal_number(3) = 1.0e19_c_double
+    charge_squared = 0.0_c_double
+    charge_squared(2) = 1.0_c_double
+    charge_squared(3) = 1.0_c_double
+    ion_energy = 1.5_c_double * kT_j * &
+         (sum(thermal_number) + inert(1)%density_m3)
+    call fill_coupled(out, -13.0_c_double)
+
+    call fusion_coupled_thermal_table_trial(1.0e-6_c_double, options, tables, &
+         cells, edges, thermal_number, electron_energy, ion_energy, &
+         electron_density, charge_squared, 1_c_int, inert, logs, old_s, old_t, &
+         external_birth, escape, trial_thermal, trial_s, trial_t, out, status)
+
+    call check(status == PB11_STATUS_INVALID_ARGUMENT, &
+         'enabled DT channel with a null table is rejected without fallback')
+    call check(all(trial_thermal == 0.0_c_double) .and. &
+         all(trial_s == 0.0_c_double) .and. all(trial_t == 0.0_c_double) .and. &
+         coupled_is_zero(out), &
+         'missing enabled DT table clears every output')
+  end subroutine verify_table_dt_null_rejected
 
 end program test_fusion_coupled_thermal_fortran

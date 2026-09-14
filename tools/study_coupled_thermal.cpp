@@ -8,6 +8,8 @@
 #include <string>
 #include <stdexcept>
 #include <algorithm>
+#include <memory>
+#include <chrono>
 using R=long double;
 constexpr double keV=1.602176634e-16,MeV=1.602176634e-13;
 void require(bool p,const char*s){if(!p)throw std::runtime_error(s);}
@@ -37,11 +39,31 @@ int main(int argc,char**argv){try{
  const double first_keV=fuel=="pb"?1e-18:1e-10;
  for(int j=1;j<=low;++j)edges[j]=first_keV*keV*std::pow(100/first_keV,double(j-1)/(low-1));
  for(int j=low+1;j<=n;++j)edges[j]=(100.+24900.*(j-low)/(n-low))*keV;
+ const double table_tol=argc>7?std::stod(argv[7]):0;
+ require(std::isfinite(table_tol)&&table_tol>=0&&table_tol<=1,"table tolerance");
+ std::array<std::shared_ptr<fusion_birth_table_v1>,5> table_owner;
+ std::array<const fusion_birth_table_v1*,5> tables{};
+ if(table_tol>0){
+  require(argc>9,"table mode requires lower and upper keV arguments");
+  double lower=std::stod(argv[8])*keV,upper=std::stod(argv[9])*keV;
+  fusion_birth_table_control_v1 control{table_tol,table_tol,table_tol,table_tol,o.max_source_rate_error,o.max_source_debit_error,128,2048,16};
+  for(int ch=0;ch<5;++ch)if(o.channels[ch]){
+   auto source=o.birth;if(ch!=0)source.pb_low=0;
+   fusion_birth_table_v1*raw=nullptr;auto start=std::chrono::steady_clock::now();
+   int status=fusion_c_birth_table_create(ch,lower,upper,&source,&control,n,edges.data(),&raw);
+   if(status){std::fprintf(stderr,"table failed channel=%d status=%d\n",ch,status);return status;}
+   table_owner[ch]=std::shared_ptr<fusion_birth_table_v1>(raw,fusion_c_birth_table_destroy);tables[ch]=raw;
+   fusion_birth_table_info_v1 info{};require(fusion_c_birth_table_info(raw,&info)==0,"table info");
+   std::fprintf(stderr,"table channel=%d knots=%d direct_evaluations=%d build_seconds=%.9g max_sampled_rate=%.9g max_sampled_debit=%.9g max_sampled_number_L1=%.9g max_sampled_energy_L1=%.9g\n",ch,info.knots,info.direct_evaluations,std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count(),info.max_validated_rate_error,info.max_validated_debit_error,info.max_validated_number_L1,info.max_validated_energy_L1);
+  }
+ }
  R Q=0,neutronE=0,neutronN=0,maxResidual=0,inertHeat=0,heatE=0,heatI=0,removedU=0;
  std::array<R,5> events{};std::array<R,6> ash{};int projections=0;
  std::puts("step,time_s,Te_keV,Ti_keV,Ue_J_m3,Ui_J_m3,fast_energy_J_m3,neutron_energy_J_m3,Q_J_m3,energy_relative_residual,inert_heat_J_m3,events_pb,events_dd_tp,events_dd_he3n,events_dt,events_dhe3,thermal_H,thermal_D,thermal_T,thermal_He3,thermal_He4,thermal_B11,fast_He4,thermalized_He4,projections,electron_heat_J_m3,network_ion_heat_J_m3,removed_thermal_energy_J_m3");
  for(int step=1;step<=steps;++step){double Nnew[6]{};fusion_coupled_thermal_v1 result{};
-  int st=fusion_c_coupled_thermal_trial(duration/steps,&o,n,edges.data(),N,Ue,Ui,ne,Z2,1,&carbon,logs.data(),s.data(),t.data(),external.data(),escape.data(),Nnew,sn.data(),tn.data(),&result);
+  int st=table_tol>0?
+   fusion_c_coupled_thermal_table_trial(duration/steps,&o,tables.data(),n,edges.data(),N,Ue,Ui,ne,Z2,1,&carbon,logs.data(),s.data(),t.data(),external.data(),escape.data(),Nnew,sn.data(),tn.data(),&result):
+   fusion_c_coupled_thermal_trial(duration/steps,&o,n,edges.data(),N,Ue,Ui,ne,Z2,1,&carbon,logs.data(),s.data(),t.data(),external.data(),escape.data(),Nnew,sn.data(),tn.data(),&result);
   if(st){std::fprintf(stderr,"trial failed fuel=%s step=%d status=%d Ti=%.9gkeV Te=%.9gkeV\n",fuel.c_str(),step,st,Ui/(1.5*double(Nt))/keV,Ue/(1.5*ne)/keV);return st;}
   // Atomic acceptance in this standalone driver only, after successful trial.
   std::copy(Nnew,Nnew+6,N);Ue=result.electron_energy_J_m3;Ui=result.ion_energy_J_m3;s.swap(sn);t.swap(tn);

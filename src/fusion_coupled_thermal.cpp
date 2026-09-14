@@ -1,4 +1,5 @@
 #include "fusion_coupled_thermal.h"
+#include "fusion_birth_table_internal.h"
 #include "fusion_thermal_burn.h"
 #include "fusion_nuclear_data.h"
 #include "fusion_two_component.h"
@@ -45,7 +46,9 @@ int validate_options(const fusion_coupled_thermal_options_v1&o){
  return b.ground_state_q_J<=pb.q_J?PB11_STATUS_OK:PB11_STATUS_OUT_OF_RANGE;
 }
 }
-extern "C" int fusion_c_coupled_thermal_trial(double dt,const fusion_coupled_thermal_options_v1*op,
+namespace {
+int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
+ const fusion_birth_table_v1*const*tables,bool table_mode,
  int n,const double*edges,const double*thermal,double Ue,double Ui,double ne,const double*charge2,
  int ninert,const fusion_inert_ion_v1*inert,const double*logs,const double*old_s,const double*old_t,
  const double*external,const double*escape,double*new_thermal,double*new_s,double*new_t,fusion_coupled_thermal_v1*out){
@@ -53,7 +56,7 @@ extern "C" int fusion_c_coupled_thermal_trial(double dt,const fusion_coupled_the
  if(new_thermal)std::fill(new_thermal,new_thermal+6,0.);
  if(n>0&&n<=100000){if(new_s)std::fill(new_s,new_s+6*n,0.);if(new_t)std::fill(new_t,new_t+6*n,0.);}
  if(!out||!new_thermal||!new_s||!new_t)return PB11_STATUS_NULL_OUTPUT;
- if(!op||!edges||!thermal||!charge2||!logs||!old_s||!old_t||!external||!escape||n<1||n>100000||ninert<0||ninert>32||(ninert&&!inert))return BAD;
+ if(!op||!edges||!thermal||!charge2||!logs||!old_s||!old_t||!external||!escape||n<1||n>100000||ninert<0||ninert>32||(ninert&&!inert)||(table_mode&&!tables))return BAD;
  if(!finite_value(dt)||!finite_value(Ue)||!finite_value(Ui)||!finite_value(ne))return BAD;
  if(dt<=0||Ue<=0||Ui<=0||ne<=0)return PB11_STATUS_OUT_OF_RANGE;
  int st=validate_options(*op);if(st)return st;
@@ -70,7 +73,7 @@ extern "C" int fusion_c_coupled_thermal_trial(double dt,const fusion_coupled_the
   std::vector<R> centers(n);for(int j=0;j<n;++j)centers[j]=(R(edges[j])+edges[j+1])/2;
   std::array<R,6> oldN{},oldE{};for(int i=0;i<6;++i)for(int j=0;j<n;++j){R z=R(old_s[i*n+j])+old_t[i*n+j];oldN[i]+=z;oldE[i]+=z*centers[j];}
   std::array<fusion_nuclear_channel_v1,5> reactions{};
-  std::array<fusion_thermal_birth_v1,5> source{};
+  std::array<fusion_birth_coefficients_v1,5> source{};
   std::array<std::vector<double>,5> grids;
   double rates[5]{},mean_a[5]{},mean_b[5]{},oldUi[6]{},trialNi[6]{},trialUi[6]{};
   fusion_coupled_thermal_v1 result{};auto&l=result.ledger;
@@ -78,10 +81,24 @@ extern "C" int fusion_c_coupled_thermal_trial(double dt,const fusion_coupled_the
   for(int ch=0;ch<5;++ch){st=fusion_c_nuclear_channel(ch,&reactions[ch]);if(st)return st;
    if(!op->channels[ch]||thermal[reactions[ch].reactant_ids[0]]==0||thermal[reactions[ch].reactant_ids[1]]==0)continue;
    auto options=op->birth;if(ch!=0)options.pb_low=FUSION_PB_LOW_TB;
-   grids[ch].resize(7*n);st=fusion_c_thermal_birth_grid(ch,Ti,&options,n,edges,grids[ch].data(),&source[ch]);if(st)return st;
-   const auto&r=source[ch];result.max_source_rate_discrepancy=std::max(result.max_source_rate_discrepancy,std::abs(r.relative_rate_discrepancy));
-   result.max_source_debit_discrepancy=std::max(result.max_source_debit_discrepancy,r.relative_reactant_energy_discrepancy);
-   if(std::abs(r.relative_rate_discrepancy)>op->max_source_rate_error||r.relative_reactant_energy_discrepancy>op->max_source_debit_error)return NUM;
+   grids[ch].resize(7*n);
+   double rate_error=0,debit_error=0;
+   if(table_mode){
+    if(!fusion_detail::birth_table_matches(tables[ch],ch,options,n,edges))return BAD;
+    fusion_birth_table_info_v1 info{};st=fusion_c_birth_table_info(tables[ch],&info);if(st)return st;
+    rate_error=info.max_sampled_direct_rate_discrepancy;debit_error=info.max_sampled_direct_debit_discrepancy;
+    st=fusion_c_birth_table_evaluate(tables[ch],Ti,n,grids[ch].data(),&source[ch]);if(st)return st;
+   }else{
+    fusion_thermal_birth_v1 direct{};
+    st=fusion_c_thermal_birth_grid(ch,Ti,&options,n,edges,grids[ch].data(),&direct);if(st)return st;
+    rate_error=std::abs(direct.relative_rate_discrepancy);debit_error=direct.relative_reactant_energy_discrepancy;
+    auto&c=source[ch];c.reactivity_m3_s=direct.reactivity_m3_s;
+    for(int i=0;i<2;++i)c.reactant_energy_moment_J_m3_s[i]=direct.reactant_energy_moment_J_m3_s[i];
+    for(int i=0;i<7;++i){c.below_number_m3_s[i]=direct.below_number_m3_s[i];c.below_energy_J_m3_s[i]=direct.below_energy_J_m3_s[i];c.above_number_m3_s[i]=direct.above_number_m3_s[i];c.above_energy_J_m3_s[i]=direct.above_energy_J_m3_s[i];}
+   }
+   const auto&r=source[ch];result.max_source_rate_discrepancy=std::max(result.max_source_rate_discrepancy,rate_error);
+   result.max_source_debit_discrepancy=std::max(result.max_source_debit_discrepancy,debit_error);
+   if(rate_error>op->max_source_rate_error||debit_error>op->max_source_debit_error)return NUM;
    for(int i=0;i<6;++i)if(r.below_number_m3_s[i]>0||r.above_number_m3_s[i]>0)return PB11_STATUS_OUT_OF_RANGE;
    rates[ch]=r.reactivity_m3_s;
    if(rates[ch]>0){mean_a[ch]=r.reactant_energy_moment_J_m3_s[0]/rates[ch];mean_b[ch]=r.reactant_energy_moment_J_m3_s[1]/rates[ch];}
@@ -153,4 +170,18 @@ extern "C" int fusion_c_coupled_thermal_trial(double dt,const fusion_coupled_the
   bool valid=true;ledger_fields(l,[&](double x){if(!finite_value(x))valid=false;});if(!valid)return NUM;
   std::copy(trialNi,trialNi+6,new_thermal);std::copy(s.begin(),s.end(),new_s);std::copy(t.begin(),t.end(),new_t);*out=result;return PB11_STATUS_OK;
  }catch(...){return PB11_STATUS_EXCEPTION;}
+}
+
+}
+extern "C" int fusion_c_coupled_thermal_trial(double dt,const fusion_coupled_thermal_options_v1*op,
+ int n,const double*edges,const double*thermal,double Ue,double Ui,double ne,const double*charge2,
+ int ninert,const fusion_inert_ion_v1*inert,const double*logs,const double*old_s,const double*old_t,
+ const double*external,const double*escape,double*new_thermal,double*new_s,double*new_t,fusion_coupled_thermal_v1*out){
+ return coupled_trial(dt,op,nullptr,false,n,edges,thermal,Ue,Ui,ne,charge2,ninert,inert,logs,old_s,old_t,external,escape,new_thermal,new_s,new_t,out);
+}
+extern "C" int fusion_c_coupled_thermal_table_trial(double dt,const fusion_coupled_thermal_options_v1*op,
+ const fusion_birth_table_v1*const*tables,int n,const double*edges,const double*thermal,double Ue,double Ui,double ne,const double*charge2,
+ int ninert,const fusion_inert_ion_v1*inert,const double*logs,const double*old_s,const double*old_t,
+ const double*external,const double*escape,double*new_thermal,double*new_s,double*new_t,fusion_coupled_thermal_v1*out){
+ return coupled_trial(dt,op,tables,true,n,edges,thermal,Ue,Ui,ne,charge2,ninert,inert,logs,old_s,old_t,external,escape,new_thermal,new_s,new_t,out);
 }

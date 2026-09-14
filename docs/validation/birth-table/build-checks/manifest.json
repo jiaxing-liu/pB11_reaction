@@ -1,0 +1,126 @@
+{
+  "files": {
+    "consumer-build.log": {
+      "bytes": 335,
+      "sha256": "ae1fc5f1621c0f8d531f9168f79dd00e5261752b83a37a84ad06601bbe3f309c"
+    },
+    "consumer-config.log": {
+      "bytes": 867,
+      "sha256": "274d009713708cc5ebeb3b1dd4cf279b49930483f2d160247095358f19641968"
+    },
+    "consumer-test.log": {
+      "bytes": 120,
+      "sha256": "a6fa1d3ba6593b155bcda6d7f2e2dde1eaaa6515fbdb8e8e57734a079de8ebf8"
+    },
+    "first-build.log": {
+      "bytes": 899,
+      "sha256": "524be067c8d72ff956cbe19be8b8dd9cd7a5254312c6a95afd49a42ca2612769"
+    },
+    "first-configure.log": {
+      "bytes": 109,
+      "sha256": "983fa03efb3aa245909d688dd4388c7f58ce001478555191d823118e25764dbd"
+    },
+    "first-test.log": {
+      "bytes": 446,
+      "sha256": "c1444490398ea63b9663afc04d8b59d19ca47abf4d256013df7ebae4c011a925"
+    },
+    "gnu/LastTest.log": {
+      "bytes": 44477,
+      "sha256": "421b1758a2f820bf5e72b308f3da4d60c7309a8c6f03f854f8595bace9c766bc"
+    },
+    "gnu/build.log": {
+      "bytes": 8906,
+      "sha256": "f94a0bccde91a31d8094e20335a8b4dbf4839eabb4783cd4a5680a138b98621b"
+    },
+    "gnu/configure.log": {
+      "bytes": 114,
+      "sha256": "891c414c2864aab73bf5a94e30c863a29a649072ee7e47f2f3f1e904af0ed59c"
+    },
+    "gnu/test.log": {
+      "bytes": 7794,
+      "sha256": "40f905572ad5daf77887428a97fa81695d8fad8809b55efd86281f5d8839ba99"
+    },
+    "host-build.log": {
+      "bytes": 3639,
+      "sha256": "08908079f37dd036150be8a532432d23fd860285b6ea825adfbee8d805b7782a"
+    },
+    "ifx-r4/LastTest.log": {
+      "bytes": 43415,
+      "sha256": "fe51ad813321af9dcfa51f4626012d524cd43263433487fcf524edcf647b8ab8"
+    },
+    "ifx-r4/build.log": {
+      "bytes": 10830,
+      "sha256": "75954439c8e6052b2ef26fbffc5635dfa98a515f34094dbbf24cb9b72931f66b"
+    },
+    "ifx-r4/configure.log": {
+      "bytes": 105,
+      "sha256": "1b2ba05060cca01e29fa72bb0c6f8c7b1dfd4749cc6143ba9971f595b88f3dfd"
+    },
+    "ifx-r4/test.log": {
+      "bytes": 7785,
+      "sha256": "1865664073a73f345586e2e150bcc4414d501e3a62bdcfec9a24bcbf49bea8db"
+    },
+    "ifx-r8/LastTest.log": {
+      "bytes": 43415,
+      "sha256": "c1796a35ee049063a7365cbde4e1489d3c5814ab41e2245add130583cb706a2f"
+    },
+    "ifx-r8/build.log": {
+      "bytes": 10830,
+      "sha256": "479dca9a750ddd6a2e8a7c92e32c8ebd6188b230ab124c819ed5c4869336aec2"
+    },
+    "ifx-r8/configure.log": {
+      "bytes": 105,
+      "sha256": "5496e953d81bcb0537a58ca1e661b671920e70c266bc64392b283d296bcc2492"
+    },
+    "ifx-r8/test.log": {
+      "bytes": 7785,
+      "sha256": "f1d274c7cc96153a5f9e2178dfb60e6e43a1cf9eff53391d4807b42cbcfda25a"
+    },
+    "install.log": {
+      "bytes": 5937,
+      "sha256": "652838204addd9ee04082694ff1199c301a77b7608b21aae83913be325b9d53c"
+    },
+    "installed-consumer/CMakeLists.txt": {
+      "bytes": 552,
+      "sha256": "799e194ea571c24ada5fe782d1b0cd646d460ed14c1d12b35cd51c3db1e0494c"
+    },
+    "installed-consumer/main.c": {
+      "bytes": 1668,
+      "sha256": "6a9af290563ade6295f2c6abe86c654101d289dda43ea02ef79bbd75e57871c3"
+    },
+    "installed-consumer/main.f90": {
+      "bytes": 3266,
+      "sha256": "a8ab7fc2258a243d940ef8d88667b36cd7e353f081840abd1806fe6fa24d127b"
+    },
+    "no-fortran/LastTest.log": {
+      "bytes": 29050,
+      "sha256": "c1648b35f2ccbc6d6f49e9f3f73d90836877d92fa7dfe94e03956ef4dbb2223c"
+    },
+    "no-fortran/build.log": {
+      "bytes": 4141,
+      "sha256": "62d3399a7e1e90db21e386f895cc7e61130f9291f626f7e5ad7efb1aacd64dce"
+    },
+    "no-fortran/configure.log": {
+      "bytes": 109,
+      "sha256": "983fa03efb3aa245909d688dd4388c7f58ce001478555191d823118e25764dbd"
+    },
+    "no-fortran/test.log": {
+      "bytes": 4542,
+      "sha256": "b4165650c86260f36aa1df2fce0e7c18cbad0d47ac6389c94b01305958ba0f5d"
+    }
+  },
+  "source_sha256_after_build": {
+    "CMakeLists.txt": "d444a33dc92bddc3a4fa94c6badd0b44c24921663b80407e09ca8146004595ed",
+    "include/fusion_birth_table.h": "eb39f044ffb47076de834c8e73663f040082961ad99d743fa9feb34d6ef507f6",
+    "src/fusion_birth_table.cpp": "d05a9f4125bf7db707eeffe4745fa0945e6444ccdfbf0e1ab6235330b431d3c1",
+    "src/fusion_birth_table_internal.h": "52aecba83c5813d1e4ba5b5cefb0a694369fb7b383a01840184de906d141841c",
+    "src/fusion_coupled_thermal.cpp": "0a5cdd0d002d5066c077c705f0564e5a02b756dd7e6fb7b2fb46f4decbfc4efe",
+    "include/fusion_coupled_thermal.h": "58319669ee68e442869d2c1aceff898a3342df51615603d0d58779d7c6db7a1d",
+    "fortran/fusion_birth_table_fortran.f90": "da504c069f0bebf39264e2644b281e0d171f2015a8d6db2ad8da51a5cec4e956",
+    "fortran/fusion_coupled_thermal_fortran.f90": "f934a5107711a8dc2296348ca32033e8b68051e8a6af530fe2df89012f2e2d9c",
+    "tests/test_fusion_birth_table.cpp": "2eab9a246d73eadbd3d7814959dc736c72e79b9f2dd25b0ec0af2ed352922abd",
+    "tests/test_fusion_birth_table_fortran.f90": "4aaafd88ea2bb0504386d46b18f69aed87e431077a794d295c569b5976eee2c8",
+    "tests/test_fusion_coupled_table.cpp": "eebac4a28b0b9d0e136a3181aaa061db4c4ffbd30fd9d28967189cb7b531aea7",
+    "tests/test_fusion_coupled_thermal_fortran.f90": "edec549c123800796e3fe189c83082349ae66b290a6e5cb4b78a1cb2bd439d9d"
+  }
+}

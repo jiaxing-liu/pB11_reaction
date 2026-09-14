@@ -1,0 +1,5 @@
+table channel=1 knots=9 direct_evaluations=47 build_seconds=0.988464989 max_sampled_rate=0.000138932379 max_sampled_debit=0.000346307409 max_sampled_number_L1=0.000138932379 max_sampled_energy_L1=0.000147091329
+table channel=2 knots=9 direct_evaluations=47 build_seconds=0.96633025 max_sampled_rate=0.000151237346 max_sampled_debit=0.00036541195 max_sampled_number_L1=0.000151237346 max_sampled_energy_L1=0.000161570424
+table channel=3 knots=5 direct_evaluations=23 build_seconds=0.680679435 max_sampled_rate=7.14880864e-05 max_sampled_debit=0.000586859767 max_sampled_number_L1=0.000376196286 max_sampled_energy_L1=0.000401063999
+table channel=4 knots=11 direct_evaluations=59 build_seconds=1.74898156 max_sampled_rate=0.000638918086 max_sampled_debit=0.000995163706 max_sampled_number_L1=0.000639509664 max_sampled_energy_L1=0.000644408703
+fuel=dd steps=16 cells=800 duration=0.01 max_total_energy_relative_residual=1.94230065258e-16 projections=0 neutron_number=1.29999777297e+18

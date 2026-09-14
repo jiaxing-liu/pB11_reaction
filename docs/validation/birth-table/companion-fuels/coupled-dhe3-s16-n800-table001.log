@@ -1,0 +1,2 @@
+table channel=4 knots=11 direct_evaluations=59 build_seconds=1.7894008 max_sampled_rate=0.000638918086 max_sampled_debit=0.000995163706 max_sampled_number_L1=0.000639509664 max_sampled_energy_L1=0.000644408703
+fuel=dhe3 steps=16 cells=800 duration=0.01 max_total_energy_relative_residual=1.36293462536e-16 projections=0 neutron_number=0

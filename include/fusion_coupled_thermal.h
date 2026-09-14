@@ -1,6 +1,7 @@
 #ifndef FUSION_COUPLED_THERMAL_H
 #define FUSION_COUPLED_THERMAL_H
 #include "fusion_thermal_birth.h"
+#include "fusion_birth_table.h"
 #include "fusion_source_state.h"
 #ifdef __cplusplus
 extern "C" {
@@ -71,6 +72,25 @@ typedef struct fusion_coupled_thermal_v1 {
  */
 int fusion_c_coupled_thermal_trial(double dt_s,
  const fusion_coupled_thermal_options_v1 *options,int cells,const double *edges_J,
+ const double thermal_number_m3[6],double electron_energy_J_m3,double ion_energy_J_m3,
+ double electron_density_m3,const double thermal_charge_squared[6],
+ int inert_count,const fusion_inert_ion_v1 *inert,const double *coulomb_logs,
+ const double *old_s_m3,const double *old_t_m3,const double *external_birth_m3_s,
+ const double *escape_s_inv,double trial_thermal_number_m3[6],
+ double *trial_s_m3,double *trial_t_m3,fusion_coupled_thermal_v1 *out);
+/* Additive table-backed variant. tables[5] is required; every enabled channel
+ * with available thermal reactants needs a nonnull matching table. Unused
+ * entries may be null. Exact model options, channel and energy edges are
+ * checked; pB low policy is normalized to0 for non-pB as in the direct API.
+ * Out-of-table Ti rejects the whole trial; there is no hidden direct fallback.
+ * Source discrepancy outputs report maxima SAMPLED during table construction,
+ * not a new direct reference at this temperature. Inspect each table's info
+ * for separate sampled interpolation gates; these are not nuclear error bounds.
+ * All other trial, clearing and ownership semantics are identical. Tables
+ * remain immutable; the same table may serve independent zones concurrently. */
+int fusion_c_coupled_thermal_table_trial(double dt_s,
+ const fusion_coupled_thermal_options_v1 *options,
+ const fusion_birth_table_v1 *const *tables,int cells,const double *edges_J,
  const double thermal_number_m3[6],double electron_energy_J_m3,double ion_energy_J_m3,
  double electron_density_m3,const double thermal_charge_squared[6],
  int inert_count,const fusion_inert_ion_v1 *inert,const double *coulomb_logs,

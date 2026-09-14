@@ -1,0 +1,26 @@
+{
+  "binary": "/tmp/study_coupled_thermal_table",
+  "binary_sha256": "3a8a703cd307d12a8ef128c15c469053d4bb85d1c0beb980f4a6e8b6f0b6a1e2",
+  "commands": [
+    "/tmp/study_coupled_thermal_table 16 800 dd 0.01 1 8",
+    "/tmp/study_coupled_thermal_table 16 800 dd 0.01 1 8 0.001 19.5 23",
+    "/tmp/study_coupled_thermal_table 16 800 dhe3 0.01 1 8",
+    "/tmp/study_coupled_thermal_table 16 800 dhe3 0.01 1 8 0.001 19.5 23"
+  ],
+  "files": {
+    "archive_and_compare.py": "95400e088b3d3558a84fde79574d8cec8c9f3050bc218582ce960478c600b973",
+    "coupled-dd-s16-n800-table-era-direct.csv": "8cedc9492a0b2d3b6a54da6ec03a747b494e0ccb975b2ae4c990b910ea9d61df",
+    "coupled-dd-s16-n800-table-era-direct.log": "1c665f26e6ecf5e3882e63085083689793a363b679e12d6b864ee631630e7fe1",
+    "coupled-dd-s16-n800-table001.csv": "85b59bd6ebf30ad31c829c9a75113792cec273cfca4bfbaa94e6fb51b4e540d0",
+    "coupled-dd-s16-n800-table001.log": "bac3fa331184112fbce93221d31d4d112dc252d98a91809d1a3793e4834e2de9",
+    "coupled-dd-s16-n800.csv": "268533f1999be738284ba9806af1f5d602c11a0b386ed23425541a1135d76654",
+    "coupled-dd-s16-n800.log": "1c665f26e6ecf5e3882e63085083689793a363b679e12d6b864ee631630e7fe1",
+    "coupled-dhe3-s16-n800-table-era-direct.csv": "be0c743da57112a0e49ee36703724827bd2d43906626d596410a572a9bc3f0ea",
+    "coupled-dhe3-s16-n800-table-era-direct.log": "45382706de3ed173f7eb68fe7c666d99434d259f520e97cb21d691fe6cf63a38",
+    "coupled-dhe3-s16-n800-table001.csv": "580f6c0e6125615f8b918ca684974aaefc22c6621169f72e597a10fb3a1f387e",
+    "coupled-dhe3-s16-n800-table001.log": "a29d62bb1566ae99cad054da63d30a1f5514324b9ffc507a14232ffec166dc4f",
+    "coupled-dhe3-s16-n800.csv": "35adc4ea6f28cdccffa8ffaf1c9c76c8aac753e813a61d2f75c56288073997f4",
+    "coupled-dhe3-s16-n800.log": "45382706de3ed173f7eb68fe7c666d99434d259f520e97cb21d691fe6cf63a38",
+    "summary.json": "1588fc19a97654f5410a1c74058d89f8d5243ecea21c40599bebd742d8c9c7c2"
+  }
+}

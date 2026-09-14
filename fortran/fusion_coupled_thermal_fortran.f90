@@ -73,6 +73,7 @@ module fusion_coupled_thermal_fortran
   end type fusion_coupled_thermal_v1
 
   public :: fusion_coupled_thermal_trial
+  public :: fusion_coupled_thermal_table_trial
 
   interface
      function c_fusion_c_coupled_thermal_trial(dt_s, options, cells, edges, &
@@ -104,6 +105,37 @@ module fusion_coupled_thermal_fortran
        type(c_ptr), value :: out
        integer(c_int) :: status
      end function c_fusion_c_coupled_thermal_trial
+
+     function c_fusion_c_coupled_thermal_table_trial(dt_s, options, tables, &
+          cells, edges, thermal_number, electron_energy, ion_energy, &
+          electron_density, thermal_charge_squared, inert_count, inert, &
+          coulomb_logs, old_s, old_t, external_birth, escape, &
+          trial_thermal_number, trial_s, trial_t, out) bind(C, &
+          name="fusion_c_coupled_thermal_table_trial") result(status)
+       import :: c_double, c_int, c_ptr
+       real(c_double), value :: dt_s
+       type(c_ptr), value :: options
+       type(c_ptr), value :: tables
+       integer(c_int), value :: cells
+       type(c_ptr), value :: edges
+       type(c_ptr), value :: thermal_number
+       real(c_double), value :: electron_energy
+       real(c_double), value :: ion_energy
+       real(c_double), value :: electron_density
+       type(c_ptr), value :: thermal_charge_squared
+       integer(c_int), value :: inert_count
+       type(c_ptr), value :: inert
+       type(c_ptr), value :: coulomb_logs
+       type(c_ptr), value :: old_s
+       type(c_ptr), value :: old_t
+       type(c_ptr), value :: external_birth
+       type(c_ptr), value :: escape
+       type(c_ptr), value :: trial_thermal_number
+       type(c_ptr), value :: trial_s
+       type(c_ptr), value :: trial_t
+       type(c_ptr), value :: out
+       integer(c_int) :: status
+     end function c_fusion_c_coupled_thermal_table_trial
   end interface
 
 contains
@@ -152,6 +184,137 @@ contains
          cells <= FUSION_COUPLED_THERMAL_MAX_CELLS
   end function valid_cells
 
+  subroutine clear_trial_outputs(trial_thermal_number_m3, trial_s_m3, &
+       trial_t_m3, out)
+    real(c_double), intent(out) :: trial_thermal_number_m3(:)
+    real(c_double), intent(out) :: trial_s_m3(:,:)
+    real(c_double), intent(out) :: trial_t_m3(:,:)
+    type(fusion_coupled_thermal_v1), intent(out) :: out
+
+    call clear_coupled(out)
+    trial_thermal_number_m3 = 0.0_c_double
+    trial_s_m3 = 0.0_c_double
+    trial_t_m3 = 0.0_c_double
+  end subroutine clear_trial_outputs
+
+  subroutine prepare_trial_arguments(options, cells, edges_J, &
+       thermal_number_m3, thermal_charge_squared, inert_count, inert, &
+       coulomb_logs, old_s_m3, old_t_m3, external_birth_m3_s, escape_s_inv, &
+       trial_thermal_number_m3, trial_s_m3, trial_t_m3, options_ptr, &
+       edges_ptr, thermal_number_ptr, thermal_charge_squared_ptr, inert_ptr, &
+       coulomb_logs_ptr, old_s_ptr, old_t_ptr, external_birth_ptr, &
+       escape_ptr, trial_thermal_number_ptr, trial_s_ptr, trial_t_ptr, &
+       tables_ptr, status, tables)
+    type(fusion_coupled_thermal_options_v1), intent(in), target :: options
+    integer(c_int), intent(in) :: cells
+    real(c_double), intent(in), target, contiguous :: edges_J(:)
+    real(c_double), intent(in), target, contiguous :: thermal_number_m3(:)
+    real(c_double), intent(in), target, contiguous :: &
+         thermal_charge_squared(:)
+    integer(c_int), intent(in) :: inert_count
+    type(fusion_inert_ion_v1), intent(in), target, contiguous :: inert(:)
+    real(c_double), intent(in), target, contiguous :: coulomb_logs(:,:)
+    real(c_double), intent(in), target, contiguous :: old_s_m3(:,:)
+    real(c_double), intent(in), target, contiguous :: old_t_m3(:,:)
+    real(c_double), intent(in), target, contiguous :: external_birth_m3_s(:,:)
+    real(c_double), intent(in), target, contiguous :: escape_s_inv(:,:)
+    real(c_double), intent(out), target, contiguous :: &
+         trial_thermal_number_m3(:)
+    real(c_double), intent(out), target, contiguous :: trial_s_m3(:,:)
+    real(c_double), intent(out), target, contiguous :: trial_t_m3(:,:)
+    type(c_ptr), intent(out) :: options_ptr, edges_ptr, thermal_number_ptr
+    type(c_ptr), intent(out) :: thermal_charge_squared_ptr, inert_ptr
+    type(c_ptr), intent(out) :: coulomb_logs_ptr, old_s_ptr, old_t_ptr
+    type(c_ptr), intent(out) :: external_birth_ptr, escape_ptr
+    type(c_ptr), intent(out) :: trial_thermal_number_ptr, trial_s_ptr
+    type(c_ptr), intent(out) :: trial_t_ptr, tables_ptr
+    integer(c_int), intent(out) :: status
+    type(c_ptr), intent(in), target, contiguous, optional :: tables(:)
+
+    integer(c_int) :: expected_baths
+    integer(c_size_t) :: expected_edges, expected_logs
+
+    options_ptr = c_null_ptr
+    edges_ptr = c_null_ptr
+    thermal_number_ptr = c_null_ptr
+    thermal_charge_squared_ptr = c_null_ptr
+    inert_ptr = c_null_ptr
+    coulomb_logs_ptr = c_null_ptr
+    old_s_ptr = c_null_ptr
+    old_t_ptr = c_null_ptr
+    external_birth_ptr = c_null_ptr
+    escape_ptr = c_null_ptr
+    trial_thermal_number_ptr = c_null_ptr
+    trial_s_ptr = c_null_ptr
+    trial_t_ptr = c_null_ptr
+    tables_ptr = c_null_ptr
+    status = PB11_STATUS_INVALID_ARGUMENT
+
+    ! Validate every extent, including the optional table handle array, before
+    ! taking any C_LOC.  A zero-size inert/table actual is safe on rejection.
+    if (.not. valid_cells(cells)) return
+    expected_edges = int(cells, c_size_t) + 1_c_size_t
+    if (size(edges_J, kind=c_size_t) /= expected_edges) return
+    if (size(thermal_number_m3, kind=c_size_t) /= &
+         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
+    if (size(thermal_charge_squared, kind=c_size_t) /= &
+         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
+    if (size(trial_thermal_number_m3, kind=c_size_t) /= &
+         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
+
+    if (inert_count < 0_c_int .or. &
+         inert_count > FUSION_COUPLED_THERMAL_MAX_INERT) return
+    if (size(inert, kind=c_size_t) /= int(inert_count, c_size_t)) return
+
+    expected_baths = FUSION_COUPLED_THERMAL_BASE_BATHS + inert_count
+    if (size(coulomb_logs, 1, kind=c_size_t) /= &
+         int(expected_baths, c_size_t)) return
+    if (size(coulomb_logs, 2, kind=c_size_t) /= &
+         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
+    expected_logs = int(expected_baths, c_size_t) * &
+         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)
+    if (size(coulomb_logs, kind=c_size_t) /= expected_logs) return
+
+    if (size(old_s_m3, 1, kind=c_size_t) /= int(cells, c_size_t)) return
+    if (size(old_s_m3, 2, kind=c_size_t) /= &
+         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
+    if (size(old_t_m3, 1, kind=c_size_t) /= int(cells, c_size_t)) return
+    if (size(old_t_m3, 2, kind=c_size_t) /= &
+         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
+    if (size(external_birth_m3_s, 1, kind=c_size_t) /= &
+         int(cells, c_size_t)) return
+    if (size(external_birth_m3_s, 2, kind=c_size_t) /= &
+         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
+    if (size(escape_s_inv, 1, kind=c_size_t) /= int(cells, c_size_t)) return
+    if (size(escape_s_inv, 2, kind=c_size_t) /= &
+         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
+    if (size(trial_s_m3, 1, kind=c_size_t) /= int(cells, c_size_t)) return
+    if (size(trial_s_m3, 2, kind=c_size_t) /= &
+         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
+    if (size(trial_t_m3, 1, kind=c_size_t) /= int(cells, c_size_t)) return
+    if (size(trial_t_m3, 2, kind=c_size_t) /= &
+         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
+    if (present(tables)) then
+       if (size(tables, kind=c_size_t) /= &
+            int(FUSION_COUPLED_THERMAL_CHANNELS, c_size_t)) return
+    end if
+
+    options_ptr = c_loc(options)
+    edges_ptr = c_loc(edges_J(1))
+    thermal_number_ptr = c_loc(thermal_number_m3(1))
+    thermal_charge_squared_ptr = c_loc(thermal_charge_squared(1))
+    coulomb_logs_ptr = c_loc(coulomb_logs(1,1))
+    old_s_ptr = c_loc(old_s_m3(1,1))
+    old_t_ptr = c_loc(old_t_m3(1,1))
+    external_birth_ptr = c_loc(external_birth_m3_s(1,1))
+    escape_ptr = c_loc(escape_s_inv(1,1))
+    trial_thermal_number_ptr = c_loc(trial_thermal_number_m3(1))
+    trial_s_ptr = c_loc(trial_s_m3(1,1))
+    trial_t_ptr = c_loc(trial_t_m3(1,1))
+    status = PB11_STATUS_OK
+    if (present(tables)) tables_ptr = c_loc(tables(1))
+  end subroutine prepare_trial_arguments
+
   subroutine fusion_coupled_thermal_trial(dt_s, options, cells, edges_J, &
        thermal_number_m3, electron_energy_J_m3, ion_energy_J_m3, &
        electron_density_m3, thermal_charge_squared, inert_count, inert, &
@@ -181,83 +344,22 @@ contains
     type(fusion_coupled_thermal_v1), intent(out), target :: out
     integer(c_int), intent(out) :: status
 
-    integer(c_int) :: expected_baths
-    integer(c_size_t) :: expected_edges, expected_logs
     type(c_ptr) :: options_ptr, edges_ptr, thermal_number_ptr
     type(c_ptr) :: thermal_charge_squared_ptr, inert_ptr, coulomb_logs_ptr
     type(c_ptr) :: old_s_ptr, old_t_ptr, external_birth_ptr, escape_ptr
     type(c_ptr) :: trial_thermal_number_ptr, trial_s_ptr, trial_t_ptr
-    type(c_ptr) :: out_ptr
+    type(c_ptr) :: out_ptr, tables_ptr
 
-    call clear_coupled(out)
-    trial_thermal_number_m3 = 0.0_c_double
-    trial_s_m3 = 0.0_c_double
-    trial_t_m3 = 0.0_c_double
-    status = PB11_STATUS_INVALID_ARGUMENT
-
-    ! Validate every extent before taking C_LOC.  In particular, malformed
-    ! zero-size actual arrays must return safely without referencing element 1.
-    if (.not. valid_cells(cells)) return
-    expected_edges = int(cells, c_size_t) + 1_c_size_t
-    if (size(edges_J, kind=c_size_t) /= expected_edges) return
-    if (size(thermal_number_m3, kind=c_size_t) /= &
-         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
-    if (size(thermal_charge_squared, kind=c_size_t) /= &
-         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
-    if (size(trial_thermal_number_m3, kind=c_size_t) /= &
-         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
-
-    if (inert_count < 0_c_int .or. &
-         inert_count > FUSION_COUPLED_THERMAL_MAX_INERT) return
-    if (size(inert, kind=c_size_t) /= int(inert_count, c_size_t)) return
-
-    expected_baths = FUSION_COUPLED_THERMAL_BASE_BATHS + inert_count
-    if (size(coulomb_logs, 1, kind=c_size_t) /= &
-         int(expected_baths, c_size_t)) return
-    if (size(coulomb_logs, 2, kind=c_size_t) /= &
-         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
-    expected_logs = int(expected_baths, c_size_t) * &
-         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)
-    ! Keep the product check explicit even though the two rank-2 checks above
-    ! already imply it; this guards future changes to either fixed dimension.
-    if (size(coulomb_logs, kind=c_size_t) /= expected_logs) return
-
-    if (size(old_s_m3, 1, kind=c_size_t) /= int(cells, c_size_t)) return
-    if (size(old_s_m3, 2, kind=c_size_t) /= &
-         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
-    if (size(old_t_m3, 1, kind=c_size_t) /= int(cells, c_size_t)) return
-    if (size(old_t_m3, 2, kind=c_size_t) /= &
-         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
-    if (size(external_birth_m3_s, 1, kind=c_size_t) /= &
-         int(cells, c_size_t)) return
-    if (size(external_birth_m3_s, 2, kind=c_size_t) /= &
-         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
-    if (size(escape_s_inv, 1, kind=c_size_t) /= int(cells, c_size_t)) return
-    if (size(escape_s_inv, 2, kind=c_size_t) /= &
-         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
-    if (size(trial_s_m3, 1, kind=c_size_t) /= int(cells, c_size_t)) return
-    if (size(trial_s_m3, 2, kind=c_size_t) /= &
-         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
-    if (size(trial_t_m3, 1, kind=c_size_t) /= int(cells, c_size_t)) return
-    if (size(trial_t_m3, 2, kind=c_size_t) /= &
-         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
-
-    options_ptr = c_loc(options)
-    edges_ptr = c_loc(edges_J(1))
-    thermal_number_ptr = c_loc(thermal_number_m3(1))
-    thermal_charge_squared_ptr = c_loc(thermal_charge_squared(1))
-    coulomb_logs_ptr = c_loc(coulomb_logs(1,1))
-    old_s_ptr = c_loc(old_s_m3(1,1))
-    old_t_ptr = c_loc(old_t_m3(1,1))
-    external_birth_ptr = c_loc(external_birth_m3_s(1,1))
-    escape_ptr = c_loc(escape_s_inv(1,1))
-    trial_thermal_number_ptr = c_loc(trial_thermal_number_m3(1))
-    trial_s_ptr = c_loc(trial_s_m3(1,1))
-    trial_t_ptr = c_loc(trial_t_m3(1,1))
+    call clear_trial_outputs(trial_thermal_number_m3, trial_s_m3, trial_t_m3, out)
+    call prepare_trial_arguments(options, cells, edges_J, thermal_number_m3, &
+         thermal_charge_squared, inert_count, inert, coulomb_logs, old_s_m3, &
+         old_t_m3, external_birth_m3_s, escape_s_inv, trial_thermal_number_m3, &
+         trial_s_m3, trial_t_m3, options_ptr, edges_ptr, thermal_number_ptr, &
+         thermal_charge_squared_ptr, inert_ptr, coulomb_logs_ptr, old_s_ptr, &
+         old_t_ptr, external_birth_ptr, escape_ptr, trial_thermal_number_ptr, &
+         trial_s_ptr, trial_t_ptr, tables_ptr, status)
+    if (status /= PB11_STATUS_OK) return
     out_ptr = c_loc(out)
-
-    ! C permits a null inert pointer exactly when inert_count is zero.  All
-    ! other arrays are mandatory and have positive validated extents here.
     inert_ptr = c_null_ptr
     if (inert_count > 0_c_int) inert_ptr = c_loc(inert(1))
 
@@ -268,11 +370,71 @@ contains
          external_birth_ptr, escape_ptr, trial_thermal_number_ptr, &
          trial_s_ptr, trial_t_ptr, out_ptr)
     if (status /= PB11_STATUS_OK) then
-       trial_thermal_number_m3 = 0.0_c_double
-       trial_s_m3 = 0.0_c_double
-       trial_t_m3 = 0.0_c_double
-       call clear_coupled(out)
+       call clear_trial_outputs(trial_thermal_number_m3, trial_s_m3, &
+            trial_t_m3, out)
     end if
   end subroutine fusion_coupled_thermal_trial
+
+  subroutine fusion_coupled_thermal_table_trial(dt_s, options, tables, cells, &
+       edges_J, thermal_number_m3, electron_energy_J_m3, ion_energy_J_m3, &
+       electron_density_m3, thermal_charge_squared, inert_count, inert, &
+       coulomb_logs, old_s_m3, old_t_m3, external_birth_m3_s, escape_s_inv, &
+       trial_thermal_number_m3, trial_s_m3, trial_t_m3, out, status)
+    real(c_double), intent(in) :: dt_s
+    type(fusion_coupled_thermal_options_v1), intent(in), target :: options
+    type(c_ptr), intent(in), target, contiguous :: tables(:)
+    integer(c_int), intent(in) :: cells
+    real(c_double), intent(in), target, contiguous :: edges_J(:)
+    real(c_double), intent(in), target, contiguous :: thermal_number_m3(:)
+    real(c_double), intent(in) :: electron_energy_J_m3
+    real(c_double), intent(in) :: ion_energy_J_m3
+    real(c_double), intent(in) :: electron_density_m3
+    real(c_double), intent(in), target, contiguous :: &
+         thermal_charge_squared(:)
+    integer(c_int), intent(in) :: inert_count
+    type(fusion_inert_ion_v1), intent(in), target, contiguous :: inert(:)
+    real(c_double), intent(in), target, contiguous :: coulomb_logs(:,:)
+    real(c_double), intent(in), target, contiguous :: old_s_m3(:,:)
+    real(c_double), intent(in), target, contiguous :: old_t_m3(:,:)
+    real(c_double), intent(in), target, contiguous :: external_birth_m3_s(:,:)
+    real(c_double), intent(in), target, contiguous :: escape_s_inv(:,:)
+    real(c_double), intent(out), target, contiguous :: &
+         trial_thermal_number_m3(:)
+    real(c_double), intent(out), target, contiguous :: trial_s_m3(:,:)
+    real(c_double), intent(out), target, contiguous :: trial_t_m3(:,:)
+    type(fusion_coupled_thermal_v1), intent(out), target :: out
+    integer(c_int), intent(out) :: status
+
+    type(c_ptr) :: options_ptr, tables_ptr, edges_ptr, thermal_number_ptr
+    type(c_ptr) :: thermal_charge_squared_ptr, inert_ptr, coulomb_logs_ptr
+    type(c_ptr) :: old_s_ptr, old_t_ptr, external_birth_ptr, escape_ptr
+    type(c_ptr) :: trial_thermal_number_ptr, trial_s_ptr, trial_t_ptr
+    type(c_ptr) :: out_ptr
+
+    call clear_trial_outputs(trial_thermal_number_m3, trial_s_m3, trial_t_m3, out)
+    call prepare_trial_arguments(options, cells, edges_J, thermal_number_m3, &
+         thermal_charge_squared, inert_count, inert, coulomb_logs, old_s_m3, &
+         old_t_m3, external_birth_m3_s, escape_s_inv, trial_thermal_number_m3, &
+         trial_s_m3, trial_t_m3, options_ptr, edges_ptr, thermal_number_ptr, &
+         thermal_charge_squared_ptr, inert_ptr, coulomb_logs_ptr, old_s_ptr, &
+         old_t_ptr, external_birth_ptr, escape_ptr, trial_thermal_number_ptr, &
+         trial_s_ptr, trial_t_ptr, tables_ptr, status, &
+         tables=tables)
+    if (status /= PB11_STATUS_OK) return
+    out_ptr = c_loc(out)
+    inert_ptr = c_null_ptr
+    if (inert_count > 0_c_int) inert_ptr = c_loc(inert(1))
+
+    status = c_fusion_c_coupled_thermal_table_trial(dt_s, options_ptr, &
+         tables_ptr, cells, edges_ptr, thermal_number_ptr, &
+         electron_energy_J_m3, ion_energy_J_m3, electron_density_m3, &
+         thermal_charge_squared_ptr, inert_count, inert_ptr, coulomb_logs_ptr, &
+         old_s_ptr, old_t_ptr, external_birth_ptr, escape_ptr, &
+         trial_thermal_number_ptr, trial_s_ptr, trial_t_ptr, out_ptr)
+    if (status /= PB11_STATUS_OK) then
+       call clear_trial_outputs(trial_thermal_number_m3, trial_s_m3, &
+            trial_t_m3, out)
+    end if
+  end subroutine fusion_coupled_thermal_table_trial
 
 end module fusion_coupled_thermal_fortran

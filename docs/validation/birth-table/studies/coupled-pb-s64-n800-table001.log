@@ -1,0 +1,2 @@
+table channel=0 knots=2 direct_evaluations=5 build_seconds=68.9098656 max_sampled_rate=0.000298038153 max_sampled_debit=0.000590289489 max_sampled_number_L1=0.000298051038 max_sampled_energy_L1=0.000309000132
+fuel=pb steps=64 cells=800 duration=0.001 max_total_energy_relative_residual=4.42657937896e-16 projections=0 neutron_number=0

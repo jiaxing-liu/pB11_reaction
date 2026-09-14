@@ -142,8 +142,9 @@ convergence and from single-step accounting tests.
 
 Full compiler/binding tests, independent invariant checks, installed consumers
 and immutable study outputs accompany the published milestone. Atomic host thermal/geometry
-state ownership, efficient verified source interpolation, remaining nuclear-source
-closures and host acceptance are still required for the original program.
+state ownership, remaining nuclear-source closures and host acceptance are still
+required for the original program. Verified common-T source interpolation is now
+provided by the additive variant described below, for explicit validated ranges.
 
 
 The archived pB1ms refinement (`validation/coupled-thermal/pb-refinement`)
@@ -161,3 +162,13 @@ correction; an archived DT32-step rerun compares all common numerical columns.
 Source hashes captured by the plotting script identify analysis-time source
 snapshots, not necessarily the earlier executable's build inputs. The pB
 refinement manifest preserves the launch-time binary/library hashes separately.
+
+
+## Explicit table-backed variant
+
+`fusion_c_coupled_thermal_table_trial` shares this physical operator with the
+original direct entry point, but obtains complete birth coefficients from
+immutable, validated tables. It checks channel, model options and exact grid;
+there is no silent extrapolation or fallback. See [THERMAL_BIRTH_TABLE.md](THERMAL_BIRTH_TABLE.md)
+for sampled error semantics, evolving direct/table comparisons and limitations.
+The original entry point still evaluates the direct quadrature each trial.

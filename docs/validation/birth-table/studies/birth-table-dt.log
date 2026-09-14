@@ -1,0 +1,2 @@
+channel=3 cells=400 range_keV=19.5:23 tolerance=0.001 knots=5 direct_evaluations=23 build_seconds=0.464790278 accepted_max_rate=7.14880864e-05 debit=0.000586859767 number_L1=0.000267297959 energy_L1=0.000272506896
+off-construction checks passed

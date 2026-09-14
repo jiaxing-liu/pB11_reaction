@@ -1,0 +1,486 @@
+{
+  "dd": {
+    "rows": 16,
+    "duration_s": 0.01,
+    "old_new_direct_common_columns_exact": true,
+    "max_table_energy_relative_residual": 1.94230065258e-16,
+    "fields": {
+      "Te_keV": {
+        "direct_final": 5.3421590222,
+        "table_final": 5.34219497719,
+        "final_difference": 3.5954990000419684e-05,
+        "final_relative_percent": 0.0006730423008937828,
+        "max_history_absolute_difference": 3.5954990000419684e-05,
+        "max_history_relative_percent_nonzero_reference": 0.0006730423008937828,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "Ti_keV": {
+        "direct_final": 20.0119114233,
+        "table_final": 20.0119103136,
+        "final_difference": -1.1096999976700772e-06,
+        "final_relative_percent": -5.545197428657646e-06,
+        "max_history_absolute_difference": 1.1096999976700772e-06,
+        "max_history_relative_percent_nonzero_reference": 5.545197428657646e-06,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "Ue_J_m3": {
+        "direct_final": 12838623.540716,
+        "table_final": 12838709.950094,
+        "final_difference": 86.40937799960375,
+        "final_relative_percent": 0.0006730423843768595,
+        "max_history_absolute_difference": 86.40937799960375,
+        "max_history_relative_percent_nonzero_reference": 0.0006730423843768595,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "Ui_J_m3": {
+        "direct_final": 47829335.400819,
+        "table_final": 47829330.204606,
+        "final_difference": -5.196213006973267,
+        "final_relative_percent": -1.0864071104956832e-05,
+        "max_history_absolute_difference": 5.196213006973267,
+        "max_history_relative_percent_nonzero_reference": 1.0864071104956832e-05,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "fast_energy_J_m3": {
+        "direct_final": 112433.70666634,
+        "table_final": 112446.74299723,
+        "final_difference": 13.036330889997771,
+        "final_relative_percent": 0.011594682125605436,
+        "max_history_absolute_difference": 13.036330889997771,
+        "max_history_relative_percent_nonzero_reference": 0.011594682125605434,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "neutron_energy_J_m3": {
+        "direct_final": 522020.43367133,
+        "table_final": 522079.59321282,
+        "final_difference": 59.15954149002209,
+        "final_relative_percent": 0.011332801874048788,
+        "max_history_absolute_difference": 59.15954149002209,
+        "max_history_relative_percent_nonzero_reference": 0.011332801874048788,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "Q_J_m3": {
+        "direct_final": 1461115.8019733,
+        "table_final": 1461269.2110099,
+        "final_difference": 153.40903660003096,
+        "final_relative_percent": 0.010499444081902709,
+        "max_history_absolute_difference": 153.40903660003096,
+        "max_history_relative_percent_nonzero_reference": 0.010499444081902709,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "energy_relative_residual": {
+        "direct_final": -1.25299105168e-16,
+        "table_final": -7.90489164691e-17,
+        "final_difference": 4.625018869890001e-17,
+        "final_relative_percent": -36.91182681383729,
+        "max_history_absolute_difference": 2.0117442616645e-16,
+        "max_history_relative_percent_nonzero_reference": 2896.946584698068,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "inert_heat_J_m3": {
+        "direct_final": 59.8958349077,
+        "table_final": 59.906812403764,
+        "final_difference": 0.010977496064001002,
+        "final_relative_percent": 0.018327645120762435,
+        "max_history_absolute_difference": 0.014330790439998964,
+        "max_history_relative_percent_nonzero_reference": 0.018327645120762435,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "events_pb": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "events_dd_tp": {
+        "direct_final": 1.2077692649215e+18,
+        "table_final": 1.2078909640981e+18,
+        "final_difference": 121699176600064.0,
+        "final_relative_percent": 0.01007635979277664,
+        "max_history_absolute_difference": 121699176600064.0,
+        "max_history_relative_percent_nonzero_reference": 0.010076359792776641,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "events_dd_he3n": {
+        "direct_final": 1.299854991551e+18,
+        "table_final": 1.2999977729652e+18,
+        "final_difference": 142781414199808.0,
+        "final_relative_percent": 0.01098441096336752,
+        "max_history_absolute_difference": 142781414199808.0,
+        "max_history_relative_percent_nonzero_reference": 0.01098441096336752,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "events_dt": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "events_dhe3": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "thermal_H": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "thermal_D": {
+        "direct_final": 9.9349847514871e+21,
+        "table_final": 9.9349842225259e+21,
+        "final_difference": -528961201242112.0,
+        "final_relative_percent": -5.324227610545003e-06,
+        "max_history_absolute_difference": 528961201242112.0,
+        "max_history_relative_percent_nonzero_reference": 5.324227610545003e-06,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "thermal_T": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "thermal_He3": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "thermal_He4": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "thermal_B11": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "fast_He4": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "thermalized_He4": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "projections": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "electron_heat_J_m3": {
+        "direct_final": 822298.78571619,
+        "table_final": 822385.19509366,
+        "final_difference": 86.40937747003045,
+        "final_relative_percent": 0.010508270104615474,
+        "max_history_absolute_difference": 86.40937747003045,
+        "max_history_relative_percent_nonzero_reference": 0.010508270104615474,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "network_ion_heat_J_m3": {
+        "direct_final": 43153.921824333,
+        "table_final": 43158.860550241,
+        "final_difference": 4.938725907995831,
+        "final_relative_percent": 0.01144444282051569,
+        "max_history_absolute_difference": 4.938725907995831,
+        "max_history_relative_percent_nonzero_reference": 0.01144444282051569,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "removed_thermal_energy_J_m3": {
+        "direct_final": 38850.941739809,
+        "table_final": 38861.087656491,
+        "final_difference": 10.145916681998642,
+        "final_relative_percent": 0.026114982617274702,
+        "max_history_absolute_difference": 10.145916681998642,
+        "max_history_relative_percent_nonzero_reference": 0.026114982617274705,
+        "zero_reference_nonzero_difference_count": 0
+      }
+    }
+  },
+  "dhe3": {
+    "rows": 16,
+    "duration_s": 0.01,
+    "old_new_direct_common_columns_exact": true,
+    "max_table_energy_relative_residual": 1.36293462536e-16,
+    "fields": {
+      "Te_keV": {
+        "direct_final": 5.40543751863,
+        "table_final": 5.40550291098,
+        "final_difference": 6.539234999980437e-05,
+        "final_relative_percent": 0.0012097512879286404,
+        "max_history_absolute_difference": 6.539234999980437e-05,
+        "max_history_relative_percent_nonzero_reference": 0.0012097512879286404,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "Ti_keV": {
+        "direct_final": 20.0086689851,
+        "table_final": 20.0086700635,
+        "final_difference": 1.0783999968566604e-06,
+        "final_relative_percent": 5.3896638385078e-06,
+        "max_history_absolute_difference": 1.0783999968566604e-06,
+        "max_history_relative_percent_nonzero_reference": 5.3896638385078e-06,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "Ue_J_m3": {
+        "direct_final": 12990698.533342,
+        "table_final": 12990855.688479,
+        "final_difference": 157.15513700060546,
+        "final_relative_percent": 0.0012097512431471656,
+        "max_history_absolute_difference": 157.15513700060546,
+        "max_history_relative_percent_nonzero_reference": 0.0012097512431471656,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "Ui_J_m3": {
+        "direct_final": 31909500.288104,
+        "table_final": 31909501.412822,
+        "final_difference": 1.1247179992496967,
+        "final_relative_percent": 3.5247120421656883e-06,
+        "max_history_absolute_difference": 1.1247179992496967,
+        "max_history_relative_percent_nonzero_reference": 3.5247120421656883e-06,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "fast_energy_J_m3": {
+        "direct_final": 135504.24014249,
+        "table_final": 135527.86856097,
+        "final_difference": 23.62841848001699,
+        "final_relative_percent": 0.017437401556711758,
+        "max_history_absolute_difference": 23.62841848001699,
+        "max_history_relative_percent_nonzero_reference": 0.017437401556711758,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "neutron_energy_J_m3": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "Q_J_m3": {
+        "direct_final": 1120041.5236486,
+        "table_final": 1120223.4319215,
+        "final_difference": 181.90827289992012,
+        "final_relative_percent": 0.016241207942661214,
+        "max_history_absolute_difference": 181.90827289992012,
+        "max_history_relative_percent_nonzero_reference": 0.016241207942661214,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "energy_relative_residual": {
+        "direct_final": 1.06707700572e-16,
+        "table_final": 6.60877745279e-17,
+        "final_difference": -4.06199260441e-17,
+        "final_relative_percent": -38.06653674135926,
+        "max_history_absolute_difference": 7.29516030386e-17,
+        "max_history_relative_percent_nonzero_reference": 146.63010665054983,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "inert_heat_J_m3": {
+        "direct_final": 70.876068745739,
+        "table_final": 70.889035138369,
+        "final_difference": 0.012966392629991219,
+        "final_relative_percent": 0.01829445800176487,
+        "max_history_absolute_difference": 0.012966392629991219,
+        "max_history_relative_percent_nonzero_reference": 0.01829445800176487,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "events_pb": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "events_dd_tp": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "events_dd_he3n": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "events_dt": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "events_dhe3": {
+        "direct_final": 3.8090385443364e+17,
+        "table_final": 3.8096571782071e+17,
+        "final_difference": 61863387070016.0,
+        "final_relative_percent": 0.01624120794524374,
+        "max_history_absolute_difference": 61863387070016.0,
+        "max_history_relative_percent_nonzero_reference": 0.01624120794524374,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "thermal_H": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "thermal_D": {
+        "direct_final": 3.3129524294789e+21,
+        "table_final": 3.3129523676155e+21,
+        "final_difference": -61863399784448.0,
+        "final_relative_percent": -1.8673192900079945e-06,
+        "max_history_absolute_difference": 61863399784448.0,
+        "max_history_relative_percent_nonzero_reference": 1.8673192900079947e-06,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "thermal_T": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "thermal_He3": {
+        "direct_final": 3.3129524294789e+21,
+        "table_final": 3.3129523676155e+21,
+        "final_difference": -61863399784448.0,
+        "final_relative_percent": -1.8673192900079945e-06,
+        "max_history_absolute_difference": 61863399784448.0,
+        "max_history_relative_percent_nonzero_reference": 1.8673192900079947e-06,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "thermal_He4": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "thermal_B11": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "fast_He4": {
+        "direct_final": 3.8090385443364e+17,
+        "table_final": 3.8096571782071e+17,
+        "final_difference": 61863387070016.0,
+        "final_relative_percent": 0.01624120794524374,
+        "max_history_absolute_difference": 61863387070016.0,
+        "max_history_relative_percent_nonzero_reference": 0.01624120794524374,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "thermalized_He4": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "projections": {
+        "direct_final": 0.0,
+        "table_final": 0.0,
+        "final_difference": 0.0,
+        "final_relative_percent": null,
+        "max_history_absolute_difference": 0.0,
+        "max_history_relative_percent_nonzero_reference": null,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "electron_heat_J_m3": {
+        "direct_final": 974373.77834201,
+        "table_final": 974530.93347859,
+        "final_difference": 157.1551365799969,
+        "final_relative_percent": 0.016128834752451096,
+        "max_history_absolute_difference": 157.1551365799969,
+        "max_history_relative_percent_nonzero_reference": 0.01621710309889277,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "network_ion_heat_J_m3": {
+        "direct_final": 18228.702703566,
+        "table_final": 18231.848581211,
+        "final_difference": 3.1458776450017467,
+        "final_relative_percent": 0.017257825179113447,
+        "max_history_absolute_difference": 3.1458776450017467,
+        "max_history_relative_percent_nonzero_reference": 0.017257825179113447,
+        "zero_reference_nonzero_difference_count": 0
+      },
+      "removed_thermal_energy_J_m3": {
+        "direct_final": 8136.0736082197,
+        "table_final": 8138.1077343708,
+        "final_difference": 2.0341261511002813,
+        "final_relative_percent": 0.02500132433715014,
+        "max_history_absolute_difference": 2.0341261511002813,
+        "max_history_relative_percent_nonzero_reference": 0.02500132433715014,
+        "zero_reference_nonzero_difference_count": 0
+      }
+    }
+  }
+}
