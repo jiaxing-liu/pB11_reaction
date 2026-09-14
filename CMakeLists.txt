@@ -432,6 +432,13 @@ if(BUILD_TESTING)
     add_executable(test_fusion_source_state tests/test_fusion_source_state.cpp)
     target_link_libraries(test_fusion_source_state PRIVATE pb11::pb11)
     add_test(NAME fusion_source_state_tests COMMAND test_fusion_source_state)
+    add_executable(test_fusion_source_state_inert tests/test_fusion_source_state_inert.cpp)
+    target_link_libraries(test_fusion_source_state_inert PRIVATE pb11::pb11)
+    add_test(NAME fusion_source_state_inert_tests COMMAND test_fusion_source_state_inert)
+    add_executable(test_fusion_coupled_restart tests/test_fusion_coupled_restart.cpp)
+    target_link_libraries(test_fusion_coupled_restart PRIVATE pb11::pb11)
+    add_test(NAME fusion_coupled_restart_tests COMMAND test_fusion_coupled_restart)
+
 
     add_executable(test_fusion_nuclear_data tests/test_fusion_nuclear_data.cpp)
     target_link_libraries(test_fusion_nuclear_data PRIVATE pb11::pb11)

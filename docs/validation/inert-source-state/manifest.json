@@ -1,0 +1,114 @@
+{
+  "consumer-build.log": {
+    "bytes": 178,
+    "sha256": "0d49a9240fae489de4095263e7b32400641acb2df71e3bccc127165206b50e71"
+  },
+  "consumer-config.log": {
+    "bytes": 125,
+    "sha256": "161bb66b276fa35b58c6ab45c30ecd35ec89b862748364d1e5b22c13ee96f3a5"
+  },
+  "consumer-first-config-failure.log": {
+    "bytes": 1206,
+    "sha256": "32ebeb1b48b0fd908664e05fb55ee1591d09bc75f67a143038d3450aced821df"
+  },
+  "consumer-first-link-failure.log": {
+    "bytes": 725,
+    "sha256": "49a420ecf72b4fab6f9f42308d3e7a81a791d4d41f4ff3165f0bab7568ad8702"
+  },
+  "consumer-test.log": {
+    "bytes": 97,
+    "sha256": "17b4ccd6c8aeac7f2732f355031832a6beacec796ab51847e65cc0b65bdd0ea3"
+  },
+  "gnu/LastTest.log": {
+    "bytes": 42505,
+    "sha256": "481fb1402159e2b0ee7262054984695bd1b3ed85c49cf5e25aff1739641238e0"
+  },
+  "gnu/build.log": {
+    "bytes": 8383,
+    "sha256": "820002e7e9a4d36c2427bf79a50fc0554254223a89927e8361b5b55219fdb692"
+  },
+  "gnu/configure.log": {
+    "bytes": 114,
+    "sha256": "891c414c2864aab73bf5a94e30c863a29a649072ee7e47f2f3f1e904af0ed59c"
+  },
+  "gnu/test.log": {
+    "bytes": 7395,
+    "sha256": "7d3904f4c9b37a525f6369bf7769cdee2b9be05e38b55f4cb5d97a1596274fc0"
+  },
+  "ifx-r4/LastTest.log": {
+    "bytes": 41497,
+    "sha256": "b64c0f581a99a714ce60a82cf13079b9ccdbc1e5d679d48f405c0fca3ba85b1a"
+  },
+  "ifx-r4/build.log": {
+    "bytes": 10233,
+    "sha256": "e1334b0d7828271373b383f677329f66de7f480ce20f3b165df1c9a01938676b"
+  },
+  "ifx-r4/configure.log": {
+    "bytes": 105,
+    "sha256": "1b2ba05060cca01e29fa72bb0c6f8c7b1dfd4749cc6143ba9971f595b88f3dfd"
+  },
+  "ifx-r4/test.log": {
+    "bytes": 7386,
+    "sha256": "b9ec8e6af2ee92ab3ea126ce5c9a29b6e143e114082765ea1bf9b7a6c50639cb"
+  },
+  "ifx-r8/LastTest.log": {
+    "bytes": 41497,
+    "sha256": "88a0a3a27cb0f8c239f027f36b39515ab88dfea0db31ffe60a638aa4e65e30d5"
+  },
+  "ifx-r8/build.log": {
+    "bytes": 10233,
+    "sha256": "d56962926f4fe9299c44687246194d180545ed9b7a681c5608a005f87f7a95e7"
+  },
+  "ifx-r8/configure.log": {
+    "bytes": 105,
+    "sha256": "5496e953d81bcb0537a58ca1e661b671920e70c266bc64392b283d296bcc2492"
+  },
+  "ifx-r8/test.log": {
+    "bytes": 7386,
+    "sha256": "77af87f6179dacca66e4337b09dbf16b397a7a4bf04a3c0665dcc4a5615aa47f"
+  },
+  "install.log": {
+    "bytes": 5686,
+    "sha256": "7ce39fe8ff62503a2b40892db89ab7a1f93e660ce797bd95d23ab1bab04d15dd"
+  },
+  "installed-consumer/CMakeLists.txt": {
+    "bytes": 516,
+    "sha256": "5204a274030430390b8fcaaf985a0cae1e228d46d108bacd35e5d01bc3da6943"
+  },
+  "installed-consumer/main.c": {
+    "bytes": 1285,
+    "sha256": "80d2e4f43c2f7d2ef173f60a0983a26aad623bf30ee9d30a46669908ac0b13cd"
+  },
+  "installed-consumer/main.f90": {
+    "bytes": 30841,
+    "sha256": "11f3e7457a11d538f773cb74ae1de27585162918b68281ad6159454cbf3e3a5f"
+  },
+  "no-fortran/LastTest.log": {
+    "bytes": 27792,
+    "sha256": "0624269a062996886e798b0fd9fbc9ba764a5ff3131f7882850e537f4a87da68"
+  },
+  "no-fortran/build.log": {
+    "bytes": 4464,
+    "sha256": "06f2aa198e103ead08b27941aed654948a413ac9bf780e563f67c599d727ecec"
+  },
+  "no-fortran/configure.log": {
+    "bytes": 109,
+    "sha256": "983fa03efb3aa245909d688dd4388c7f58ce001478555191d823118e25764dbd"
+  },
+  "no-fortran/test.log": {
+    "bytes": 4294,
+    "sha256": "24453177bd3fd3b4d5ae95b9e0b184904431212050d28cde8549052f68a1ab48"
+  },
+  "source_state_legacy_bytes.cpp": {
+    "bytes": 938,
+    "sha256": "13bc41ef8ab60adf11753e1370accbdae662c5f571042175dbefc5b4bf106602"
+  },
+  "source_state_v1_new.bin": {
+    "bytes": 1352,
+    "sha256": "0ecb57eb1da899b1c16bba4b5e990c09f317d1d253940c061eabe258d7e9498d"
+  },
+  "source_state_v1_old.bin": {
+    "bytes": 1352,
+    "sha256": "0ecb57eb1da899b1c16bba4b5e990c09f317d1d253940c061eabe258d7e9498d"
+  }
+}

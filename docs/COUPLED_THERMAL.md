@@ -64,10 +64,12 @@ Network bath heat retains the existing 6-by-7 layout (electron then ions0..5).
 For charge mixtures, the collision input is `<Z²>`, not `<Z>²`.
 
 The embedded source-state-v1 ledger alone does not include the extra inert-ion
-heat. It cannot be passed alone to the old stage validator when that heat is
-nonzero. An extended accepted/trial/restart owner must preserve the COMPLETE
-coupled result before host activation. This stateless operator does not claim
-that the existing source-state-v1 persistence already solves that requirement.
+heat. Pass it together with `inert_ion_heat_J_m3` to the additive source-state
+`stage_inert` interface. Its version2 restart preserves both accounts; use
+`snapshot_inert` to recover them. [SOURCE_STATE.md](SOURCE_STATE.md) defines
+promotion, compatibility and same-epoch thermal ownership. The host still
+must preserve its thermal and geometry state atomically with this context;
+stateless operator success does not implement BALDUR's acceptance path.
 
 The electron density is an explicit frozen trial input; only Ue is advanced
 here. The host owns charge balance, ionization, ambipolar boundary electron
@@ -139,8 +141,8 @@ pB timestep, grid and angular resolution studies remain distinct from DT
 convergence and from single-step accounting tests.
 
 Full compiler/binding tests, independent invariant checks, installed consumers
-and immutable study outputs accompany the published milestone. A complete
-state owner, efficient verified source interpolation, remaining nuclear-source
+and immutable study outputs accompany the published milestone. Atomic host thermal/geometry
+state ownership, efficient verified source interpolation, remaining nuclear-source
 closures and host acceptance are still required for the original program.
 
 

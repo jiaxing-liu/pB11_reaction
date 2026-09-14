@@ -62,10 +62,31 @@ int fusion_c_source_state_snapshot(const fusion_source_state_v1 *state,
 int fusion_c_source_state_begin(fusion_source_state_v1 *state,double dt_s,uint64_t *ticket);
 int fusion_c_source_state_stage(fusion_source_state_v1 *state,uint64_t ticket,
  const double *trial_s_m3,const double *trial_t_m3,const fusion_source_ledger_v1 *step);
+/* Extended accounting for collision heat delivered to non-network ion baths.
+ * Six signed finite amounts, one total over inert baths per FAST species.
+ * These must exclude the seven baths already represented by the base ledger.
+ * Both stage APIs preserve cumulative inert heat; the original stage assumes
+ * zero extra heat for this step. The extended stage requires a nonnull array.
+ * Calling stage_inert and then committing promotes the context to extended
+ * format, even if all six amounts are zero. Discard/rejected trials do not.
+ * Old snapshot rejects promoted contexts rather than silently omit accounts;
+ * snapshot_inert works for both formats and returns zero heat for legacy state.
+ * On snapshot failure, scalar/ledger/inert outputs are cleared when nonnull;
+ * kinetic arrays are untouched. Output arrays must not overlap any inputs.
+ */
+int fusion_c_source_state_stage_inert(fusion_source_state_v1 *state,uint64_t ticket,
+ const double *trial_s_m3,const double *trial_t_m3,
+ const fusion_source_ledger_v1 *step,const double *inert_heat_J_m3);
+int fusion_c_source_state_snapshot_inert(const fusion_source_state_v1 *state,
+ double *accepted_s_m3,double *accepted_t_m3,fusion_source_ledger_v1 *cumulative,
+ double *cumulative_inert_heat_J_m3,double *accepted_time_s,uint64_t *epoch);
 int fusion_c_source_state_commit(fusion_source_state_v1 *state,uint64_t ticket);
 int fusion_c_source_state_discard(fusion_source_state_v1 *state,uint64_t ticket);
 /* Portable versioned little-endian IEEE754 restart, with accidental-corruption
- * checksum. Pack rejects pending trials; no unaccepted result enters restart.
+ * checksum. Legacy contexts retain byte-compatible version 1; extended
+ * contexts write version 2 with six additional heat words after the ledger.
+ * Unpack reads both versions, old readers safely reject version 2.
+ * Pack rejects pending trials; no unaccepted result enters restart.
  * Unpack creates a NEW context, checks tag, dimensions, all ledgers and total
  * balances. Host must checkpoint its thermal/geometry state at same epoch/time.
  * bytes_written/required are zero on errors. No struct padding serialized.

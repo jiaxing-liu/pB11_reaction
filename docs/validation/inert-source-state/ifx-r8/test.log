@@ -1,0 +1,115 @@
+Test project /tmp/m3-ifx-r8
+      Start  1: pb11_unit_tests
+ 1/55 Test  #1: pb11_unit_tests ................................   Passed    0.00 sec
+      Start  2: pb11_c_abi_tests
+ 2/55 Test  #2: pb11_c_abi_tests ...............................   Passed    0.00 sec
+      Start  3: pb11_instant_source_tests
+ 3/55 Test  #3: pb11_instant_source_tests ......................   Passed    0.00 sec
+      Start  4: fusion_network_tests
+ 4/55 Test  #4: fusion_network_tests ...........................   Passed    0.00 sec
+      Start  5: fusion_rates_tests
+ 5/55 Test  #5: fusion_rates_tests .............................   Passed    0.00 sec
+      Start  6: fusion_cross_sections_tests
+ 6/55 Test  #6: fusion_cross_sections_tests ....................   Passed    0.00 sec
+      Start  7: fusion_closed_box_tests
+ 7/55 Test  #7: fusion_closed_box_tests ........................   Passed    0.00 sec
+      Start  8: fusion_kinetics_tests
+ 8/55 Test  #8: fusion_kinetics_tests ..........................   Passed    0.00 sec
+      Start  9: fusion_coulomb_tests
+ 9/55 Test  #9: fusion_coulomb_tests ...........................   Passed    0.00 sec
+      Start 10: fusion_slowing_tests
+10/55 Test #10: fusion_slowing_tests ...........................   Passed    1.60 sec
+      Start 11: fusion_rate_model_tests
+11/55 Test #11: fusion_rate_model_tests ........................   Passed    0.04 sec
+      Start 12: fusion_beam_tests
+12/55 Test #12: fusion_beam_tests ..............................   Passed    7.32 sec
+      Start 13: fusion_transfer_rate_tests
+13/55 Test #13: fusion_transfer_rate_tests .....................   Passed    0.01 sec
+      Start 14: fusion_two_component_tests
+14/55 Test #14: fusion_two_component_tests .....................   Passed    0.00 sec
+      Start 15: fusion_two_component_slowing_tests
+15/55 Test #15: fusion_two_component_slowing_tests .............   Passed    1.80 sec
+      Start 16: fusion_handoff_tests
+16/55 Test #16: fusion_handoff_tests ...........................   Passed    0.01 sec
+      Start 17: fusion_coupled_thermal_tests
+17/55 Test #17: fusion_coupled_thermal_tests ...................   Passed    0.03 sec
+      Start 18: fusion_thermal_birth_tests
+18/55 Test #18: fusion_thermal_birth_tests .....................   Passed    5.20 sec
+      Start 19: fusion_thermal_birth_width_tests
+19/55 Test #19: fusion_thermal_birth_width_tests ...............   Passed    1.18 sec
+      Start 20: fusion_reaction_event_tests
+20/55 Test #20: fusion_reaction_event_tests ....................   Passed    0.00 sec
+      Start 21: fusion_pb_population_tests
+21/55 Test #21: fusion_pb_population_tests .....................   Passed    0.41 sec
+      Start 22: fusion_pb_birth_tests
+22/55 Test #22: fusion_pb_birth_tests ..........................   Passed    0.02 sec
+      Start 23: fusion_fsci_tests
+23/55 Test #23: fusion_fsci_tests ..............................   Passed    0.07 sec
+      Start 24: fusion_source_state_tests
+24/55 Test #24: fusion_source_state_tests ......................   Passed    0.00 sec
+      Start 25: fusion_source_state_inert_tests
+25/55 Test #25: fusion_source_state_inert_tests ................   Passed    0.00 sec
+      Start 26: fusion_coupled_restart_tests
+26/55 Test #26: fusion_coupled_restart_tests ...................   Passed    0.31 sec
+      Start 27: fusion_nuclear_data_tests
+27/55 Test #27: fusion_nuclear_data_tests ......................   Passed    0.00 sec
+      Start 28: fusion_nuclear_birth_four_momentum_tests
+28/55 Test #28: fusion_nuclear_birth_four_momentum_tests .......   Passed    0.00 sec
+      Start 29: fusion_thermal_burn_tests
+29/55 Test #29: fusion_thermal_burn_tests ......................   Passed    0.00 sec
+      Start 30: fusion_target_burn_tests
+30/55 Test #30: fusion_target_burn_tests .......................   Passed    0.00 sec
+      Start 31: fusion_products_tests
+31/55 Test #31: fusion_products_tests ..........................   Passed    0.01 sec
+      Start 32: fusion_laboratory_tests
+32/55 Test #32: fusion_laboratory_tests ........................   Passed    0.00 sec
+      Start 33: fusion_spectrum_tests
+33/55 Test #33: fusion_spectrum_tests ..........................   Passed    0.00 sec
+      Start 34: fusion_alpha_grid_tests
+34/55 Test #34: fusion_alpha_grid_tests ........................   Passed    0.56 sec
+      Start 35: pb11_fortran_binding_tests
+35/55 Test #35: pb11_fortran_binding_tests .....................   Passed    0.00 sec
+      Start 36: fusion_fortran_binding_tests
+36/55 Test #36: fusion_fortran_binding_tests ...................   Passed    0.00 sec
+      Start 37: fusion_kinetics_fortran_binding_tests
+37/55 Test #37: fusion_kinetics_fortran_binding_tests ..........   Passed    0.00 sec
+      Start 38: fusion_rate_model_fortran_binding_tests
+38/55 Test #38: fusion_rate_model_fortran_binding_tests ........   Passed    0.00 sec
+      Start 39: fusion_beam_fortran_binding_tests
+39/55 Test #39: fusion_beam_fortran_binding_tests ..............   Passed    0.00 sec
+      Start 40: fusion_two_component_fortran_binding_tests
+40/55 Test #40: fusion_two_component_fortran_binding_tests .....   Passed    0.00 sec
+      Start 41: fusion_handoff_fortran_binding_tests
+41/55 Test #41: fusion_handoff_fortran_binding_tests ...........   Passed    0.00 sec
+      Start 42: fusion_coupled_thermal_fortran_binding_tests
+42/55 Test #42: fusion_coupled_thermal_fortran_binding_tests ...   Passed    0.00 sec
+      Start 43: fusion_thermal_birth_fortran_binding_tests
+43/55 Test #43: fusion_thermal_birth_fortran_binding_tests .....   Passed    0.18 sec
+      Start 44: fusion_reaction_event_fortran_binding_tests
+44/55 Test #44: fusion_reaction_event_fortran_binding_tests ....   Passed    0.00 sec
+      Start 45: fusion_pb_population_fortran_binding_tests
+45/55 Test #45: fusion_pb_population_fortran_binding_tests .....   Passed    0.02 sec
+      Start 46: fusion_pb_birth_fortran_binding_tests
+46/55 Test #46: fusion_pb_birth_fortran_binding_tests ..........   Passed    0.01 sec
+      Start 47: fusion_fsci_fortran_binding_tests
+47/55 Test #47: fusion_fsci_fortran_binding_tests ..............   Passed    0.01 sec
+      Start 48: fusion_source_state_fortran_binding_tests
+48/55 Test #48: fusion_source_state_fortran_binding_tests ......   Passed    0.00 sec
+      Start 49: fusion_nuclear_data_fortran_binding_tests
+49/55 Test #49: fusion_nuclear_data_fortran_binding_tests ......   Passed    0.00 sec
+      Start 50: fusion_thermal_burn_fortran_binding_tests
+50/55 Test #50: fusion_thermal_burn_fortran_binding_tests ......   Passed    0.00 sec
+      Start 51: fusion_target_burn_fortran_binding_tests
+51/55 Test #51: fusion_target_burn_fortran_binding_tests .......   Passed    0.00 sec
+      Start 52: fusion_products_fortran_binding_tests
+52/55 Test #52: fusion_products_fortran_binding_tests ..........   Passed    0.00 sec
+      Start 53: fusion_laboratory_fortran_binding_tests
+53/55 Test #53: fusion_laboratory_fortran_binding_tests ........   Passed    0.00 sec
+      Start 54: fusion_spectrum_fortran_binding_tests
+54/55 Test #54: fusion_spectrum_fortran_binding_tests ..........   Passed    0.00 sec
+      Start 55: fusion_alpha_grid_fortran_binding_tests
+55/55 Test #55: fusion_alpha_grid_fortran_binding_tests ........   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 55
+
+Total Test time (real) =  18.84 sec

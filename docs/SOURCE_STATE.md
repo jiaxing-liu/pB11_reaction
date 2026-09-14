@@ -131,3 +131,50 @@ default-integer-8 together. Installed C11 and Intel-r8 consumers link and run;
 BALDUR's existing Intel-r8 executable links successfully without new-mode
 activation. The installed example uses the exported `pb11Targets.cmake`;
 a `find_package` configuration wrapper remains later packaging work.
+
+
+## Inert-ion extension and restart schema 2
+
+The additive `stage_inert` and `snapshot_inert` interfaces preserve collision
+heat to non-network ion baths without changing `fusion_source_ledger_v1`.
+An extra six-element signed finite array contains the sum over all inert
+baths for EACH FAST species; it excludes the seven baths in the base ledger.
+Both step and cumulative kinetic-energy validation include these amounts.
+No extra ion density, collision closure or thermal advance is hidden in the
+state manager. Host common-ion energy must include the same heat once.
+
+The original stage interface means zero inert heat for that step, even when
+continuing an already extended state. It preserves earlier cumulative inert
+heat. The extended interface requires its array, including for all-zero heat.
+Only successfully committing an extended stage promotes an old context.
+Rejected/replaced/discarded trials do not promote the accepted state. Repeated
+stage calls replace, rather than add to, both base and extra heat accounts.
+Once promoted, old `snapshot` rejects rather than return incomplete accounts;
+`snapshot_inert` reads either format and yields zero extra heat for v1 state.
+The C extended snapshot clears scalar/ledger/extra-heat outputs on failure and
+leaves kinetic output arrays untouched. Fortran retains its stronger existing
+policy of clearing all outputs. Invalid Fortran extents invalidate earlier
+staging through the C null-stage path before forming any array addresses.
+
+Unpromoted contexts serialize exactly as schema1. Schema2 retains all existing
+header fields and inserts six binary64 inert-heat amounts after the121-double
+ledger, before grid edges. Its length is `8*(149+13*n)` bytes, exactly48 more
+than v1. The version field is2; the common checksum covers the entire payload.
+New unpack accepts both; old readers reject2. Schema2 with epoch0 is invalid,
+because only a commit can promote state. Nonfinite inert heat and coherent-
+checksum payloads that violate cumulative energy balance are rejected.
+
+The standalone real-DT/carbon regression composes8 coupled steps over1ms,
+with changing thermal temperatures. A split run packs the kinetic state and
+captures its host thermal tuple at epoch4, restores both at that epoch, and
+continues. Complete final thermal values and packed kinetic/ledger bytes equal
+the uninterrupted result exactly. At this numerical stress point the carbon
+receives about448.984J/m^3. Dropping its actual heat from the staged ledger
+rejects the candidate. This is a local ownership regression, not validation
+of BALDUR's separately owned common blocks or restart files.
+
+An old-library/new-library binary fixture with six nonzero fast species and
+signed-bath energy transfer confirms v1 byte compatibility. Independent tests
+cover signed extra heat, lifecycle replacement/discard, semantic corruption
+with a recomputed checksum, zero extra heat, and continued restart evolution.
+See `validation/inert-source-state` for commands and retained evidence.

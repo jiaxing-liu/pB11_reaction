@@ -1,0 +1,11 @@
+[ 25%] Building C object CMakeFiles/c11.dir/main.c.o
+[ 50%] Building Fortran object CMakeFiles/fortran_test.dir/main.f90.o
+[ 75%] Linking CXX executable c11
+[ 75%] Built target c11
+[100%] Linking CXX executable fortran_test
+/usr/bin/x86_64-linux-gnu-ld.bfd: CMakeFiles/fortran_test.dir/main.f90.o: relocation R_X86_64_32S against `.bss' can not be used when making a PIE object; recompile with -fPIE
+/usr/bin/x86_64-linux-gnu-ld.bfd: failed to set dynamic section sizes: bad value
+collect2: error: ld returned 1 exit status
+gmake[2]: *** [CMakeFiles/fortran_test.dir/build.make:102: fortran_test] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:122: CMakeFiles/fortran_test.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2

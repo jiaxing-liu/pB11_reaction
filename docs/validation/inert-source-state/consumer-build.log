@@ -1,0 +1,4 @@
+[ 75%] Linking Fortran executable fortran_test
+[ 75%] Built target c11
+ifx: warning #10182: disabling optimization; runtime debug checks enabled
+[100%] Built target fortran_test

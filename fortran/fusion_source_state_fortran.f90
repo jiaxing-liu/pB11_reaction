@@ -11,6 +11,9 @@ module fusion_source_state_fortran
   !! that count before checking array extents and before forming any C_LOC.
   !! Restart unpack likewise queries the newly-created context, so no caller
   !! supplied dimension is trusted for an opaque state.
+  !! The extended stage/snapshot pair carries one signed finite inert-bath
+  !! heat amount per fast species.  It is separate from the fixed seven-bath
+  !! ledger fields and is preserved by version-2 restart packets.
   use, intrinsic :: iso_c_binding, only : c_double, c_int, c_int8_t, &
        c_int64_t, c_size_t, c_ptr, c_null_ptr, c_loc, c_associated
   implicit none
@@ -55,8 +58,10 @@ module fusion_source_state_fortran
   public :: fusion_source_state_destroy
   public :: fusion_source_state_cells
   public :: fusion_source_state_snapshot
+  public :: fusion_source_state_snapshot_inert
   public :: fusion_source_state_begin
   public :: fusion_source_state_stage
+  public :: fusion_source_state_stage_inert
   public :: fusion_source_state_commit
   public :: fusion_source_state_discard
   public :: fusion_source_state_pack_size
@@ -124,6 +129,34 @@ module fusion_source_state_fortran
        type(c_ptr), value :: step
        integer(c_int) :: status
      end function c_fusion_source_state_stage
+
+     function c_fusion_source_state_stage_inert(state, ticket, trial_s, &
+          trial_t, step, inert_heat) bind(C, &
+          name="fusion_c_source_state_stage_inert") result(status)
+       import :: c_double, c_int, c_int64_t, c_ptr
+       type(c_ptr), value :: state
+       integer(c_int64_t), value :: ticket
+       type(c_ptr), value :: trial_s
+       type(c_ptr), value :: trial_t
+       type(c_ptr), value :: step
+       type(c_ptr), value :: inert_heat
+       integer(c_int) :: status
+     end function c_fusion_source_state_stage_inert
+
+     function c_fusion_source_state_snapshot_inert(state, accepted_s, &
+          accepted_t, cumulative, cumulative_inert_heat, accepted_time, &
+          epoch) bind(C, name="fusion_c_source_state_snapshot_inert") &
+          result(status)
+       import :: c_double, c_int, c_int64_t, c_ptr
+       type(c_ptr), value :: state
+       type(c_ptr), value :: accepted_s
+       type(c_ptr), value :: accepted_t
+       type(c_ptr), value :: cumulative
+       type(c_ptr), value :: cumulative_inert_heat
+       type(c_ptr), value :: accepted_time
+       type(c_ptr), value :: epoch
+       integer(c_int) :: status
+     end function c_fusion_source_state_snapshot_inert
 
      function c_fusion_source_state_commit(state, ticket) bind(C, &
           name="fusion_c_source_state_commit") result(status)
@@ -242,6 +275,18 @@ contains
          c_null_ptr, c_null_ptr)
   end subroutine invalidate_staged_candidate
 
+  subroutine invalidate_staged_candidate_inert(state, ticket)
+    type(c_ptr), intent(in) :: state
+    integer(c_int64_t), intent(in) :: ticket
+    integer(c_int) :: ignored_status
+
+    ! The extended C stage clears its staged flag before checking pointers.
+    ! Passing all null pointers invalidates an earlier candidate without ever
+    ! taking C_LOC of malformed Fortran arrays.
+    ignored_status = c_fusion_source_state_stage_inert(state, ticket, &
+         c_null_ptr, c_null_ptr, c_null_ptr, c_null_ptr)
+  end subroutine invalidate_staged_candidate_inert
+
   logical function state_arrays_match(cells, first_size, second_size)
     integer(c_int), intent(in) :: cells
     integer(c_size_t), intent(in) :: first_size, second_size
@@ -358,6 +403,60 @@ contains
     end if
   end subroutine fusion_source_state_snapshot
 
+  subroutine fusion_source_state_snapshot_inert(state, accepted_s_m3, &
+       accepted_t_m3, cumulative, cumulative_inert_heat_J_m3, &
+       accepted_time_s, epoch, status)
+    type(c_ptr), intent(in) :: state
+    real(c_double), intent(out), target, contiguous :: accepted_s_m3(:)
+    real(c_double), intent(out), target, contiguous :: accepted_t_m3(:)
+    type(fusion_source_ledger_v1), intent(out), target :: cumulative
+    real(c_double), intent(out), target, contiguous :: &
+         cumulative_inert_heat_J_m3(:)
+    real(c_double), intent(out), target :: accepted_time_s
+    integer(c_int64_t), intent(out), target :: epoch
+    integer(c_int), intent(out) :: status
+
+    integer(c_int) :: cells, query_status
+    integer(c_size_t) :: inert_count
+    type(c_ptr) :: state_ptr
+
+    ! Match the original Fortran snapshot policy: clear every output before
+    ! validation and again if the C call rejects the request.  This is stricter
+    ! than the C snapshot_inert contract, which leaves kinetic arrays alone on
+    ! failure, and gives Fortran callers deterministic output state.
+    accepted_s_m3 = 0.0_c_double
+    accepted_t_m3 = 0.0_c_double
+    call clear_ledger(cumulative)
+    cumulative_inert_heat_J_m3 = 0.0_c_double
+    accepted_time_s = 0.0_c_double
+    epoch = 0_c_int64_t
+    status = PB11_STATUS_INVALID_ARGUMENT
+
+    call query_cells(state, cells, query_status)
+    if (query_status /= PB11_STATUS_OK) then
+       status = query_status
+       return
+    end if
+    inert_count = int(FUSION_SOURCE_STATE_SPECIES, c_size_t)
+    if (.not. state_arrays_match(cells, size(accepted_s_m3, kind=c_size_t), &
+         size(accepted_t_m3, kind=c_size_t))) return
+    if (size(cumulative_inert_heat_J_m3, kind=c_size_t) /= inert_count) return
+
+    state_ptr = state
+    status = c_fusion_source_state_snapshot_inert(state_ptr, &
+         c_loc(accepted_s_m3(1)), c_loc(accepted_t_m3(1)), &
+         c_loc(cumulative), c_loc(cumulative_inert_heat_J_m3(1)), &
+         c_loc(accepted_time_s), c_loc(epoch))
+    if (status /= PB11_STATUS_OK) then
+       accepted_s_m3 = 0.0_c_double
+       accepted_t_m3 = 0.0_c_double
+       call clear_ledger(cumulative)
+       cumulative_inert_heat_J_m3 = 0.0_c_double
+       accepted_time_s = 0.0_c_double
+       epoch = 0_c_int64_t
+    end if
+  end subroutine fusion_source_state_snapshot_inert
+
   subroutine fusion_source_state_begin(state, dt_s, ticket, status)
     type(c_ptr), intent(in) :: state
     real(c_double), intent(in) :: dt_s
@@ -409,6 +508,48 @@ contains
     status = c_fusion_source_state_stage(state_ptr, ticket, &
          c_loc(trial_s_m3(1)), c_loc(trial_t_m3(1)), c_loc(step))
   end subroutine fusion_source_state_stage
+
+  subroutine fusion_source_state_stage_inert(state, ticket, trial_s_m3, &
+       trial_t_m3, step, inert_heat_J_m3, status)
+    type(c_ptr), intent(in) :: state
+    integer(c_int64_t), intent(in) :: ticket
+    real(c_double), intent(in), target, contiguous :: trial_s_m3(:)
+    real(c_double), intent(in), target, contiguous :: trial_t_m3(:)
+    type(fusion_source_ledger_v1), intent(in), target :: step
+    real(c_double), intent(in), target, contiguous :: inert_heat_J_m3(:)
+    integer(c_int), intent(out) :: status
+
+    integer(c_int) :: cells, query_status
+    integer(c_size_t) :: inert_count
+    type(c_ptr) :: state_ptr
+
+    status = PB11_STATUS_INVALID_ARGUMENT
+    if (.not. c_associated(state)) return
+
+    call query_cells(state, cells, query_status)
+    if (query_status /= PB11_STATUS_OK) then
+       call invalidate_staged_candidate_inert(state, ticket)
+       status = query_status
+       return
+    end if
+    if (.not. state_arrays_match(cells, size(trial_s_m3, kind=c_size_t), &
+         size(trial_t_m3, kind=c_size_t))) then
+       call invalidate_staged_candidate_inert(state, ticket)
+       status = PB11_STATUS_INVALID_ARGUMENT
+       return
+    end if
+    inert_count = int(FUSION_SOURCE_STATE_SPECIES, c_size_t)
+    if (size(inert_heat_J_m3, kind=c_size_t) /= inert_count) then
+       call invalidate_staged_candidate_inert(state, ticket)
+       status = PB11_STATUS_INVALID_ARGUMENT
+       return
+    end if
+
+    state_ptr = state
+    status = c_fusion_source_state_stage_inert(state_ptr, ticket, &
+         c_loc(trial_s_m3(1)), c_loc(trial_t_m3(1)), c_loc(step), &
+         c_loc(inert_heat_J_m3(1)))
+  end subroutine fusion_source_state_stage_inert
 
   subroutine fusion_source_state_commit(state, ticket, status)
     type(c_ptr), intent(in) :: state
