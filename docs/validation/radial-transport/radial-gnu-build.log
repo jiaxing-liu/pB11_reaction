@@ -1,0 +1,9 @@
+[ 93%] Built target pb11
+[100%] Built target test_fusion_radial_transport
+[ 87%] Built target pb11
+[ 93%] Building Fortran object CMakeFiles/fusion_radial_transport_fortran.dir/fortran/fusion_radial_transport_fortran.f90.o
+[ 93%] Linking CXX static library libfusion_radial_transport_fortran.a
+[ 93%] Built target fusion_radial_transport_fortran
+[100%] Building Fortran object CMakeFiles/test_fusion_radial_transport_fortran.dir/tests/test_fusion_radial_transport_fortran.f90.o
+[100%] Linking Fortran executable test_fusion_radial_transport_fortran
+[100%] Built target test_fusion_radial_transport_fortran

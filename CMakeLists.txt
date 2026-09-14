@@ -29,7 +29,7 @@ find_package(Boost 1.70 REQUIRED)
 
 add_library(pb11 src/pb11.cpp src/pb11_c.cpp src/pb11_source.cpp
                    src/fusion_network.cpp src/fusion_rates.cpp
-                   src/fusion_cross_sections.cpp src/fusion_kinetics.cpp
+                   src/fusion_cross_sections.cpp src/fusion_kinetics.cpp src/fusion_radial_transport.cpp
                    src/fusion_coulomb.cpp src/fusion_beam.cpp src/fusion_rate_model.cpp
                    src/fusion_products.cpp src/fusion_laboratory.cpp
                    src/fusion_nuclear_coulomb.cpp
@@ -113,6 +113,17 @@ if(PB11_FORTRAN_AVAILABLE)
             "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>"
     )
     target_link_libraries(fusion_kinetics_fortran PUBLIC pb11::pb11)
+
+    add_library(fusion_radial_transport_fortran STATIC
+                fortran/fusion_radial_transport_fortran.f90)
+    add_library(pb11::fusion_radial_transport_fortran ALIAS fusion_radial_transport_fortran)
+    set_target_properties(fusion_radial_transport_fortran PROPERTIES
+        Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fortran-mod"
+        EXPORT_NAME fusion_radial_transport_fortran)
+    target_include_directories(fusion_radial_transport_fortran INTERFACE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>")
+    target_link_libraries(fusion_radial_transport_fortran PUBLIC pb11::pb11)
 
     add_library(fusion_two_component_fortran STATIC
                 fortran/fusion_two_component_fortran.f90)
@@ -380,6 +391,9 @@ if(BUILD_TESTING)
     target_link_libraries(test_fusion_closed_box PRIVATE pb11::pb11)
     add_test(NAME fusion_closed_box_tests COMMAND test_fusion_closed_box)
 
+    add_executable(test_fusion_radial_transport tests/test_fusion_radial_transport.cpp)
+    target_link_libraries(test_fusion_radial_transport PRIVATE pb11::pb11)
+    add_test(NAME fusion_radial_transport_tests COMMAND test_fusion_radial_transport)
     add_executable(test_fusion_kinetics tests/test_fusion_kinetics.cpp)
     target_link_libraries(test_fusion_kinetics PRIVATE pb11::pb11)
     add_test(NAME fusion_kinetics_tests COMMAND test_fusion_kinetics)
@@ -558,6 +572,16 @@ if(BUILD_TESTING)
         add_test(NAME fusion_beam_fortran_binding_tests
                  COMMAND test_fusion_beam_fortran)
 
+        add_executable(test_fusion_radial_transport_fortran
+                       tests/test_fusion_radial_transport_fortran.f90)
+        set_target_properties(test_fusion_radial_transport_fortran PROPERTIES
+            LINKER_LANGUAGE Fortran
+            Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod")
+        target_link_libraries(test_fusion_radial_transport_fortran PRIVATE
+            pb11::fusion_radial_transport_fortran)
+        add_test(NAME fusion_radial_transport_fortran_binding_tests
+                 COMMAND test_fusion_radial_transport_fortran)
+
         add_executable(test_fusion_two_component_fortran
                        tests/test_fusion_two_component_fortran.f90)
         set_target_properties(test_fusion_two_component_fortran PROPERTIES
@@ -709,7 +733,7 @@ install(
 )
 if(PB11_FORTRAN_AVAILABLE)
     install(
-        TARGETS pb11_fortran fusion_fortran fusion_kinetics_fortran
+        TARGETS pb11_fortran fusion_fortran fusion_kinetics_fortran fusion_radial_transport_fortran
                 fusion_two_component_fortran fusion_handoff_fortran fusion_thermal_burn_fortran fusion_nuclear_data_fortran fusion_source_state_fortran fusion_fast_moments_fortran
                 fusion_beam_fortran fusion_rate_model_fortran fusion_target_burn_fortran fusion_fsci_fortran fusion_pb_birth_fortran fusion_pb_population_fortran fusion_reaction_event_fortran
                 fusion_products_fortran fusion_thermal_birth_fortran fusion_birth_table_fortran fusion_coupled_thermal_fortran
@@ -728,7 +752,7 @@ endif()
 install(
     FILES include/pb11.hpp include/pb11_c.h include/pb11_source.h
           include/fusion_network.h include/fusion_rates.h
-          include/fusion_cross_sections.h include/fusion_kinetics.h
+          include/fusion_cross_sections.h include/fusion_kinetics.h include/fusion_radial_transport.h
           include/fusion_coulomb.h include/fusion_beam.h include/fusion_rate_model.h
           include/fusion_target_burn.h include/fusion_two_component.h include/fusion_handoff.h
           include/fusion_thermal_burn.h include/fusion_nuclear_data.h include/fusion_source_state.h include/fusion_fast_moments.h

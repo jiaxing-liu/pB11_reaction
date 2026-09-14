@@ -1,0 +1,37 @@
+{
+  "scope": "independent radial numerical primitive, no host production coupling or adiabatic work",
+  "previous_external_commit": "b603f8359146ca95d29edccec42fbb57d6463ed4",
+  "host_observation_commit": "4daa7a196a3be0bdfbfe81886c8bbf072e89788b",
+  "results": {
+    "gnu": "2/2",
+    "intel_r8": "2/2",
+    "installed_c11": "PASS",
+    "installed_fortran": "PASS"
+  },
+  "initial_build_failure": "new CMake target unavailable before reconfigure; configure then build and test passed",
+  "sha256": {
+    "radial-gnu-test.log": "13527371ad249c0a307048ceb04839b410467f12c06418dbc98af501b35390d9",
+    "radial-gnu-build.log": "bb4128df98c6544e6a2d74c0112a04a53fe6aa6d0f8a11b4100c9802547d0a34",
+    "radial-gnu-config.log": "891c414c2864aab73bf5a94e30c863a29a649072ee7e47f2f3f1e904af0ed59c",
+    "radial-ifx-test.log": "46d8bedb1bce3e8c4de5acdf93d8ab123b7fa76912abc015beec3926e7955e70",
+    "radial-ifx-build.log": "b9d2ce3cad603f742899a017b27542146c8bfcffee9f03e281c8f8830cdfed84",
+    "radial-ifx-config.log": "5496e953d81bcb0537a58ca1e661b671920e70c266bc64392b283d296bcc2492",
+    "radial-build02.log": "70a628218c9510f1d96ce023187cef5734d8b7348c4a8758bc07816e660a138a",
+    "radial-build01.log": "5193ccbc36dde37d966f7af57ec68b431ed0f6e381dff537fce98e508765cd0a",
+    "radial-test02.log": "057c6ed16b184a5de9d5c29080c2bc9243693b8f1e4cb6361949f16abdd5e02e",
+    "radial-test01.log": "ca239cd9a009f0c5f1ce53b2dee72b455b14b471a5a485d466130ce5ff59a1ca",
+    "radial-configure01.log": "891c414c2864aab73bf5a94e30c863a29a649072ee7e47f2f3f1e904af0ed59c",
+    "radial-install.log": "1a1f0b1025171cbb14b4e4dacadbf182855f2f8f2132fbc9fb9e7c5cb9ba6a95",
+    "installed-consumer/CMakeLists.txt": "bbeb807c6958349f17e71aacef8d365a5f41bb31feda688d5a7b91e50a2eff95",
+    "installed-consumer/consumer.c": "965fd8e7812a72d355db81940112f70a88bde01cb7fbe0fdd56334bf3d901b0b",
+    "installed-consumer/fortran_consumer.f90": "046da5f9791dbfe13e6fa08b34b9fe479622515799eeaf7f49c8e6884cc190c2",
+    "installed-consumer/configure.log": "69c4e21ef0126d503c09e95f4e557e5b525e77a680dfca413cf694238f0b53ec",
+    "installed-consumer/build.log": "5251ceebc6ba46026128b3971b538962ad6d624ad3343bcd52c7750ff0cf929c",
+    "installed-consumer/run-c.log": "db634ab7dbfef3f0fd326dea6a10cc7b73059009b9f77ee112d78161adad2966",
+    "installed-consumer/run-fortran.log": "f5a0ac3a1eb78dd296d9c33639f02f4710ef9bbb668e2886edf088644c83ff70",
+    "radial-ifx-env.log.gz": "dc57cf5e7b4a08e517c9cc9906475182bd94c6b167ef168f4a08e8a162c08654"
+  },
+  "gzip_uncompressed_sha256": {
+    "radial-ifx-env.log.gz": "e6eb92119de581919a731f87e44c25b62bb362d377879d7ac99522f315bc4c18"
+  }
+}

@@ -1,0 +1,9 @@
+Test project /tmp/m3-target-burn-gnu
+    Start  8: fusion_radial_transport_tests
+1/2 Test  #8: fusion_radial_transport_tests ...................   Passed    0.00 sec
+    Start 46: fusion_radial_transport_fortran_binding_tests
+2/2 Test #46: fusion_radial_transport_fortran_binding_tests ...   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.00 sec
