@@ -25,6 +25,37 @@ typedef struct fusion_source_ledger_v1 {
  double heat_to_bath_J_m3[42];
  double neutron_number_m3, neutron_energy_J_m3;
 } fusion_source_ledger_v1;
+/* Extensive spatial/work increments: particle counts and joules, NOT per m3.
+ * Spatial fields are signed net inward exchange; work is signed onto particles.
+ * Lower/upper fields are nonnegative numerical energy-domain outflow carrying
+ * the immutable grid-edge energy. These are NOT physical escape or fluid ash.
+ */
+typedef struct fusion_transport_ledger_v1 {
+ double spatial_number[6],spatial_energy_J[6],work_J[6];
+ double lower_number[6],lower_energy_J[6],upper_number[6],upper_energy_J[6];
+} fusion_transport_ledger_v1;
+/* Volume-aware contexts keep physical density populations and an immutable
+ * reference volume equal to initial_volume. Source/inert cumulative ledgers
+ * are per reference m3; transport ledgers are extensive. Legacy snapshots and
+ * stage calls reject these contexts to prevent normalization ambiguity.
+ */
+int fusion_c_source_state_create_volume(int cells,const double *edges_J,
+ const double *initial_s_m3,const double *initial_t_m3,double initial_volume_m3,
+ double initial_time_s,uint64_t model_tag,fusion_source_state_v1 **out);
+/* Source and inert STEP densities are integrated over source_volume; trial
+ * populations are normalized by trial_volume. Both volumes finite positive.
+ * The caller may combine suboperators only after putting their source amounts
+ * at a common explicit source-volume normalization. No spatial/work inference.
+ */
+int fusion_c_source_state_stage_volume(fusion_source_state_v1 *state,uint64_t ticket,
+ const double *trial_s_m3,const double *trial_t_m3,double trial_volume_m3,
+ double source_volume_m3,const fusion_source_ledger_v1 *source_step,
+ const double *inert_heat_J_m3,const fusion_transport_ledger_v1 *transport_step);
+int fusion_c_source_state_snapshot_volume(const fusion_source_state_v1 *state,
+ double *accepted_s_m3,double *accepted_t_m3,fusion_source_ledger_v1 *cumulative_reference,
+ double *inert_heat_reference_J_m3,fusion_transport_ledger_v1 *cumulative_transport,
+ double *reference_volume_m3,double *accepted_volume_m3,double *accepted_time_s,uint64_t *epoch);
+
 /* Per-zone owner of two kinetic component populations [species][cell].
  * Both are kinetic, not fluid ash. Grid edges in J; arithmetic-center energy.
  * Host owns thermal state and must commit/restore it atomically with this
@@ -97,7 +128,9 @@ int fusion_c_source_state_discard(fusion_source_state_v1 *state,uint64_t ticket)
 /* Portable versioned little-endian IEEE754 restart, with accidental-corruption
  * checksum. Legacy contexts retain byte-compatible version 1; extended
  * contexts write version 2 with six additional heat words after the ledger.
- * Unpack reads both versions, old readers safely reject version 2.
+ * Volume-aware contexts write version 3, including reference/accepted volumes
+ * and extensive spatial/work/domain ledgers. Unpack reads all three versions;
+ * old readers reject unsupported versions. Legacy v1/v2 bytes stay unchanged.
  * Pack rejects pending trials; no unaccepted result enters restart.
  * Unpack creates a NEW context, checks tag, dimensions, all ledgers and total
  * balances. Host must checkpoint its thermal/geometry state at same epoch/time.

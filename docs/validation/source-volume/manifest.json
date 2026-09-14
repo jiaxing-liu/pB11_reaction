@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "scope": "volume-aware source state only; no full host moving-grid source completion",
+  "gnu_build": "/tmp/m3-target-burn-gnu",
+  "ifx_r8_build": "/tmp/m3-ifx-r8",
+  "fortran_flags": "-r8 -check all -traceback",
+  "ctest_regex": "fusion_source_(state|volume).*tests",
+  "focused_tests_each": 5,
+  "installed_consumers": 2,
+  "installed_prefix": "/tmp/volume-state-installed",
+  "installation_interface": "include installed pb11Targets.cmake; no find_package Config file is currently supplied",
+  "composition": {
+    "initial_number": 22,
+    "initial_energy_J": 44,
+    "final_number_approx": 20.4318,
+    "grid_out_number_approx": 1.56818,
+    "final_energy_J_approx": 39.7327,
+    "work_J_approx": 2.00541,
+    "grid_out_energy_J_approx": 6.27273
+  },
+  "fixture_corrections": "Fortran initial grid midpoint is 0.5 J; initial test source energy corrected from 0.5 to 0.25 J/m3. Conservation check was retained."
+}

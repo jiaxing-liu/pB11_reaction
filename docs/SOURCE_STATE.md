@@ -178,3 +178,12 @@ signed-bath energy transfer confirms v1 byte compatibility. Independent tests
 cover signed extra heat, lifecycle replacement/discard, semantic corruption
 with a recomputed checksum, zero extra heat, and continued restart evolution.
 See `validation/inert-source-state` for commands and retained evidence.
+
+## Volume-aware extension
+
+For evolving actual volumes, signed spatial exchange/work and numerical energy
+domain outflow, use the explicit additive volume API described in
+[SOURCE_VOLUME.md](SOURCE_VOLUME.md). Its v3 contexts retain physical population
+densities, immutable reference-normalized source ledgers and separate extensive
+transport ledgers. Legacy stage/snapshot calls deliberately reject these
+contexts. This does not add a host moving-grid implementation implicitly.
