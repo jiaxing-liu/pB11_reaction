@@ -37,7 +37,7 @@ add_library(pb11 src/pb11.cpp src/pb11_c.cpp src/pb11_source.cpp
                    src/fusion_alpha_spectrum.cpp src/fusion_alpha_events.cpp src/fusion_thermal_birth.cpp src/fusion_birth_table.cpp src/fusion_beam_birth_table.cpp src/fusion_coupled_thermal.cpp src/fusion_pb_birth.cpp src/fusion_pb_population.cpp src/fusion_reaction_event.cpp
                    src/fusion_target_burn.cpp src/fusion_target_network.cpp
                    src/fusion_transfer_rate.cpp src/fusion_two_component.cpp
-                   src/fusion_handoff.cpp src/fusion_thermal_burn.cpp src/fusion_nuclear_data.cpp src/fusion_source_state.cpp src/fusion_fast_moments.cpp)
+                   src/fusion_birth_floor.cpp src/fusion_handoff.cpp src/fusion_thermal_burn.cpp src/fusion_nuclear_data.cpp src/fusion_source_state.cpp src/fusion_fast_moments.cpp)
 add_library(pb11::pb11 ALIAS pb11)
 
 target_compile_features(pb11 PUBLIC cxx_std_17)
@@ -156,6 +156,16 @@ if(PB11_FORTRAN_AVAILABLE)
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>"
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>")
     target_link_libraries(fusion_handoff_fortran PUBLIC pb11::pb11)
+
+    add_library(fusion_birth_floor_fortran STATIC fortran/fusion_birth_floor_fortran.f90)
+    add_library(pb11::fusion_birth_floor_fortran ALIAS fusion_birth_floor_fortran)
+    set_target_properties(fusion_birth_floor_fortran PROPERTIES
+        Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fortran-mod"
+        EXPORT_NAME fusion_birth_floor_fortran)
+    target_include_directories(fusion_birth_floor_fortran INTERFACE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>")
+    target_link_libraries(fusion_birth_floor_fortran PUBLIC pb11::pb11)
 
     add_library(fusion_birth_table_fortran STATIC fortran/fusion_birth_table_fortran.f90)
     add_library(pb11::fusion_birth_table_fortran ALIAS fusion_birth_table_fortran)
@@ -524,6 +534,10 @@ if(BUILD_TESTING)
     target_link_libraries(test_fusion_handoff PRIVATE pb11::pb11)
     add_test(NAME fusion_handoff_tests COMMAND test_fusion_handoff)
 
+    add_executable(test_fusion_birth_floor tests/test_fusion_birth_floor.cpp)
+    target_link_libraries(test_fusion_birth_floor PRIVATE pb11::pb11)
+    add_test(NAME fusion_birth_floor_tests COMMAND test_fusion_birth_floor)
+
     add_executable(test_fusion_coupled_fast tests/test_fusion_coupled_fast.cpp)
     target_link_libraries(test_fusion_coupled_fast PRIVATE pb11::pb11)
     add_test(NAME fusion_coupled_fast_tests COMMAND test_fusion_coupled_fast)
@@ -722,6 +736,13 @@ if(BUILD_TESTING)
         target_link_libraries(test_fusion_handoff_fortran PRIVATE pb11::fusion_handoff_fortran)
         add_test(NAME fusion_handoff_fortran_binding_tests COMMAND test_fusion_handoff_fortran)
 
+        add_executable(test_fusion_birth_floor_fortran tests/test_fusion_birth_floor_fortran.f90)
+        set_target_properties(test_fusion_birth_floor_fortran PROPERTIES
+            LINKER_LANGUAGE Fortran
+            Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod")
+        target_link_libraries(test_fusion_birth_floor_fortran PRIVATE pb11::fusion_birth_floor_fortran)
+        add_test(NAME fusion_birth_floor_fortran_binding_tests COMMAND test_fusion_birth_floor_fortran)
+
         add_executable(test_fusion_beam_birth_table_fortran tests/test_fusion_beam_birth_table_fortran.f90)
         set_target_properties(test_fusion_beam_birth_table_fortran PROPERTIES
             LINKER_LANGUAGE Fortran
@@ -910,7 +931,7 @@ install(
 if(PB11_FORTRAN_AVAILABLE)
     install(
         TARGETS pb11_fortran fusion_fortran fusion_energy_work_fortran fusion_kinetics_fortran fusion_radial_transport_fortran
-                fusion_two_component_fortran fusion_handoff_fortran fusion_thermal_burn_fortran fusion_nuclear_data_fortran fusion_source_state_fortran fusion_source_volume_fortran fusion_kinetic_geometry_fortran fusion_fast_moments_fortran
+                fusion_two_component_fortran fusion_handoff_fortran fusion_birth_floor_fortran fusion_thermal_burn_fortran fusion_nuclear_data_fortran fusion_source_state_fortran fusion_source_volume_fortran fusion_kinetic_geometry_fortran fusion_fast_moments_fortran
                 fusion_beam_fortran fusion_rate_model_fortran fusion_target_burn_fortran fusion_target_network_fortran fusion_fsci_fortran fusion_pb_birth_fortran fusion_pb_population_fortran fusion_reaction_event_fortran
                 fusion_products_fortran fusion_thermal_birth_fortran fusion_beam_birth_fortran fusion_birth_table_fortran fusion_beam_birth_table_fortran fusion_coupled_thermal_fortran fusion_coupled_fast_fortran fusion_coupled_sources_fortran
                 fusion_laboratory_fortran fusion_spectrum_fortran
@@ -930,7 +951,7 @@ install(
           include/fusion_network.h include/fusion_rates.h
           include/fusion_cross_sections.h include/fusion_kinetics.h include/fusion_radial_transport.h include/fusion_energy_work.h
           include/fusion_coulomb.h include/fusion_beam.h include/fusion_rate_model.h
-          include/fusion_target_burn.h include/fusion_target_network.h include/fusion_two_component.h include/fusion_handoff.h
+          include/fusion_target_burn.h include/fusion_target_network.h include/fusion_two_component.h include/fusion_handoff.h include/fusion_birth_floor.h
           include/fusion_thermal_burn.h include/fusion_nuclear_data.h include/fusion_source_state.h include/fusion_kinetic_geometry.h include/fusion_fast_moments.h
           include/fusion_products.h include/fusion_laboratory.h
           include/fusion_nuclear_coulomb.h include/fusion_alpha_amplitudes.h
