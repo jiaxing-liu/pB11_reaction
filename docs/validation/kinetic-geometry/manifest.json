@@ -1,0 +1,11 @@
+{
+  "scope": "first-order radial then energy-work composition; no host moving nuclear window completion",
+  "previous_library": "7a73eac",
+  "native_and_binding_tests_each_compiler": 2,
+  "compilers": [
+    "GNU default",
+    "Intel Fortran -r8 -check all -traceback"
+  ],
+  "installed_consumers": 2,
+  "test_filter": "^fusion_kinetic_geometry"
+}

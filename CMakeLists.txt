@@ -29,7 +29,7 @@ find_package(Boost 1.70 REQUIRED)
 
 add_library(pb11 src/pb11.cpp src/pb11_c.cpp src/pb11_source.cpp
                    src/fusion_network.cpp src/fusion_rates.cpp
-                   src/fusion_cross_sections.cpp src/fusion_kinetics.cpp src/fusion_radial_transport.cpp src/fusion_energy_work.cpp
+                   src/fusion_cross_sections.cpp src/fusion_kinetics.cpp src/fusion_radial_transport.cpp src/fusion_energy_work.cpp src/fusion_kinetic_geometry.cpp
                    src/fusion_coulomb.cpp src/fusion_beam.cpp src/fusion_rate_model.cpp
                    src/fusion_products.cpp src/fusion_laboratory.cpp
                    src/fusion_nuclear_coulomb.cpp
@@ -256,6 +256,16 @@ if(PB11_FORTRAN_AVAILABLE)
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>"
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>")
     target_link_libraries(fusion_source_volume_fortran PUBLIC pb11::pb11 fusion_source_state_fortran)
+
+    add_library(fusion_kinetic_geometry_fortran STATIC fortran/fusion_kinetic_geometry_fortran.f90)
+    add_library(pb11::fusion_kinetic_geometry_fortran ALIAS fusion_kinetic_geometry_fortran)
+    set_target_properties(fusion_kinetic_geometry_fortran PROPERTIES
+        Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fortran-mod"
+        EXPORT_NAME fusion_kinetic_geometry_fortran)
+    target_include_directories(fusion_kinetic_geometry_fortran INTERFACE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>")
+    target_link_libraries(fusion_kinetic_geometry_fortran PUBLIC pb11::pb11 fusion_source_volume_fortran)
 
     add_library(fusion_nuclear_data_fortran STATIC fortran/fusion_nuclear_data_fortran.f90)
     add_library(pb11::fusion_nuclear_data_fortran ALIAS fusion_nuclear_data_fortran)
@@ -504,6 +514,9 @@ if(BUILD_TESTING)
     add_executable(test_fusion_source_batch tests/test_fusion_source_batch.cpp)
     target_link_libraries(test_fusion_source_batch PRIVATE pb11::pb11)
     add_test(NAME fusion_source_batch_tests COMMAND test_fusion_source_batch)
+    add_executable(test_fusion_kinetic_geometry tests/test_fusion_kinetic_geometry.cpp)
+    target_link_libraries(test_fusion_kinetic_geometry PRIVATE pb11::pb11)
+    add_test(NAME fusion_kinetic_geometry_tests COMMAND test_fusion_kinetic_geometry)
     add_executable(test_fusion_source_volume tests/test_fusion_source_volume.cpp)
     target_link_libraries(test_fusion_source_volume PRIVATE pb11::pb11)
     add_test(NAME fusion_source_volume_tests COMMAND test_fusion_source_volume)
@@ -684,6 +697,11 @@ if(BUILD_TESTING)
         set_target_properties(test_fusion_fast_moments_fortran PROPERTIES POSITION_INDEPENDENT_CODE ON LINKER_LANGUAGE Fortran)
         target_link_libraries(test_fusion_fast_moments_fortran PRIVATE pb11::fusion_fast_moments_fortran)
         add_test(NAME fusion_fast_moments_fortran_tests COMMAND test_fusion_fast_moments_fortran)
+        add_executable(test_fusion_kinetic_geometry_fortran tests/test_fusion_kinetic_geometry_fortran.f90)
+        set_target_properties(test_fusion_kinetic_geometry_fortran PROPERTIES
+                              POSITION_INDEPENDENT_CODE ON LINKER_LANGUAGE Fortran)
+        target_link_libraries(test_fusion_kinetic_geometry_fortran PRIVATE pb11::fusion_kinetic_geometry_fortran)
+        add_test(NAME fusion_kinetic_geometry_fortran_binding_tests COMMAND test_fusion_kinetic_geometry_fortran)
         add_executable(test_fusion_source_volume_fortran tests/test_fusion_source_volume_fortran.f90)
         set_target_properties(test_fusion_source_volume_fortran PROPERTIES
                               POSITION_INDEPENDENT_CODE ON LINKER_LANGUAGE Fortran)
@@ -772,7 +790,7 @@ install(
 if(PB11_FORTRAN_AVAILABLE)
     install(
         TARGETS pb11_fortran fusion_fortran fusion_energy_work_fortran fusion_kinetics_fortran fusion_radial_transport_fortran
-                fusion_two_component_fortran fusion_handoff_fortran fusion_thermal_burn_fortran fusion_nuclear_data_fortran fusion_source_state_fortran fusion_source_volume_fortran fusion_fast_moments_fortran
+                fusion_two_component_fortran fusion_handoff_fortran fusion_thermal_burn_fortran fusion_nuclear_data_fortran fusion_source_state_fortran fusion_source_volume_fortran fusion_kinetic_geometry_fortran fusion_fast_moments_fortran
                 fusion_beam_fortran fusion_rate_model_fortran fusion_target_burn_fortran fusion_fsci_fortran fusion_pb_birth_fortran fusion_pb_population_fortran fusion_reaction_event_fortran
                 fusion_products_fortran fusion_thermal_birth_fortran fusion_birth_table_fortran fusion_coupled_thermal_fortran
                 fusion_laboratory_fortran fusion_spectrum_fortran
@@ -793,7 +811,7 @@ install(
           include/fusion_cross_sections.h include/fusion_kinetics.h include/fusion_radial_transport.h include/fusion_energy_work.h
           include/fusion_coulomb.h include/fusion_beam.h include/fusion_rate_model.h
           include/fusion_target_burn.h include/fusion_two_component.h include/fusion_handoff.h
-          include/fusion_thermal_burn.h include/fusion_nuclear_data.h include/fusion_source_state.h include/fusion_fast_moments.h
+          include/fusion_thermal_burn.h include/fusion_nuclear_data.h include/fusion_source_state.h include/fusion_kinetic_geometry.h include/fusion_fast_moments.h
           include/fusion_products.h include/fusion_laboratory.h
           include/fusion_nuclear_coulomb.h include/fusion_alpha_amplitudes.h
           include/fusion_alpha_spectrum.h include/fusion_birth_table.h include/fusion_coupled_thermal.h include/fusion_thermal_birth.h include/fusion_pb_birth.h include/fusion_pb_population.h include/fusion_reaction_event.h
