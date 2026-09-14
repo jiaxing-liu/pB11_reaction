@@ -50,3 +50,31 @@ source ledger inclusion of physical and mapped birth energy separately;
 transaction rollback; finite reservoir handling; exact zero-spill parity;
 actual pB retry/full-window tests; lower-edge/time/grid sensitivity; explicit
 uncertainty limits. A standalone utility pass is not host/physics acceptance.
+
+## Opt-in coupled source entry
+
+`fusion_c_coupled_sources_floor_trial` aggregates actual thermal and fast-target
+birth amounts after reactant debits and projects all six charged species jointly.
+It returns the separate floor ledger alongside the physical source ledger. The
+ion correction updates the trial reservoir before collision baths are assembled;
+its temperature gate explicitly uses post-reactant-debit PRE-correction kTi.
+Upper spill remains subject to the existing strict representability bound.
+Old source entry points retain their behavior. A packet that becomes a zero
+rate rejects; conversions are checked against measured source-scale IEEE rounding.
+
+This is still an experimental numerical boundary, not validated physical closure.
+The existing source-state stage/snapshot/restart APIs and fluid-increment helper
+do NOT own this additional correction. Callers must not stage a nonzero-floor
+result through those legacy APIs or reinterpret the correction as heat. Full
+state-owner/host integration and convergence are pending. A caller using
+this pure trial owns atomic publication of ALL returned accounts.
+
+The coupled-floor C++ test uses a deliberately artificial local plasma to make
+the correction representable:1keV first center,10keV ions, fastH1e20m^-3 and
+thermalB1e19m^-3,dt1ms. It checks exact zero-spill parity, explicit-gate rejection
+and identical retry, and independently reconstructs ion energy from the physical
+ledger plus the separate correction. It is not an EXL actuator prescription.
+
+The direct `fusion_coupled_sources_floor_fortran` ISO_C_BINDING module uses
+explicit `c_ptr,value` pointers and interoperable types imported from existing
+modules. Null optional arrays and failure clearing are tested with GNU/Intel.

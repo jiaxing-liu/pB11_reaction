@@ -197,6 +197,17 @@ if(PB11_FORTRAN_AVAILABLE)
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>)
     target_link_libraries(fusion_coupled_fast_fortran PUBLIC pb11::pb11 fusion_coupled_thermal_fortran)
 
+    add_library(fusion_coupled_sources_floor_fortran STATIC fortran/fusion_coupled_sources_floor_fortran.f90)
+    add_library(pb11::fusion_coupled_sources_floor_fortran ALIAS fusion_coupled_sources_floor_fortran)
+    set_target_properties(fusion_coupled_sources_floor_fortran PROPERTIES
+        Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fortran-mod"
+        EXPORT_NAME fusion_coupled_sources_floor_fortran)
+    target_include_directories(fusion_coupled_sources_floor_fortran INTERFACE
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>")
+    target_link_libraries(fusion_coupled_sources_floor_fortran PUBLIC
+        pb11::fusion_coupled_sources_fortran pb11::fusion_birth_floor_fortran)
+
     add_library(fusion_coupled_sources_fortran STATIC fortran/fusion_coupled_sources_fortran.f90)
     add_library(pb11::fusion_coupled_sources_fortran ALIAS fusion_coupled_sources_fortran)
     set_target_properties(fusion_coupled_sources_fortran PROPERTIES
@@ -534,6 +545,10 @@ if(BUILD_TESTING)
     target_link_libraries(test_fusion_handoff PRIVATE pb11::pb11)
     add_test(NAME fusion_handoff_tests COMMAND test_fusion_handoff)
 
+    add_executable(test_fusion_coupled_floor tests/test_fusion_coupled_floor.cpp)
+    target_link_libraries(test_fusion_coupled_floor PRIVATE pb11::pb11)
+    add_test(NAME fusion_coupled_floor_tests COMMAND test_fusion_coupled_floor)
+
     add_executable(test_fusion_birth_floor tests/test_fusion_birth_floor.cpp)
     target_link_libraries(test_fusion_birth_floor PRIVATE pb11::pb11)
     add_test(NAME fusion_birth_floor_tests COMMAND test_fusion_birth_floor)
@@ -763,6 +778,13 @@ if(BUILD_TESTING)
         target_link_libraries(test_fusion_coupled_thermal_fortran PRIVATE pb11::fusion_coupled_thermal_fortran)
         add_test(NAME fusion_coupled_thermal_fortran_binding_tests COMMAND test_fusion_coupled_thermal_fortran)
 
+        add_executable(test_fusion_coupled_sources_floor_fortran tests/test_fusion_coupled_sources_floor_fortran.f90)
+        set_target_properties(test_fusion_coupled_sources_floor_fortran PROPERTIES
+            LINKER_LANGUAGE Fortran
+            Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod")
+        target_link_libraries(test_fusion_coupled_sources_floor_fortran PRIVATE pb11::fusion_coupled_sources_floor_fortran)
+        add_test(NAME fusion_coupled_sources_floor_fortran_binding_tests COMMAND test_fusion_coupled_sources_floor_fortran)
+
         add_executable(test_fusion_coupled_sources_fortran tests/test_fusion_coupled_sources_fortran.f90)
         set_target_properties(test_fusion_coupled_sources_fortran PROPERTIES
             LINKER_LANGUAGE Fortran
@@ -933,7 +955,7 @@ if(PB11_FORTRAN_AVAILABLE)
         TARGETS pb11_fortran fusion_fortran fusion_energy_work_fortran fusion_kinetics_fortran fusion_radial_transport_fortran
                 fusion_two_component_fortran fusion_handoff_fortran fusion_birth_floor_fortran fusion_thermal_burn_fortran fusion_nuclear_data_fortran fusion_source_state_fortran fusion_source_volume_fortran fusion_kinetic_geometry_fortran fusion_fast_moments_fortran
                 fusion_beam_fortran fusion_rate_model_fortran fusion_target_burn_fortran fusion_target_network_fortran fusion_fsci_fortran fusion_pb_birth_fortran fusion_pb_population_fortran fusion_reaction_event_fortran
-                fusion_products_fortran fusion_thermal_birth_fortran fusion_beam_birth_fortran fusion_birth_table_fortran fusion_beam_birth_table_fortran fusion_coupled_thermal_fortran fusion_coupled_fast_fortran fusion_coupled_sources_fortran
+                fusion_products_fortran fusion_thermal_birth_fortran fusion_beam_birth_fortran fusion_birth_table_fortran fusion_beam_birth_table_fortran fusion_coupled_thermal_fortran fusion_coupled_fast_fortran fusion_coupled_sources_fortran fusion_coupled_sources_floor_fortran
                 fusion_laboratory_fortran fusion_spectrum_fortran
         EXPORT pb11Targets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

@@ -1,6 +1,7 @@
 #ifndef FUSION_COUPLED_SOURCES_H
 #define FUSION_COUPLED_SOURCES_H
 #include "fusion_coupled_fast.h"
+#include "fusion_birth_floor.h"
 #include "fusion_beam_birth_table.h"
 #ifdef __cplusplus
 extern "C" {
@@ -53,6 +54,32 @@ int fusion_c_coupled_sources_trial(double dt_s,
  double new_thermal_m3[6], double *new_s_m3, double *new_t_m3,
  fusion_coupled_thermal_v1 *out, fusion_handoff_diagnostics_v1 *diagnostics,
  fusion_beam_table_usage_v1 *usage);
+/* Provisional opt-in numerical boundary. Limits apply to post-reactant-debit
+ * ion reservoir BEFORE numerical correction; first center and ion kT are derived internally. All below-grid
+ * nuclear births stay kinetic. Nuclear ledger energy stays physical; floor
+ * ledger correction is separate from heat/Q. All outputs clear on failure.
+ * Above-grid spill retains strict rejection. Existing entry points unchanged.
+ * See docs/BIRTH_FLOOR.md; coupled physical convergence remains required. */
+typedef struct fusion_coupled_floor_limits_v1 {
+ double max_center_over_ion_kT, max_ion_energy_fraction;
+} fusion_coupled_floor_limits_v1;
+int fusion_c_coupled_sources_floor_trial(double dt_s,
+ const fusion_coupled_thermal_options_v1 *options,
+ const fusion_fast_target_options_v1 *fast_options,
+ const fusion_birth_table_v1 *const *thermal_tables,
+ int beam_table_count, const fusion_beam_table_entry_v1 *beam_tables,
+ int effective_charge, int cells, const double *edges_J,
+ const double thermal_number_m3[6], double electron_energy_J_m3,
+ double ion_energy_J_m3, double electron_density_m3,
+ const double thermal_charge_squared[6], int inert_count,
+ const fusion_inert_ion_v1 *inert, const double *coulomb_logs,
+ const double *old_s_m3, const double *old_t_m3,
+ const double *external_birth_m3_s, const double *escape_s_inv,
+ double new_thermal_m3[6], double *new_s_m3, double *new_t_m3,
+ fusion_coupled_thermal_v1 *out, fusion_handoff_diagnostics_v1 *diagnostics,
+ fusion_beam_table_usage_v1 *usage,
+ const fusion_coupled_floor_limits_v1 *floor_limits,
+ fusion_birth_floor_ledger_v1 *floor_ledger);
 #ifdef __cplusplus
 }
 #endif
