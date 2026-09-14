@@ -230,3 +230,30 @@ strict table call rejects He4 `4.04` while the explicit effective call accepts
 it; and checks that collision heat is not clamped and that thermal/fast
 energy closes. This is library-level evidence only; it does not claim a full
 BALDUR host-driver or production coupled run.
+
+## Additive handoff observations
+
+The three `*_diagnosed` trial variants take an additional required
+`fusion_handoff_diagnostics_v1` output (264 bytes: 30 doubles and six C ints).
+The existing options/result layouts and entry points retain their ABI.
+Diagnostics publish only when the entire trial succeeds and clear on failure.
+They do not advance an accepted state or alter the physical operators.
+
+For each canonical species, candidate N/U are measured in the T population
+after the two-component FP/escape solve and before any fluid projection.
+`transferred_number_m3` and `transferred_energy_J_m3` are the internal S-to-T
+amounts from that same step. These must never be added to thermal particle or
+energy sources. A candidate can include T retained from preceding steps.
+
+`tested=1` means handoff was enabled and the candidate was nonempty.
+`target_kT_J` is the actual sequential, self-consistent mixed-ion-pool temperature
+used by that test. Both are zero when no test occurs. The existing result's
+`handoff_L1`, `handoff_mean_error` and `handoff_projected` give its measured
+outcome. Thus empty, disabled-but-populated, tested-and-rejected and projected
+states can be distinguished without guessing from a zero ash ledger.
+
+All candidate and transfer N/U fields are local per-volume quantities before
+any host geometry transport/work operation. Handoff energy differs from the
+original candidate energy by the separately accounted signed bath correction;
+compare full energy ledgers, not those two fields alone. These observations
+are trial-local, not cumulative inventories or a full restart representation.

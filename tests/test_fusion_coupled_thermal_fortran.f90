@@ -16,6 +16,8 @@ program test_fusion_coupled_thermal_fortran
 
   failures = 0
   call verify_layout()
+  call verify_diagnosed_candidate_diagnostics()
+  call verify_diagnosed_extent_clear_outputs()
   call verify_no_reaction_with_inert()
   call verify_no_inert_null_pointer()
   call verify_wrong_extents_clear_outputs()
@@ -91,6 +93,18 @@ contains
     out%handoff_projected = int(value, c_int)
   end subroutine fill_coupled
 
+  subroutine fill_handoff_diagnostics(diagnostics, value)
+    type(fusion_handoff_diagnostics_v1), intent(out) :: diagnostics
+    real(c_double), intent(in) :: value
+
+    diagnostics%candidate_number_m3 = value
+    diagnostics%candidate_energy_J_m3 = value
+    diagnostics%transferred_number_m3 = value
+    diagnostics%transferred_energy_J_m3 = value
+    diagnostics%target_kT_J = value
+    diagnostics%tested = int(value, c_int)
+  end subroutine fill_handoff_diagnostics
+
   subroutine fill_increment(out, value)
     type(fusion_thermal_increment_v1), intent(out) :: out
     real(c_double), intent(in) :: value
@@ -136,6 +150,18 @@ contains
          all(out%handoff_mean_error == 0.0_c_double) .and. &
          all(out%handoff_projected == 0_c_int)
   end function coupled_is_zero
+
+  logical function handoff_diagnostics_is_zero(diagnostics)
+    type(fusion_handoff_diagnostics_v1), intent(in) :: diagnostics
+
+    handoff_diagnostics_is_zero = &
+         all(diagnostics%candidate_number_m3 == 0.0_c_double) .and. &
+         all(diagnostics%candidate_energy_J_m3 == 0.0_c_double) .and. &
+         all(diagnostics%transferred_number_m3 == 0.0_c_double) .and. &
+         all(diagnostics%transferred_energy_J_m3 == 0.0_c_double) .and. &
+         all(diagnostics%target_kT_J == 0.0_c_double) .and. &
+         all(diagnostics%tested == 0_c_int)
+  end function handoff_diagnostics_is_zero
 
   subroutine make_options(options)
     type(fusion_coupled_thermal_options_v1), intent(out) :: options
@@ -220,6 +246,7 @@ contains
     type(fusion_coupled_thermal_options_v1) :: options
     type(fusion_coupled_thermal_v1) :: out
     type(fusion_thermal_increment_v1) :: increment
+    type(fusion_handoff_diagnostics_v1) :: diagnostics
     type(fusion_inert_ion_v1) :: inert
     type(fusion_thermal_birth_options_v1) :: birth
     type(fusion_source_ledger_v1) :: ledger
@@ -240,7 +267,153 @@ contains
     call check(c_sizeof(increment) == 64_c_size_t .and. &
          c_sizeof(increment) == 8_c_size_t * c_sizeof(dummy), &
          'thermal increment has the 64-byte C ABI layout')
+    call check(c_sizeof(diagnostics) == 264_c_size_t, &
+         'handoff diagnostics have the 264-byte C ABI layout')
   end subroutine verify_layout
+
+  subroutine verify_diagnosed_candidate_diagnostics()
+    real(c_double), target :: edges(cells + 1)
+    real(c_double), target :: thermal_number(6), charge_squared(6)
+    type(fusion_inert_ion_v1), target :: inert(1)
+    real(c_double), target :: logs(8,6)
+    real(c_double), target :: old_s(cells,6), old_t(cells,6)
+    real(c_double), target :: external_birth(cells,6), escape(cells,6)
+    real(c_double), target :: trial_thermal(6), trial_s(cells,6), trial_t(cells,6)
+    type(c_ptr), target :: tables(5)
+    type(fusion_coupled_thermal_options_v1), target :: options
+    type(fusion_coupled_thermal_v1), target :: out
+    type(fusion_handoff_diagnostics_v1), target :: diagnostics
+    real(c_double) :: electron_energy, ion_energy, electron_density
+    integer(c_int) :: status
+
+    call make_options(options)
+    call make_common_inputs(edges, thermal_number, charge_squared, inert, logs, &
+         old_s, old_t, external_birth, escape, trial_thermal, trial_s, trial_t, &
+         electron_energy, ion_energy, electron_density)
+    old_t(1,3) = 1.0e12_c_double
+    call make_null_tables(tables)
+
+    call fill_coupled(out, -21.0_c_double)
+    call fill_handoff_diagnostics(diagnostics, -21.0_c_double)
+    call fusion_coupled_thermal_trial_diagnosed(1.0e-6_c_double, options, cells, &
+         edges, thermal_number, electron_energy, ion_energy, electron_density, &
+         charge_squared, 1_c_int, inert, logs, old_s, old_t, external_birth, &
+         escape, trial_thermal, trial_s, trial_t, out, diagnostics, status)
+    call check(status == PB11_STATUS_OK .and. &
+         diagnostics%candidate_number_m3(3) > 0.0_c_double .and. &
+         diagnostics%candidate_energy_J_m3(3) > 0.0_c_double .and. &
+         all(diagnostics%tested == 0_c_int), &
+         'direct diagnosed trial reports a non-first-species candidate')
+
+    call fill_coupled(out, -22.0_c_double)
+    call fill_handoff_diagnostics(diagnostics, -22.0_c_double)
+    call fusion_coupled_thermal_table_trial_diagnosed( &
+         1.0e-6_c_double, options, tables, cells, edges, thermal_number, &
+         electron_energy, ion_energy, electron_density, charge_squared, &
+         1_c_int, inert, logs, old_s, old_t, external_birth, escape, &
+         trial_thermal, trial_s, trial_t, out, diagnostics, status)
+    call check(status == PB11_STATUS_OK .and. &
+         diagnostics%candidate_number_m3(3) > 0.0_c_double .and. &
+         diagnostics%candidate_energy_J_m3(3) > 0.0_c_double .and. &
+         all(diagnostics%tested == 0_c_int), &
+         'table diagnosed trial reports a non-first-species candidate')
+
+    call fill_coupled(out, -23.0_c_double)
+    call fill_handoff_diagnostics(diagnostics, -23.0_c_double)
+    call fusion_coupled_thermal_table_trial_effective_charge_diagnosed( &
+         1.0e-6_c_double, options, tables, cells, edges, thermal_number, &
+         electron_energy, ion_energy, electron_density, charge_squared, &
+         1_c_int, inert, logs, old_s, old_t, external_birth, escape, &
+         trial_thermal, trial_s, trial_t, out, diagnostics, status)
+    call check(status == PB11_STATUS_OK .and. &
+         diagnostics%candidate_number_m3(3) > 0.0_c_double .and. &
+         diagnostics%candidate_energy_J_m3(3) > 0.0_c_double .and. &
+         all(diagnostics%tested == 0_c_int), &
+         'effective-charge diagnosed trial reports a non-first-species candidate')
+  end subroutine verify_diagnosed_candidate_diagnostics
+
+  subroutine verify_diagnosed_extent_clear_outputs()
+    real(c_double), target :: edges(cells + 1), bad_edges(cells)
+    real(c_double), target :: thermal_number(6), charge_squared(6)
+    type(fusion_inert_ion_v1), target :: inert(1)
+    real(c_double), target :: logs(8,6)
+    real(c_double), target :: old_s(cells,6), old_t(cells,6)
+    real(c_double), target :: external_birth(cells,6), escape(cells,6)
+    real(c_double), target :: trial_thermal(6), trial_s(cells,6), trial_t(cells,6)
+    real(c_double), target :: bad_trial_t(cells-1,6)
+    type(c_ptr), target :: tables(5), bad_tables(4)
+    type(fusion_coupled_thermal_options_v1), target :: options
+    type(fusion_coupled_thermal_v1), target :: out
+    type(fusion_handoff_diagnostics_v1), target :: diagnostics
+    real(c_double) :: electron_energy, ion_energy, electron_density
+    integer(c_int) :: status
+
+    call make_options(options)
+    call make_common_inputs(edges, thermal_number, charge_squared, inert, logs, &
+         old_s, old_t, external_birth, escape, trial_thermal, trial_s, trial_t, &
+         electron_energy, ion_energy, electron_density)
+    bad_edges = 0.0_c_double
+    call make_null_tables(tables)
+    call make_null_tables(bad_tables)
+
+    call fill_coupled(out, -31.0_c_double)
+    call fill_handoff_diagnostics(diagnostics, -31.0_c_double)
+    call fusion_coupled_thermal_trial_diagnosed( &
+         1.0e-6_c_double, options, cells, bad_edges, thermal_number, &
+         electron_energy, ion_energy, electron_density, charge_squared, &
+         1_c_int, inert, logs, old_s, old_t, external_birth, escape, &
+         trial_thermal, trial_s, trial_t, out, diagnostics, status)
+    call check(status == PB11_STATUS_INVALID_ARGUMENT .and. &
+         handoff_diagnostics_is_zero(diagnostics) .and. coupled_is_zero(out), &
+         'direct diagnosed shape error clears diagnostics and result')
+
+    call fill_coupled(out, -32.0_c_double)
+    call fill_handoff_diagnostics(diagnostics, -32.0_c_double)
+    call fusion_coupled_thermal_table_trial_diagnosed( &
+         1.0e-6_c_double, options, bad_tables, cells, edges, thermal_number, &
+         electron_energy, ion_energy, electron_density, charge_squared, &
+         1_c_int, inert, logs, old_s, old_t, external_birth, escape, &
+         trial_thermal, trial_s, trial_t, out, diagnostics, status)
+    call check(status == PB11_STATUS_INVALID_ARGUMENT .and. &
+         handoff_diagnostics_is_zero(diagnostics) .and. coupled_is_zero(out), &
+         'table diagnosed shape error clears diagnostics and result')
+
+    call fill_coupled(out, -33.0_c_double)
+    call fill_handoff_diagnostics(diagnostics, -33.0_c_double)
+    bad_trial_t = -33.0_c_double
+    call fusion_coupled_thermal_table_trial_effective_charge_diagnosed( &
+         1.0e-6_c_double, options, tables, cells, edges, thermal_number, &
+         electron_energy, ion_energy, electron_density, charge_squared, &
+         1_c_int, inert, logs, old_s, old_t, external_birth, escape, &
+         trial_thermal, trial_s, bad_trial_t, out, diagnostics, status)
+    call check(status == PB11_STATUS_INVALID_ARGUMENT .and. &
+         all(trial_thermal == 0.0_c_double) .and. &
+         all(trial_s == 0.0_c_double) .and. &
+         all(bad_trial_t == 0.0_c_double) .and. &
+         handoff_diagnostics_is_zero(diagnostics) .and. coupled_is_zero(out), &
+         'effective diagnosed shape error clears all outputs and diagnostics')
+
+    options%channels = 0_c_int
+    options%channels(4) = 1_c_int
+    thermal_number = 0.0_c_double
+    thermal_number(2) = 1.0e19_c_double
+    thermal_number(3) = 1.0e19_c_double
+    charge_squared = 0.0_c_double
+    charge_squared(2) = 1.0_c_double
+    charge_squared(3) = 1.0_c_double
+    ion_energy = 1.5_c_double * kT_j * &
+         (sum(thermal_number) + inert(1)%density_m3)
+    call fill_coupled(out, -34.0_c_double)
+    call fill_handoff_diagnostics(diagnostics, -34.0_c_double)
+    call fusion_coupled_thermal_table_trial_diagnosed( &
+         1.0e-6_c_double, options, tables, cells, edges, thermal_number, &
+         electron_energy, ion_energy, electron_density, charge_squared, &
+         1_c_int, inert, logs, old_s, old_t, external_birth, escape, &
+         trial_thermal, trial_s, trial_t, out, diagnostics, status)
+    call check(status == PB11_STATUS_INVALID_ARGUMENT .and. &
+         handoff_diagnostics_is_zero(diagnostics) .and. coupled_is_zero(out), &
+         'table diagnosed C error clears diagnostics and result')
+  end subroutine verify_diagnosed_extent_clear_outputs
 
   subroutine verify_no_reaction_with_inert()
     real(c_double), target :: edges(cells + 1)

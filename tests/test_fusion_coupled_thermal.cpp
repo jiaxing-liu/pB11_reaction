@@ -211,6 +211,21 @@ int call_trial(const Inputs& inputs, double dt_s, Trial& trial) {
         &trial.result);
 }
 
+int call_trial_diagnosed(const Inputs& inputs, double dt_s, Trial& trial,
+                         fusion_handoff_diagnostics_v1* diagnostics,
+                         bool null_external = false) {
+    return fusion_c_coupled_thermal_trial_diagnosed(
+        dt_s, &inputs.options, inputs.grid.cells(), inputs.grid.edges.data(),
+        inputs.thermal_number.data(), inputs.electron_energy_J_m3,
+        inputs.ion_energy_J_m3, inputs.electron_density_m3,
+        inputs.thermal_charge_squared.data(), inputs.inert_count,
+        inputs.inert_count > 0 ? inputs.inert.data() : nullptr,
+        inputs.coulomb_logs.data(), inputs.old_s.data(), inputs.old_t.data(),
+        null_external ? nullptr : inputs.external_birth.data(),
+        inputs.escape.data(), trial.thermal_number.data(), trial.s.data(),
+        trial.t.data(), &trial.result, diagnostics);
+}
+
 int call_table_policy(const Inputs& inputs, double dt_s, Trial& trial, bool effective) {
     const fusion_birth_table_v1* tables[5]{};
     const auto fn = effective ? fusion_c_coupled_thermal_table_trial_effective_charge
@@ -225,6 +240,25 @@ int call_table_policy(const Inputs& inputs, double dt_s, Trial& trial, bool effe
         inputs.external_birth.data(), inputs.escape.data(),
         trial.thermal_number.data(), trial.s.data(), trial.t.data(),
         &trial.result);
+}
+
+int call_table_policy_diagnosed(
+    const Inputs& inputs, double dt_s, Trial& trial, bool effective,
+    fusion_handoff_diagnostics_v1* diagnostics) {
+    const fusion_birth_table_v1* tables[5]{};
+    const auto fn = effective
+                        ? fusion_c_coupled_thermal_table_trial_effective_charge_diagnosed
+                        : fusion_c_coupled_thermal_table_trial_diagnosed;
+    return fn(
+        dt_s, &inputs.options, tables, inputs.grid.cells(), inputs.grid.edges.data(),
+        inputs.thermal_number.data(), inputs.electron_energy_J_m3,
+        inputs.ion_energy_J_m3, inputs.electron_density_m3,
+        inputs.thermal_charge_squared.data(), inputs.inert_count,
+        inputs.inert_count > 0 ? inputs.inert.data() : nullptr,
+        inputs.coulomb_logs.data(), inputs.old_s.data(), inputs.old_t.data(),
+        inputs.external_birth.data(), inputs.escape.data(),
+        trial.thermal_number.data(), trial.s.data(), trial.t.data(),
+        &trial.result, diagnostics);
 }
 
 bool zero_ledger(const fusion_source_ledger_v1& ledger) {
@@ -278,6 +312,32 @@ bool zero_result(const fusion_coupled_thermal_v1& result) {
     for (double value : result.handoff_mean_error)
         if (value != 0.0) return false;
     for (int value : result.handoff_projected)
+        if (value != 0) return false;
+    return true;
+}
+
+void fill_diagnostics(fusion_handoff_diagnostics_v1& diagnostics,
+                      double value) {
+    for (double& item : diagnostics.candidate_number_m3) item = value;
+    for (double& item : diagnostics.candidate_energy_J_m3) item = value;
+    for (double& item : diagnostics.transferred_number_m3) item = value;
+    for (double& item : diagnostics.transferred_energy_J_m3) item = value;
+    for (double& item : diagnostics.target_kT_J) item = value;
+    for (int& item : diagnostics.tested) item = static_cast<int>(value);
+}
+
+bool zero_diagnostics(const fusion_handoff_diagnostics_v1& diagnostics) {
+    for (double value : diagnostics.candidate_number_m3)
+        if (value != 0.0) return false;
+    for (double value : diagnostics.candidate_energy_J_m3)
+        if (value != 0.0) return false;
+    for (double value : diagnostics.transferred_number_m3)
+        if (value != 0.0) return false;
+    for (double value : diagnostics.transferred_energy_J_m3)
+        if (value != 0.0) return false;
+    for (double value : diagnostics.target_kT_J)
+        if (value != 0.0) return false;
+    for (int value : diagnostics.tested)
         if (value != 0) return false;
     return true;
 }
@@ -389,6 +449,29 @@ double fast_number(const Trial& trial, int species) {
         number += trial.s[index] + trial.t[index];
     }
     return number;
+}
+
+void seed_mixed_pool_alpha(Inputs& inputs, double source_kT,
+                           double fraction = 0.01) {
+    std::vector<double> probability(
+        static_cast<std::size_t>(inputs.grid.cells()));
+    fusion_maxwellian_grid_v1 grid_result{};
+    require(fusion_c_maxwellian_energy_grid(
+                inputs.grid.cells(), source_kT, inputs.grid.edges.data(),
+                probability.data(), &grid_result) == PB11_STATUS_OK,
+            "diagnostic source Maxwellian grid returns OK");
+    const double thermal_pool =
+        inputs.thermal_number[FUSION_DEUTERON] +
+        inputs.thermal_number[FUSION_TRITON] + inputs.inert[0].density_m3;
+    const double fast_alpha_number = fraction * thermal_pool;
+    for (int cell = 0; cell < inputs.grid.cells(); ++cell) {
+        require(std::isfinite(probability[static_cast<std::size_t>(cell)]) &&
+                    probability[static_cast<std::size_t>(cell)] >= 0.0,
+                "diagnostic source Maxwellian probabilities are finite");
+        inputs.old_t[static_cast<std::size_t>(FUSION_HELIUM4) *
+                         inputs.grid.cells() + static_cast<std::size_t>(cell)] =
+            fast_alpha_number * probability[static_cast<std::size_t>(cell)];
+    }
 }
 
 double fast_energy(const Grid& grid, const std::vector<double>& s,
@@ -804,6 +887,227 @@ void test_mixed_pool_handoff_uses_self_consistent_target() {
             "handoff trial has transfer ledger without nuclear reactions");
 }
 
+void test_handoff_diagnostics_parity_and_empty_cases() {
+    Inputs empty;
+    empty.options.handoff_enabled = 1;
+    Trial empty_trial = make_trial(empty);
+    fusion_handoff_diagnostics_v1 empty_diagnostics{};
+    fill_diagnostics(empty_diagnostics, -1.0);
+    require(call_trial_diagnosed(empty, 1.0e-4, empty_trial,
+                                 &empty_diagnostics) == PB11_STATUS_OK,
+            "diagnosed empty handoff trial returns OK");
+    require(zero_diagnostics(empty_diagnostics),
+            "empty trial reports no candidate, transfer, or handoff test");
+    require(zero_ledger(empty_trial.result.ledger),
+            "empty diagnosed trial has no source ledger");
+
+    Inputs disabled;
+    disabled.options = make_options(Channels{{0, 0, 0, 0, 0}});
+    disabled.options.handoff_enabled = 0;
+    seed_mixed_pool_alpha(disabled, 1.01 * 10.0 * kKeVJ);
+    Trial legacy = make_trial(disabled);
+    Trial diagnosed = make_trial(disabled);
+    fusion_handoff_diagnostics_v1 diagnostics{};
+    fill_diagnostics(diagnostics, -1.0);
+    require(call_trial(disabled, 1.0e-12, legacy) == PB11_STATUS_OK,
+            "legacy populated-T trial returns OK");
+    require(call_trial_diagnosed(disabled, 1.0e-12, diagnosed, &diagnostics) ==
+                PB11_STATUS_OK,
+            "diagnosed populated-T trial returns OK");
+    require(same_result(legacy, diagnosed),
+            "diagnosed populated-T output is exactly legacy output");
+    require(diagnostics.candidate_number_m3[FUSION_HELIUM4] > 0.0 &&
+                diagnostics.candidate_energy_J_m3[FUSION_HELIUM4] > 0.0,
+            "disabled handoff still reports the post-FP T candidate");
+    for (int species = 0; species < kSpecies; ++species) {
+        require(diagnostics.target_kT_J[species] == 0.0 &&
+                    diagnostics.tested[species] == 0,
+                "disabled handoff does not report a target or test");
+        require(diagnostics.transferred_number_m3[species] == 0.0 &&
+                    diagnostics.transferred_energy_J_m3[species] == 0.0,
+                "T-only fixture has no S-to-T transfer");
+    }
+
+    // The table wrappers share the same no-channel fixture.  Check both
+    // diagnosed table entry points against their existing entry points too.
+    for (bool effective : {false, true}) {
+        Trial table_legacy = make_trial(disabled);
+        Trial table_diagnosed = make_trial(disabled);
+        fusion_handoff_diagnostics_v1 table_diagnostics{};
+        fill_diagnostics(table_diagnostics, -1.0);
+        require(call_table_policy(disabled, 1.0e-12, table_legacy, effective) ==
+                    PB11_STATUS_OK,
+                "legacy table populated-T trial returns OK");
+        require(call_table_policy_diagnosed(
+                    disabled, 1.0e-12, table_diagnosed, effective,
+                    &table_diagnostics) == PB11_STATUS_OK,
+                "diagnosed table populated-T trial returns OK");
+        require(same_result(table_legacy, table_diagnosed),
+                "diagnosed table output is exactly legacy output");
+        require(table_diagnostics.candidate_number_m3[FUSION_HELIUM4] > 0.0 &&
+                    table_diagnostics.candidate_energy_J_m3[FUSION_HELIUM4] >
+                        0.0,
+                "diagnosed table trial reports the post-FP T candidate");
+    }
+}
+
+void test_handoff_diagnostics_rejection_projection_and_transfer() {
+    Inputs rejected;
+    rejected.options = make_options(Channels{{0, 0, 0, 0, 0}});
+    rejected.options.handoff_enabled = 1;
+    rejected.options.handoff_max_L1 = 0.0;
+    rejected.options.handoff_max_mean_error = 0.0;
+    const int alpha_cell = nearest_cell(rejected.grid, 3.5 * kMeVJ);
+    rejected.old_t[static_cast<std::size_t>(FUSION_HELIUM4) *
+                   rejected.grid.cells() + static_cast<std::size_t>(alpha_cell)] =
+        1.0e12;
+    Trial rejected_trial = make_trial(rejected);
+    fusion_handoff_diagnostics_v1 rejected_diagnostics{};
+    fill_diagnostics(rejected_diagnostics, -1.0);
+    require(call_trial_diagnosed(rejected, 1.0e-12, rejected_trial,
+                                 &rejected_diagnostics) == PB11_STATUS_OK,
+            "gate-rejected diagnosed trial returns OK");
+    require(rejected_diagnostics.candidate_number_m3[FUSION_HELIUM4] > 0.0 &&
+                rejected_diagnostics.candidate_energy_J_m3[FUSION_HELIUM4] >
+                    0.0,
+            "gate-rejected trial reports its nonempty candidate");
+    require(rejected_diagnostics.tested[FUSION_HELIUM4] == 1 &&
+                rejected_diagnostics.target_kT_J[FUSION_HELIUM4] > 0.0,
+            "gate-rejected trial reports the actual target test");
+    require(rejected_trial.result.handoff_projected[FUSION_HELIUM4] == 0 &&
+                rejected_trial.result.handoff_L1[FUSION_HELIUM4] > 0.0,
+            "zero-tolerance handoff gate rejects the sparse candidate");
+    require(rejected_trial.result.ledger.handed_off_number_m3[FUSION_HELIUM4] ==
+                0.0 &&
+                rejected_trial.result.ledger.handed_off_energy_J_m3[
+                    FUSION_HELIUM4] == 0.0,
+            "rejected handoff contributes no fluid source");
+    double rejected_t_number = 0.0;
+    double rejected_t_energy = 0.0;
+    for (int cell = 0; cell < rejected.grid.cells(); ++cell) {
+        const std::size_t index =
+            static_cast<std::size_t>(FUSION_HELIUM4) * rejected.grid.cells() +
+            static_cast<std::size_t>(cell);
+        rejected_t_number += rejected_trial.t[index];
+        rejected_t_energy += cell_center(rejected.grid, cell) *
+                             rejected_trial.t[index];
+    }
+    require(close_scaled(rejected_diagnostics.candidate_number_m3[
+                             FUSION_HELIUM4],
+                         rejected_t_number, 2.0e-14, 1.0e-30) &&
+                close_scaled(rejected_diagnostics.candidate_energy_J_m3[
+                                 FUSION_HELIUM4],
+                             rejected_t_energy, 2.0e-14, 1.0e-30),
+            "rejected candidate diagnostics are the post-FP T inventory");
+
+    Inputs projected;
+    projected.options = make_options(Channels{{0, 0, 0, 0, 0}});
+    projected.options.handoff_enabled = 1;
+    projected.options.handoff_max_L1 = 0.02;
+    projected.options.handoff_max_mean_error = 0.02;
+    seed_mixed_pool_alpha(projected, 1.01 * 10.0 * kKeVJ);
+    Inputs before_projection = projected;
+    before_projection.options.handoff_enabled = 0;
+
+    Trial before_trial = make_trial(before_projection);
+    Trial projected_trial = make_trial(projected);
+    fusion_handoff_diagnostics_v1 before_diagnostics{};
+    fusion_handoff_diagnostics_v1 projected_diagnostics{};
+    require(call_trial_diagnosed(before_projection, 1.0e-12, before_trial,
+                                 &before_diagnostics) == PB11_STATUS_OK,
+            "pre-projection diagnosed fixture returns OK");
+    require(call_trial_diagnosed(projected, 1.0e-12, projected_trial,
+                                 &projected_diagnostics) == PB11_STATUS_OK,
+            "projected diagnosed fixture returns OK");
+    for (int species = 0; species < kSpecies; ++species) {
+        require(before_diagnostics.candidate_number_m3[species] ==
+                        projected_diagnostics.candidate_number_m3[species] &&
+                    before_diagnostics.candidate_energy_J_m3[species] ==
+                        projected_diagnostics.candidate_energy_J_m3[species],
+                "candidate diagnostics are captured before fluid projection");
+    }
+    require(projected_diagnostics.candidate_number_m3[FUSION_HELIUM4] > 0.0 &&
+                projected_diagnostics.candidate_energy_J_m3[FUSION_HELIUM4] >
+                    0.0 &&
+                projected_diagnostics.tested[FUSION_HELIUM4] == 1 &&
+                projected_diagnostics.target_kT_J[FUSION_HELIUM4] > 0.0,
+            "projected trial reports its candidate and sequential target");
+    require(projected_trial.result.handoff_projected[FUSION_HELIUM4] == 1 &&
+                projected_trial.result.ledger.handed_off_number_m3[
+                    FUSION_HELIUM4] > 0.0 &&
+                projected_trial.result.ledger.handed_off_energy_J_m3[
+                    FUSION_HELIUM4] > 0.0,
+            "qualifying candidate is projected to the fluid pool");
+    double final_thermal_number = 0.0;
+    for (double value : projected_trial.thermal_number)
+        final_thermal_number += value;
+    final_thermal_number += projected.inert[0].density_m3;
+    const double returned_target =
+        projected_trial.result.ion_energy_J_m3 /
+        (1.5 * final_thermal_number);
+    require(close_scaled(projected_diagnostics.target_kT_J[FUSION_HELIUM4],
+                         returned_target, 4.0e-10, 1.0e-30),
+            "diagnostic target is the self-consistent sequential target");
+    for (int species = 0; species < kSpecies; ++species)
+        if (species != FUSION_HELIUM4)
+            require(projected_diagnostics.tested[species] == 0 &&
+                        projected_diagnostics.target_kT_J[species] == 0.0,
+                    "empty species are not marked as handoff-tested");
+
+    Inputs transfer;
+    transfer.options = make_options(Channels{{0, 0, 0, 0, 0}});
+    const int transfer_cell = nearest_cell(transfer.grid, 3.5 * kMeVJ);
+    transfer.old_s[static_cast<std::size_t>(FUSION_HELIUM4) *
+                   transfer.grid.cells() + static_cast<std::size_t>(transfer_cell)] =
+        1.0e12;
+    Trial transfer_trial = make_trial(transfer);
+    fusion_handoff_diagnostics_v1 transfer_diagnostics{};
+    require(call_trial_diagnosed(transfer, 1.0e-5, transfer_trial,
+                                 &transfer_diagnostics) == PB11_STATUS_OK,
+            "internal-transfer diagnosed trial returns OK");
+    require(transfer_diagnostics.transferred_number_m3[FUSION_HELIUM4] > 0.0 &&
+                transfer_diagnostics.transferred_energy_J_m3[FUSION_HELIUM4] >
+                    0.0,
+            "diagnostics report nonzero S-to-T internal transfer");
+    require(transfer_diagnostics.candidate_number_m3[FUSION_HELIUM4] > 0.0 &&
+                transfer_diagnostics.candidate_energy_J_m3[FUSION_HELIUM4] >
+                    0.0 &&
+                transfer_trial.result.ledger.handed_off_number_m3[
+                    FUSION_HELIUM4] == 0.0,
+            "internal transfer remains kinetic and is not a fluid source");
+    require(close_scaled(transfer_diagnostics.candidate_number_m3[FUSION_HELIUM4],
+                         transfer_diagnostics.transferred_number_m3[FUSION_HELIUM4],
+                         2.0e-12),
+            "with empty old T and no escape, candidate number equals internal transfer");
+    require(zero_diagnostics(transfer_diagnostics) == false,
+            "internal-transfer trial has nonzero diagnostic observations");
+    for (int species = 0; species < kSpecies; ++species)
+        require(transfer_diagnostics.tested[species] == 0 &&
+                    transfer_diagnostics.target_kT_J[species] == 0.0,
+                "handoff-disabled transfer trial has no target tests");
+}
+
+void test_handoff_diagnostics_clearing_contract() {
+    Inputs invalid;
+    Trial invalid_trial = make_trial(invalid);
+    fusion_handoff_diagnostics_v1 invalid_diagnostics{};
+    fill_diagnostics(invalid_diagnostics, -1.0);
+    require(call_trial_diagnosed(invalid, 1.0e-4, invalid_trial,
+                                 &invalid_diagnostics, true) != PB11_STATUS_OK,
+            "diagnosed invalid input is rejected");
+    require_outputs_cleared(invalid_trial,
+                            "diagnosed invalid-input rejection");
+    require(zero_diagnostics(invalid_diagnostics),
+            "diagnosed invalid-input rejection clears diagnostics");
+
+    Trial null_diagnostics_trial = make_trial(invalid);
+    require(call_trial_diagnosed(invalid, 1.0e-4, null_diagnostics_trial,
+                                 nullptr) == PB11_STATUS_NULL_OUTPUT,
+            "diagnosed null diagnostics is rejected");
+    require_outputs_cleared(null_diagnostics_trial,
+                            "diagnosed null-diagnostics rejection");
+}
+
 void test_negative_thermal_energy_and_invalid_inputs_reject_and_clear() {
     // This is the former "extreme" case.  The hot alpha deposits a large,
     // finite amount into cold baths; it is a valid successful trial, not a
@@ -962,6 +1266,16 @@ void test_negative_thermal_energy_and_invalid_inputs_reject_and_clear() {
             "hot-bath collision step rejects negative thermal energy");
     require_outputs_cleared(negative_energy,
                             "negative-thermal-energy rejection");
+    Trial diagnosed_overdraw = make_trial(overdraw);
+    fusion_handoff_diagnostics_v1 overdraw_diagnostics{};
+    fill_diagnostics(overdraw_diagnostics, -1.0);
+    require(call_trial_diagnosed(overdraw, overdraw_dt, diagnosed_overdraw,
+                                 &overdraw_diagnostics) == PB11_STATUS_NUMERICAL_FAILURE,
+            "diagnosed late reservoir failure rejects the complete trial");
+    require_outputs_cleared(diagnosed_overdraw, "diagnosed late reservoir failure");
+    require(zero_diagnostics(overdraw_diagnostics),
+            "late failure does not publish already computed candidate diagnostics");
+
 
     Inputs invalid = Inputs{};
     invalid.options.birth.relative_order = 3;
@@ -1027,6 +1341,9 @@ int main() {
         test_dt_burn_slowing_accounting_and_repeatability();
         test_inert_heat_is_separate_and_closes();
         test_mixed_pool_handoff_uses_self_consistent_target();
+        test_handoff_diagnostics_parity_and_empty_cases();
+        test_handoff_diagnostics_rejection_projection_and_transfer();
+        test_handoff_diagnostics_clearing_contract();
         test_negative_thermal_energy_and_invalid_inputs_reject_and_clear();
         test_clipped_charged_birth_grid_rejects_and_clears();
         std::cout << "PASS: coupled thermal identity, DT source/energy closure, "

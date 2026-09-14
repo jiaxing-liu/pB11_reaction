@@ -28,6 +28,21 @@ typedef struct fusion_coupled_thermal_v1 {
  double handoff_L1[6], handoff_mean_error[6];
  int handoff_projected[6];
 } fusion_coupled_thermal_v1;
+/* Optional observations of one successful local source/collision trial.
+ * Arrays use canonical species order, amounts per m^3 per step. Candidate N/U
+ * are T AFTER FP/escape and BEFORE any fluid handoff or spatial/work operator.
+ * S-to-T transfers are internal kinetic amounts, never additional fluid sources.
+ * target_kT_J is the sequential mixed-pool target actually tested; zero when
+ * no test was performed. tested=1 only for enabled handoff with nonempty T.
+ * Consult out.handoff_L1/mean_error/projected for the measured test outcome.
+ * These observations are not accepted state and clear completely on failure.
+ * Existing result layouts and trial entry points are unchanged. */
+typedef struct fusion_handoff_diagnostics_v1 {
+ double candidate_number_m3[6], candidate_energy_J_m3[6];
+ double transferred_number_m3[6], transferred_energy_J_m3[6];
+ double target_kT_J[6];
+ int tested[6];
+} fusion_handoff_diagnostics_v1;
 /* Signed FLUID increments for one step, derived from explicit source amounts.
  * This preserves weak source signals even when final-old thermal inventories
  * would round to zero. Number m^-3, energies J/m^3; no division by dt/volume.
@@ -129,6 +144,35 @@ int fusion_c_coupled_thermal_table_trial_effective_charge(double dt_s,
  const double *old_s_m3,const double *old_t_m3,const double *external_birth_m3_s,
  const double *escape_s_inv,double trial_thermal_number_m3[6],
  double *trial_s_m3,double *trial_t_m3,fusion_coupled_thermal_v1 *out);
+
+/* Additive diagnosed variants: same physics/arguments as their namesakes.
+ * diagnostics is required, distinct from all inputs/outputs, cleared on error. */
+int fusion_c_coupled_thermal_trial_diagnosed(double dt_s,
+ const fusion_coupled_thermal_options_v1 *options,int cells,const double *edges_J,
+ const double thermal_number_m3[6],double electron_energy_J_m3,double ion_energy_J_m3,
+ double electron_density_m3,const double thermal_charge_squared[6],
+ int inert_count,const fusion_inert_ion_v1 *inert,const double *coulomb_logs,
+ const double *old_s_m3,const double *old_t_m3,const double *external_birth_m3_s,
+ const double *escape_s_inv,double trial_thermal_number_m3[6],
+ double *trial_s_m3,double *trial_t_m3,fusion_coupled_thermal_v1 *out, fusion_handoff_diagnostics_v1 *diagnostics);
+int fusion_c_coupled_thermal_table_trial_diagnosed(double dt_s,
+ const fusion_coupled_thermal_options_v1 *options,
+ const fusion_birth_table_v1 *const *tables,int cells,const double *edges_J,
+ const double thermal_number_m3[6],double electron_energy_J_m3,double ion_energy_J_m3,
+ double electron_density_m3,const double thermal_charge_squared[6],
+ int inert_count,const fusion_inert_ion_v1 *inert,const double *coulomb_logs,
+ const double *old_s_m3,const double *old_t_m3,const double *external_birth_m3_s,
+ const double *escape_s_inv,double trial_thermal_number_m3[6],
+ double *trial_s_m3,double *trial_t_m3,fusion_coupled_thermal_v1 *out, fusion_handoff_diagnostics_v1 *diagnostics);
+int fusion_c_coupled_thermal_table_trial_effective_charge_diagnosed(double dt_s,
+ const fusion_coupled_thermal_options_v1 *options,
+ const fusion_birth_table_v1 *const *tables,int cells,const double *edges_J,
+ const double thermal_number_m3[6],double electron_energy_J_m3,double ion_energy_J_m3,
+ double electron_density_m3,const double thermal_charge_squared[6],
+ int inert_count,const fusion_inert_ion_v1 *inert,const double *coulomb_logs,
+ const double *old_s_m3,const double *old_t_m3,const double *external_birth_m3_s,
+ const double *escape_s_inv,double trial_thermal_number_m3[6],
+ double *trial_s_m3,double *trial_t_m3,fusion_coupled_thermal_v1 *out, fusion_handoff_diagnostics_v1 *diagnostics);
 #ifdef __cplusplus
 }
 #endif
