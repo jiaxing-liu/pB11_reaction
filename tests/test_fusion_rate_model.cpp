@@ -497,6 +497,47 @@ void baldur_zone39_beam_regression(
                  "BALDUR zone39 total K", 2e-11);
 }
 
+void baldur_dt_t_projectile_precision_regression(
+    const std::array<double, FUSION_SPECIES_COUNT> &masses) {
+    // Exact captured BALDUR input: triton projectile, deuteron target.  This
+    // case exercises the low-temperature tail where the beam quadrature must
+    // retain intermediate precision; the regression intentionally has no
+    // model-value oracle.
+    constexpr double projectile_energy = 1.4508757491041221e-14;
+    constexpr double target_kT = 1.1122299932400609e-17;
+    fusion_rate_model_v1 result{};
+    require(fusion_c_beam_maxwellian_model(
+                FUSION_DT_ALPHAN, FUSION_ENDPOINT_S, FUSION_PB_LOW_TB,
+                masses[FUSION_TRITON], masses[FUSION_DEUTERON],
+                projectile_energy, target_kT, &result) == PB11_STATUS_OK,
+            "captured BALDUR DT T-projectile beam model status");
+    check_model(result);
+    check_segment_sum(result);
+    require(std::isfinite(result.total.resolved_reactivity_m3_s) &&
+                result.total.resolved_reactivity_m3_s > 0,
+            "captured BALDUR DT T-projectile total K is finite and positive");
+
+    constexpr double factors[] = {.999, 1., 1.001};
+    for (double energy_factor : factors) {
+        for (double temperature_factor : factors) {
+            fusion_rate_model_v1 nearby{};
+            require(fusion_c_beam_maxwellian_model(
+                        FUSION_DT_ALPHAN, FUSION_ENDPOINT_S,
+                        FUSION_PB_LOW_TB, masses[FUSION_TRITON],
+                        masses[FUSION_DEUTERON],
+                        projectile_energy * energy_factor,
+                        target_kT * temperature_factor, &nearby) ==
+                        PB11_STATUS_OK,
+                    "nearby captured BALDUR DT beam model status");
+            check_model(nearby);
+            check_segment_sum(nearby);
+            require(std::isfinite(nearby.total.resolved_reactivity_m3_s) &&
+                        nearby.total.resolved_reactivity_m3_s > 0,
+                    "nearby captured BALDUR DT total K is finite and positive");
+        }
+    }
+}
+
 void tiny_projectile_beam_regression(
     const std::array<double, FUSION_SPECIES_COUNT> &masses) {
     constexpr double projectile_energy = 1e-9 * kev;
@@ -688,6 +729,7 @@ int main() {
         fast_beam_check(masses);
         beam_subnormal_tail_regression(masses);
         baldur_zone39_beam_regression(masses);
+        baldur_dt_t_projectile_precision_regression(masses);
         tiny_projectile_beam_regression(masses);
         invalid_inputs();
         std::cout << "All fusion rate-model tests passed\n";

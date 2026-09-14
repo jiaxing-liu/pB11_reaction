@@ -14,7 +14,10 @@ using Real=long double;
 constexpr double barn=1e-28, kev=1.602176634e-16;
 constexpr double tolerance=1e-11;
 constexpr double gaussian_extent=40.;
-using Integrator=boost::math::quadrature::gauss_kronrod<double,61>;
+// Preserve small Gaussian tails through quadrature and SI scaling. Rounding
+// intermediate kernels to double can quantize the relative error estimate
+// before a representable public coefficient has been formed.
+using Integrator=boost::math::quadrature::gauss_kronrod<Real,61>;
 
 bool put(Real value,double &out) {
     if(!std::isfinite(value) || std::abs(value)>std::numeric_limits<double>::max()) return false;
@@ -53,19 +56,19 @@ struct Kernel {
     double s;
     int population=0;
     double peak=0,continuum_scale=0;
-    double probability(double x) const {
+    Real probability(Real x) const {
         const Real a=4*static_cast<Real>(x)*s;
         const Real factor=a==0?1:-std::expm1(-a)/a;
         const Real delta=static_cast<Real>(x)-s;
-        const double base=static_cast<double>(4*x*static_cast<Real>(x)/std::sqrt(std::acos(-1.L))*
+        const Real base=(4*x*static_cast<Real>(x)/std::sqrt(std::acos(-1.L))*
                                   std::exp(-delta*delta)*factor);
         if(!population || base==0)return base;
         double e=0;if(!put(relative_energy(x),e))throw PB11_STATUS_NUMERICAL_FAILURE;
         return base*population_weight(population,policy,pb_low,e,peak,continuum_scale);
     }
-    Real relative_energy(double x) const {const Real w=u*x;return mu*w*w/2;}
-    double reaction_integrand(double x,int moment) const {
-        const double p=probability(x);
+    Real relative_energy(Real x) const {const Real w=u*x;return mu*w*w/2;}
+    Real reaction_integrand(Real x,int moment) const {
+        const Real p=probability(x);
         if(p==0) return 0;
         const Real w=u*x,er=mu*w*w/2;
         double sigma=0;
@@ -85,7 +88,7 @@ struct Kernel {
         const Real value=p*x*(sigma/barn)*weight;
         if(!std::isfinite(value) || value>std::numeric_limits<double>::max())
             throw PB11_STATUS_NUMERICAL_FAILURE;
-        return static_cast<double>(value);
+        return value;
     }
 };
 
@@ -121,28 +124,27 @@ std::vector<double> make_cuts(const Kernel &k,double lo,double hi,bool nuclear) 
 }
 
 template<class Function>
-double integrate(const Kernel &k,double lo,double hi,bool nuclear,
-                 const Function &f,double *error=nullptr) {
+Real integrate(const Kernel &k,double lo,double hi,bool nuclear,
+                 const Function &f,Real *error=nullptr) {
     if(error) *error=0;
     if(hi<=lo) return 0;
     const auto cuts=make_cuts(k,lo,hi,nuclear);
     Real total=0,errors=0;
     for(std::size_t i=1;i<cuts.size();++i) {
-        double err=0;
+        Real err=0;
         // Keep the integration measure in the integrand. On a very narrow
         // physical interval an unscaled error estimate can otherwise force
         // repeated subdivision or falsely fail the final relative-error gate.
         // The physical cuts, quadrature rule, depth and tolerance are unchanged.
-        const double mid=(cuts[i]+cuts[i-1])/2,half=(cuts[i]-cuts[i-1])/2;
-        auto normalized=[&](double y){return half*f(mid+half*y);};
-        const double value=Integrator::integrate(normalized,-1.,1.,15,tolerance,&err);
+        const Real mid=(Real(cuts[i])+cuts[i-1])/2,half=(Real(cuts[i])-cuts[i-1])/2;
+        auto normalized=[&](Real y){return half*f(mid+half*y);};
+        const Real value=Integrator::integrate(normalized,Real(-1),Real(1),15,Real(tolerance),&err);
         if(!std::isfinite(value) || !std::isfinite(err) || value<0)
             throw PB11_STATUS_NUMERICAL_FAILURE;
         total+=value; errors+=err;
     }
-    double result=0;
-    if(!put(total,result) || (error && !put(errors,*error))) throw PB11_STATUS_NUMERICAL_FAILURE;
-    return result;
+    if(error) *error=errors;
+    return total;
 }
 }
 
@@ -217,18 +219,18 @@ static int beam_segment(int ch,double ma_in,double mb_in,
         const double data_lower=static_cast<double>(std::sqrt(2*emin/mu)/u);
         const double data_upper=static_cast<double>(std::sqrt(2*emax/mu)/u);
         const double lo=std::clamp(data_lower,lower,upper),hi=std::clamp(data_upper,lower,upper);
-        const auto probability=[&](double x){return k.probability(x);};
-        const auto speed=[&](double x){return x*k.probability(x);};
+        const auto probability=[&](Real x){return k.probability(x);};
+        const auto speed=[&](Real x){return x*k.probability(x);};
         result.domain_incomplete=1;
         result.resolved_pair_probability=integrate(k,lo,hi,false,probability);
         result.unresolved_pair_probability=integrate(k,lower,lo,false,probability)+
                                            integrate(k,hi,upper,false,probability);
-        const double unresolved_speed=integrate(k,lower,lo,false,speed)+
+        const Real unresolved_speed=integrate(k,lower,lo,false,speed)+
                                       integrate(k,hi,upper,false,speed);
         if(!put(u*unresolved_speed,result.unresolved_relative_speed_m_s))
             return PB11_STATUS_NUMERICAL_FAILURE;
-        double rate_error=0;
-        const double rate=integrate(k,lo,hi,true,[&](double x){return k.reaction_integrand(x,0);},&rate_error);
+        Real rate_error=0;
+        const Real rate=integrate(k,lo,hi,true,[&](Real x){return k.reaction_integrand(x,0);},&rate_error);
         const Real scale=u*barn;
         if(!put(scale*rate,result.resolved_reactivity_m3_s) ||
            !put(scale*rate_error,result.quadrature_error_m3_s) ||
@@ -238,7 +240,7 @@ static int beam_segment(int ch,double ma_in,double mb_in,
                            &result.relative_energy_reactivity_J_m3_s,
                            &result.cm_energy_reactivity_J_m3_s};
         for(int moment=1;moment<=3;++moment) {
-            const double integral=integrate(k,lo,hi,true,[&](double x){return k.reaction_integrand(x,moment);});
+            const Real integral=integrate(k,lo,hi,true,[&](Real x){return k.reaction_integrand(x,moment);});
             if(!put(scale*k.energy_scale*integral,*moments[moment-1])) return PB11_STATUS_NUMERICAL_FAILURE;
         }
         const Real residual=static_cast<Real>(result.projectile_energy_reactivity_J_m3_s)+
