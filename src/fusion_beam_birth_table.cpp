@@ -1,4 +1,4 @@
-#include "fusion_beam_birth_table.h"
+#include "fusion_beam_birth_table_internal.h"
 #include "fusion_nuclear_data.h"
 #include <algorithm>
 #include <array>
@@ -153,4 +153,21 @@ extern "C" int fusion_c_beam_birth_table_evaluate(const fusion_beam_birth_table_
   else{require(it!=t->knots.begin());const auto&a=**(it-1);const auto&b=**it;R w=weight(T,a.T,b.T);c=mix(a,b,w);values.resize(7*n);for(int j=0;j<7*n;++j)values[j]=stored((1-w)*value_at(a,j)+w*value_at(b,j));}
   conservative(*t,values.data(),c);std::copy(values.begin(),values.end(),grid);*out=c;return PB11_STATUS_OK;
  }catch(const Failure&f){return f.status;}catch(...){return PB11_STATUS_EXCEPTION;}
+}
+
+namespace fusion_detail {
+bool beam_birth_table_matches(const fusion_beam_birth_table_v1*t,int channel,
+ int slot,double energy,const fusion_beam_birth_options_v1&s,int n,const double*edges) noexcept {
+ if(!t||!edges||channel!=t->info.channel||slot!=t->info.projectile_slot||
+    energy!=t->info.projectile_energy_J||n!=t->info.cells)return false;
+ const auto&a=t->info.source;
+ if(a.relative_max_J!=s.relative_max_J||a.angular_max_exponent!=s.angular_max_exponent||
+    a.ground_state_q_J!=s.ground_state_q_J||a.cutoff_J!=s.cutoff_J||
+    a.l1_fraction!=s.l1_fraction||a.relative_phase!=s.relative_phase||
+    a.narrow_peak_fraction!=s.narrow_peak_fraction||a.continuum_peak_scale!=s.continuum_peak_scale||
+    a.continuation!=s.continuation||a.pb_low!=s.pb_low||a.remainder_policy!=s.remainder_policy||
+    a.broad_mode!=s.broad_mode||a.fsci_policy!=s.fsci_policy||a.relative_order!=s.relative_order||
+    a.angular_order!=s.angular_order||a.nq!=s.nq||a.ncos!=s.ncos)return false;
+ return std::equal(t->edges.begin(),t->edges.end(),edges);
+}
 }

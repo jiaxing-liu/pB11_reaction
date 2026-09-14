@@ -1,4 +1,5 @@
 #include "fusion_coupled_fast.h"
+#include "fusion_coupled_sources.h"
 #include "fusion_network.h"
 #include "fusion_nuclear_data.h"
 #include "fusion_rate_model.h"
@@ -841,10 +842,147 @@ void test_diagnosed_fast_interfaces() {
  }
 }
 
+fusion_beam_birth_options_v1 beam_options(const Inputs& in) {
+    fusion_beam_birth_options_v1 b{};
+    const auto& t=in.options.birth;
+    b.relative_max_J=t.relative_max_J;b.angular_max_exponent=in.fast_options.angular_max_exponent;
+    b.ground_state_q_J=t.ground_state_q_J;b.cutoff_J=t.cutoff_J;
+    b.l1_fraction=t.l1_fraction;b.relative_phase=t.relative_phase;
+    b.narrow_peak_fraction=t.narrow_peak_fraction;b.continuum_peak_scale=t.continuum_peak_scale;
+    b.continuation=t.continuation;b.pb_low=t.pb_low;b.remainder_policy=t.remainder_policy;
+    b.broad_mode=t.broad_mode;b.fsci_policy=t.fsci_policy;b.relative_order=t.relative_order;
+    b.angular_order=in.fast_options.angular_order;b.nq=t.nq;b.ncos=t.ncos;
+    return b;
+}
+
+void test_explicit_full_source_tables() {
+    Inputs in;
+    in.fast_options.channels[3]=1;
+    const int n=in.grid.cells(),cell=nearest_cell(in.grid,100*kKeVJ);
+    for(int j=cell-1;j<=cell+1;++j){in.old_s[n+j]=2e18;in.old_t[n+j]=1e18;}
+    const Inputs original=in;
+    auto options=beam_options(in);
+    fusion_birth_table_control_v1 control{};
+    control.max_rate_error=control.max_debit_error=1e-5;
+    control.max_number_L1=control.max_energy_L1=1e-4;
+    control.max_direct_rate_discrepancy=control.max_direct_debit_discrepancy=2e-3;
+    control.max_knots=512;control.max_evaluations=4096;control.max_depth=16;
+    const double lower=double(static_cast<long double>(in.ion_energy_J_m3)/(1.5L*in.thermal_number[2]));
+    std::array<fusion_beam_birth_table_v1*,3> tables{};
+    struct Cleanup {std::array<fusion_beam_birth_table_v1*,3>& tables;
+        ~Cleanup(){for(auto*t:tables)fusion_c_beam_birth_table_destroy(t);}} cleanup{tables};
+    std::vector<fusion_beam_table_entry_v1> entries;
+    for(int j=cell-1;j<=cell+1;++j){
+        double energy=double((static_cast<long double>(in.grid.edges[j])+in.grid.edges[j+1])/2);
+        int status=fusion_c_beam_birth_table_create(3,0,energy,lower,1.05*lower,&options,&control,
+            n,in.grid.edges.data(),&tables[j-cell+1]);
+        require(status==0,"coupled beam table construction status="+std::to_string(status));
+        entries.push_back({3,0,j,tables[j-cell+1]});
+    }
+    fusion_handoff_diagnostics_v1 diagnostic{};
+    fusion_beam_table_usage_v1 usage{};
+    auto evaluate=[&](const std::vector<fusion_beam_table_entry_v1>& list,Trial& out,int effective=0){
+        return fusion_c_coupled_sources_trial(1e-4,&in.options,&in.fast_options,nullptr,
+            int(list.size()),list.empty()?nullptr:list.data(),effective,n,in.grid.edges.data(),
+            in.thermal_number.data(),in.electron_energy_J_m3,in.ion_energy_J_m3,in.electron_density_m3,
+            in.thermal_charge_squared.data(),0,nullptr,in.coulomb_logs.data(),in.old_s.data(),in.old_t.data(),
+            in.external_birth.data(),in.escape.data(),out.thermal_number.data(),out.s.data(),out.t.data(),
+            &out.result,&diagnostic,&usage);
+    };
+    Trial direct=make_trial(in),empty=make_trial(in),tabulated=make_trial(in);
+    require(call_fast(in,1e-4,direct)==0,"source-table direct reference");
+    require(evaluate({},empty)==0&&same_result(direct.result,empty.result)&&
+        direct.s==empty.s&&direct.t==empty.t&&direct.thermal_number==empty.thermal_number,
+        "empty beam set exactly preserves direct arithmetic");
+    require(usage.direct_evaluations==3&&usage.table_evaluations==0,"direct calls counted");
+    require(evaluate(entries,tabulated)==0,"beam-table endpoint coupled trial");
+    require(tabulated.s==direct.s&&tabulated.t==direct.t&&tabulated.thermal_number==direct.thermal_number&&
+        same_ledger(tabulated.result.ledger,direct.result.ledger)&&
+        tabulated.result.electron_energy_J_m3==direct.result.electron_energy_J_m3&&
+        tabulated.result.ion_energy_J_m3==direct.result.ion_energy_J_m3,"endpoint complete physical-state equality");
+    require(usage.table_evaluations==3&&usage.direct_evaluations==0,"table calls counted");
+    require(usage.max_validated_rate_error<=control.max_rate_error&&
+        usage.max_validated_debit_error<=control.max_debit_error&&
+        usage.max_validated_number_L1<=control.max_number_L1&&
+        usage.max_validated_energy_L1<=control.max_energy_L1,"table envelopes exposed separately");
+    auto subset=entries;subset.pop_back();
+    require(evaluate(subset,tabulated)==0&&usage.table_evaluations==2&&usage.direct_evaluations==1&&
+        tabulated.s==direct.s&&tabulated.t==direct.t,"explicit sparse table/direct mixture");
+    for(double fraction:{.013,.029,.043}){
+        in.ion_energy_J_m3=original.ion_energy_J_m3*(1+fraction);
+        require(call_fast(in,1e-4,direct)==0&&evaluate(entries,tabulated)==0,"independent coupled temperature");
+        require_finite_trial(tabulated,"table coupled state");
+        auto l1=[](const double*a,const double*b,int count){
+            long double difference=0,norm=0;
+            for(int j=0;j<count;++j){difference+=std::abs(static_cast<long double>(a[j])-b[j]);norm+=std::abs(static_cast<long double>(a[j]));}
+            return norm==0?(difference==0?0.:1.):double(difference/norm);
+        };
+        for(int id=0;id<6;++id){
+            require(l1(direct.s.data()+id*n,tabulated.s.data()+id*n,n)<1e-3,"per-species S full-shape convergence");
+            require(l1(direct.t.data()+id*n,tabulated.t.data()+id*n,n)<1e-3,"per-species T full-shape convergence");
+            require(l1(direct.result.ledger.heat_to_bath_J_m3+7*id,tabulated.result.ledger.heat_to_bath_J_m3+7*id,7)<1e-3,"per-projectile heat partition convergence");
+        }
+        require(close_scaled(direct.result.ledger.events_m3[3],tabulated.result.ledger.events_m3[3],1e-4),"coupled event convergence");
+        require(close_scaled(direct.result.ledger.neutron_energy_J_m3,tabulated.result.ledger.neutron_energy_J_m3,1e-4),"neutron energy convergence");
+        require(close_scaled(direct.result.ledger.thermal_consumed_energy_J_m3[2],tabulated.result.ledger.thermal_consumed_energy_J_m3[2],1e-4),"selected target debit convergence");
+        Trial retry=make_trial(in);require(evaluate(entries,retry)==0&&retry.s==tabulated.s&&retry.t==tabulated.t&&same_result(retry.result,tabulated.result),"immutable table retry determinism");
+    }
+    // Thermal burning changes the target Ti before the old-fast source is sampled.
+    in=original;in.options.channels[3]=1;in.thermal_number[1]=5e19;
+    in.ion_energy_J_m3=double(1.5L*(static_cast<long double>(in.thermal_number[1])+in.thermal_number[2])*lower*1.02L);
+    require(call_fast(in,1e-4,direct)==0&&evaluate(entries,tabulated)==0,"thermal then beam-table split");
+    require(close_scaled(direct.result.ledger.events_m3[3],tabulated.result.ledger.events_m3[3],1e-4),"combined thermal/fast events");
+    require(usage.table_evaluations==3&&usage.direct_evaluations==0,"post-thermal source uses selected beam tables");
+    in=original;
+    auto rejected=[&](const std::vector<fusion_beam_table_entry_v1>& list,const std::string& label,int effective=0){
+        Trial out=make_trial(in);usage={7,7,7,7,7,7};diagnostic.candidate_number_m3[0]=7;
+        require(evaluate(list,out,effective)!=0,label+" rejects");require_cleared(out,label);
+        require(usage.direct_evaluations==0&&usage.table_evaluations==0&&usage.max_validated_rate_error==0&&
+            usage.max_validated_debit_error==0&&usage.max_validated_number_L1==0&&usage.max_validated_energy_L1==0&&
+            diagnostic.candidate_number_m3[0]==0,label+" clears diagnostics/usage");
+    };
+    auto bad=entries;bad.push_back(entries[0]);rejected(bad,"duplicate entry");
+    bad=entries;bad[0].table=nullptr;rejected(bad,"null table");
+    bad=entries;bad[0].energy_cell++;rejected(bad,"wrong projectile energy");
+    bad=entries;bad[0].projectile_slot=1;rejected(bad,"wrong projectile slot");
+    bad=entries;bad[0].channel=1;rejected(bad,"disabled channel");
+    bad=entries;bad[0].energy_cell=-1;rejected(bad,"negative cell");
+    rejected(entries,"invalid effective charge selector",2);
+    in.ion_energy_J_m3*=1.1;rejected(entries,"used table temperature outside domain");in=original;
+    // Every source option is part of the exact model key, even for inactive populations.
+    for(int selector=0;selector<16;++selector){
+        in=original;
+        switch(selector){
+        case 0:in.options.birth.relative_max_J*=1.01;break;
+        case 1:in.fast_options.angular_max_exponent+=1;break;
+        case 2:in.options.birth.ground_state_q_J*=1.01;break;
+        case 3:in.options.birth.cutoff_J*=1.01;break;
+        case 4:in.options.birth.l1_fraction*=.99;break;
+        case 5:in.options.birth.relative_phase+=.01;break;
+        case 6:in.options.birth.narrow_peak_fraction*=.99;break;
+        case 7:in.options.birth.continuum_peak_scale*=.99;break;
+        case 8:in.options.birth.remainder_policy=1;break;
+        case 9:in.options.birth.broad_mode=1;break;
+        case 10:in.options.birth.fsci_policy=1;break;
+        case 11:in.options.birth.relative_order+=1;break;
+        case 12:in.fast_options.angular_order+=1;break;
+        case 13:in.options.birth.nq+=1;break;
+        case 14:in.options.birth.ncos+=1;break;
+        case 15:in.options.birth.continuation=FUSION_HIGH_FLAT;break;
+        }
+        std::fill(in.old_s.begin(),in.old_s.end(),0);std::fill(in.old_t.begin(),in.old_t.end(),0);
+        rejected(entries,"complete model key "+std::to_string(selector));
+    }
+    in=original;in.grid.edges[n-1]=std::nextafter(in.grid.edges[n-1],in.grid.edges[n]);
+    rejected(entries,"full output grid key");in=original;
+    require(in.old_s==original.old_s&&in.old_t==original.old_t,"table trials retain caller inventory");
+}
+
 }  // namespace
 
 int main() {
     try {
+        test_explicit_full_source_tables();
         test_diagnosed_fast_interfaces();
         test_fast_dt_accounting_and_shared_components();
         test_all_fast_disabled_exact_legacy_parity();

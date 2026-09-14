@@ -46,3 +46,6 @@ benchmark, not BALDUR performance. Tests use explicitly recorded controls, which
 are not new production defaults. BALDUR/coupled-fast table dispatch and its
 validation remain subsequent work; current host fast reactions still use the
 direct source with the existing exact within-trial cache.
+
+D090 update: explicit coupled dispatch is now available; see COUPLED_SOURCES.md.
+The source-level benchmark above retains its original limited scope.
