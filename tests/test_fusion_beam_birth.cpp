@@ -348,6 +348,34 @@ void check_warm_dt_against_model() {
     check_number_and_energy_closure(evaluation);
 }
 
+void check_piecewise_fit_boundaries() {
+    auto options = options_for(2.5);
+    options.angular_order = 16;
+    // Captured BALDUR800-cell zone19 input. Rate accuracy is independent of
+    // the outgoing mapper grid, whose complete number/energy budget is checked.
+    auto actual = evaluate(FUSION_DT_ALPHAN, 1, 2.1399859254691007e-13,
+                           1.4401072590598843e-17, options);
+    require(std::abs(actual.result.spectrum.relative_rate_discrepancy) < 1e-8,
+            "actual zone19 source resolves DT fit boundary");
+    require(actual.result.spectrum.relative_reactant_energy_discrepancy < 1e-8,
+            "actual zone19 debit resolves DT fit boundary");
+    check_number_and_energy_closure(actual);
+    for (int channel : {FUSION_DT_ALPHAN, FUSION_DHE3_ALPHAP}) {
+        auto data = channel_data(channel);
+        double boundary = (channel == FUSION_DT_ALPHAN ? 530. : 900.) * keV;
+        double energy = boundary * (data.reactant[0].mass_kg +
+            data.reactant[1].mass_kg) / data.reactant[1].mass_kg;
+        for (double factor : {.995, 1., 1.005}) {
+            auto value = evaluate(channel, 0, energy * factor, .1 * keV, options);
+            require(std::abs(value.result.spectrum.relative_rate_discrepancy) < 1e-8,
+                    "piecewise source rate matches independent reference");
+            require(value.result.spectrum.relative_reactant_energy_discrepancy < 1e-8,
+                    "piecewise source debit matches independent reference");
+            check_number_and_energy_closure(value);
+        }
+    }
+}
+
 void check_zero_energy_cold_source() {
     const fusion_beam_birth_options_v1 options = options_for(5.0);
     const Evaluation evaluation =
@@ -603,6 +631,7 @@ int main() {
         check_cold_rate_and_canonical_debits(FUSION_PB11_3ALPHA, 1, 5.0 * MeV,
                                              pb_options);
         check_warm_dt_against_model();
+        check_piecewise_fit_boundaries();
         check_zero_energy_cold_source();
         check_cold_cutoff_exclusion();
         check_invalid_inputs_clear_all_outputs();

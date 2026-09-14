@@ -73,6 +73,10 @@ std::vector<double> relative_knots(double T,double limit,int ch){
  for(R e=R(T)/128;e<limit;e*=2){if(e>0)k.push_back(double(e));else break;}
  double lo=0,hi=0;int st=fusion_c_cross_section_domain(ch,&lo,&hi);if(st)throw std::runtime_error("Channel domain");
  for(double e:{lo,hi})if(e>0&&e<limit)k.push_back(e);
+ // Split at internal piecewise cross-section fit boundaries, as the
+ // independent rate reference does; a single rule must not straddle them.
+ if(ch==FUSION_DT_ALPHAN&&530*kev<limit)k.push_back(530*kev);
+ if(ch==FUSION_DHE3_ALPHAP&&900*kev<limit)k.push_back(900*kev);
  if(ch==0){
   for(double x:{101.,124.5,138.6,143.3,145.65,148.,150.35,152.7,157.4,171.5,195.,400.,668.,1211.,2340.,3294.,5700.})
    if(x*kev<limit)k.push_back(x*kev);
