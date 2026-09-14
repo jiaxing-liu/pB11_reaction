@@ -1,0 +1,299 @@
+{
+  "scope": "D074 independent unequal-temperature birth validation; no coupled activation",
+  "files": [
+    {
+      "source": "/tmp/pair-birth-root01/host-build.log",
+      "archive": "host-build.log.gz",
+      "sha256": "67eed8bf74022173819ad655a32ccdb610e31aab42645ac66fa38dcae18b28ae",
+      "gzip_sha256": "5fb3af7e9cfeb8d016af533fafcd89ff730a07041c2ff1e9ebccc58d178bc794"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/intel-test03.log",
+      "archive": "intel-test03.log.gz",
+      "sha256": "983fc3d5459d776cf3e3b02b78673596a7563187d8eafe8ad6f46d7ff5927544",
+      "gzip_sha256": "d6c2a6cbbce5ab7d9400947876717c4a1e1f67fb393c37b1c178c36bb4f4c917"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/gnu-test03.log",
+      "archive": "gnu-test03.log.gz",
+      "sha256": "aeb2e7f4b5041e86fd40a63ffb7724b42e9621011afc0ae863f90d3a1d7cdb2b",
+      "gzip_sha256": "d7231c18c67001b667acd1b55540f5f932cc9bd4a901003a19d6e6c0ac86268a"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/intel-build03.log",
+      "archive": "intel-build03.log.gz",
+      "sha256": "53527fac24617e3c88d15ce6a4843321c9a90e90c9d98d991e790095997ab690",
+      "gzip_sha256": "cc1f9ff91b449ab07731350e5d5f72021e60981f6abc95de242213aa9021160f"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/intel-configure03.log",
+      "archive": "intel-configure03.log.gz",
+      "sha256": "5496e953d81bcb0537a58ca1e661b671920e70c266bc64392b283d296bcc2492",
+      "gzip_sha256": "2e13195ac6de022d563683e97cb160c26f0af98e47f0821c17c423fc4590e892"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/gnu-build03.log",
+      "archive": "gnu-build03.log.gz",
+      "sha256": "8355a38199a359cb702701f6db2f3431c29696b6486322c2db884f4311f669a3",
+      "gzip_sha256": "71c4ab94e4b7321eb92c14fdb1e6be109e8939cfeb0121c3e16b3eea5db86149"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/intel-env03.log",
+      "archive": "intel-env03.log.gz",
+      "sha256": "e6eb92119de581919a731f87e44c25b62bb362d377879d7ac99522f315bc4c18",
+      "gzip_sha256": "dc57cf5e7b4a08e517c9cc9906475182bd94c6b167ef168f4a08e8a162c08654"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/gnu-configure03.log",
+      "archive": "gnu-configure03.log.gz",
+      "sha256": "891c414c2864aab73bf5a94e30c863a29a649072ee7e47f2f3f1e904af0ed59c",
+      "gzip_sha256": "47e9d4c750c809468a085438d125c289aa605f0cc0b88dd1a0d217e02db2c64f"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/gnu-pair-test02.log",
+      "archive": "gnu-pair-test02.log.gz",
+      "sha256": "eb7f37d0664439f26fcee30ff0fe14fcb505949643ed75fa7f0648912bfff4e7",
+      "gzip_sha256": "ba6a821eb59b925ebea1461798f545cb421f77d33cdc68b113fef7cff25f287c"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/intel-build02.log",
+      "archive": "intel-build02.log.gz",
+      "sha256": "b72c610631583f66d19294c6b39a0b73d37c1c8e6186e3939cd66a71697bc0e9",
+      "gzip_sha256": "48fc68b0a71a73070fb0f1619c7d8ffb806778c61cfd49177c26a0c587f8562c"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/intel-configure02.log",
+      "archive": "intel-configure02.log.gz",
+      "sha256": "5496e953d81bcb0537a58ca1e661b671920e70c266bc64392b283d296bcc2492",
+      "gzip_sha256": "2e13195ac6de022d563683e97cb160c26f0af98e47f0821c17c423fc4590e892"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/gnu-pair-build02.log",
+      "archive": "gnu-pair-build02.log.gz",
+      "sha256": "8295547007588826175143ce21daf0b57a8a36cc1924438dd9cd497fe393842d",
+      "gzip_sha256": "14fe0492969241412d0a15ff7ac58350285d86776d00651231d3c0d6512d0492"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/intel-env02.log",
+      "archive": "intel-env02.log.gz",
+      "sha256": "e6eb92119de581919a731f87e44c25b62bb362d377879d7ac99522f315bc4c18",
+      "gzip_sha256": "dc57cf5e7b4a08e517c9cc9906475182bd94c6b167ef168f4a08e8a162c08654"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/gnu-configure02.log",
+      "archive": "gnu-configure02.log.gz",
+      "sha256": "891c414c2864aab73bf5a94e30c863a29a649072ee7e47f2f3f1e904af0ed59c",
+      "gzip_sha256": "47e9d4c750c809468a085438d125c289aa605f0cc0b88dd1a0d217e02db2c64f"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/intel-test.log",
+      "archive": "intel-test.log.gz",
+      "sha256": "aaf976714669d558535c45d57cdb638bac89437bd9febd3412bb2837461ba778",
+      "gzip_sha256": "467f66fc4a3253323f8a4319bcc9eb17edec029f64b5d1fc0fdeabfeffae4a27"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/intel-build.log",
+      "archive": "intel-build.log.gz",
+      "sha256": "434d2a431ed2225724baec97d91a6eae91d94f39ee0fbdb483b9eda98933a6fe",
+      "gzip_sha256": "cc86bec8c0e4f1e21c71c5909a8d7961a3ad36a1625cd46ba465351b1a0b7a0f"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/intel-env.log",
+      "archive": "intel-env.log.gz",
+      "sha256": "e6eb92119de581919a731f87e44c25b62bb362d377879d7ac99522f315bc4c18",
+      "gzip_sha256": "dc57cf5e7b4a08e517c9cc9906475182bd94c6b167ef168f4a08e8a162c08654"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/gnu-pair-test.log",
+      "archive": "gnu-pair-test.log.gz",
+      "sha256": "c486d6c60eaa580e12135a0f8d7bb4f4c7c10b50c758f63d1279b669b7ead396",
+      "gzip_sha256": "3f8bc224a641a6a03e21b2100a41b5a7f0084682c9f4933f291c297878093707"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/gnu-pair-build.log",
+      "archive": "gnu-pair-build.log.gz",
+      "sha256": "434d2a431ed2225724baec97d91a6eae91d94f39ee0fbdb483b9eda98933a6fe",
+      "gzip_sha256": "cc86bec8c0e4f1e21c71c5909a8d7961a3ad36a1625cd46ba465351b1a0b7a0f"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/study02.log",
+      "archive": "study02.log.gz",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gzip_sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/study.log",
+      "archive": "study.log.gz",
+      "sha256": "4a87f8d55973cdebe38f473ef6d24c0665fe2910e537893b1dac73256252fb59",
+      "gzip_sha256": "e992e46856c84ec387dfbeb009430f9dda57174ef83a391d14468e0d2fc11146"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/gnu-regression.log",
+      "archive": "gnu-regression.log.gz",
+      "sha256": "d1dc0213674fd77027bd0d1efa161cb4a2424e1bb1e94abff7b8986a4642998f",
+      "gzip_sha256": "e3b9f58d99bd0c3d575502923b2bc6e819d5500a48048ba6fcfcca731c81a747"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/gnu-build.log",
+      "archive": "gnu-build.log.gz",
+      "sha256": "83dab394d3b3d8594a751813d5c4d29ea9f738a9c46c060bbc86cd2de798d08c",
+      "gzip_sha256": "c4150d368f68b95f625da4b82bb7c608a249ff3fc08699fe82c41862398ae9ae"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/unequal.log",
+      "archive": "unequal.log.gz",
+      "sha256": "d4bffae93266dbb94b45517396641ec23c3d22312e8b1c6872cc0bcf22aec74f",
+      "gzip_sha256": "224e3cc3aff07dc2322059c0479b88ef3ec70d49b781af44d1e313c36f754681"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/legacy_2.log",
+      "archive": "legacy_2.log.gz",
+      "sha256": "db2925fd645d524bbbf6ef1f2f15cd334edc286f3c300147eb1dbb5761840df1",
+      "gzip_sha256": "089eca8cd5c87a713a13e2c5f08ac0dae75ccc050e754662ea59998848b7e457"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/legacy_0.1.log",
+      "archive": "legacy_0.1.log.gz",
+      "sha256": "9049853ba13e5e764bf929a9233fdce19c7b108fd397b497298349a615efc804",
+      "gzip_sha256": "843a6004cbc9d9566f5cc3b126c06cfc6b3082c67de7be474708b2adf9c63e70"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/legacy_0.006.log",
+      "archive": "legacy_0.006.log.gz",
+      "sha256": "2c34d75416d12f1412939c7b646d5a7a684f8505918f16a939b030257e50d43e",
+      "gzip_sha256": "98071cf96fa78ab4ec46959dee90353b9c7d2d9e378777acf3454aeb7e1c5a11"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/legacy_0.002.log",
+      "archive": "legacy_0.002.log.gz",
+      "sha256": "e12c34121c668df08f7d3e9e25ca83019fce0287d8543c978a5448e7785b7cf3",
+      "gzip_sha256": "2f8ec7b3d21cb801c75fd14bb5acd04629bdf4f04db14249676183c64b2242c4"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/study02.csv",
+      "archive": "study02.csv.gz",
+      "sha256": "2cf88c50727747e944cf71c93df7e9068e743e4fbeec1451c39c88d5b9e49f9d",
+      "gzip_sha256": "7937b2ee2b87ed83e6b30bed41316d899ec6ad4b79b3d688ce8c06c3398bd8f4"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/study.csv",
+      "archive": "study.csv.gz",
+      "sha256": "382efe7973058401d6dd5e2fb3a47aa5c55bc4ee3da06bfec7a3788690cf5fab",
+      "gzip_sha256": "05355c2d28339c6601c0e36ef1ea73e58c2fed8e7b27598dac09cfbaf3803276"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/study02.cpp",
+      "archive": "study02.cpp.gz",
+      "sha256": "c5f1cb06bebda2428de16eeb183516f8c915af97e6b265c8912106351bcc60d4",
+      "gzip_sha256": "de12b54fc01067c2faaa843461ae28614692f88d8caac04286a3e3e72eb81e42"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/study.cpp",
+      "archive": "study.cpp.gz",
+      "sha256": "29497ccff8059fb8de75cc5c0cc87a146fbc0a8af895c7873e88402c7876aa04",
+      "gzip_sha256": "842723015cc3eb96d8a942d0a791f017b63416287bc289eadfc6d1098d2ce203"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/unequal.cpp",
+      "archive": "unequal.cpp.gz",
+      "sha256": "44c1c032b3eace3f8159665bd94522d714bf5688dcf65c7cace632b18c302efc",
+      "gzip_sha256": "388f800b32462953368131454aa69130e80a2f573b59aea937631d8a44c3ef18"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/unequal.bin",
+      "archive": "unequal.bin.gz",
+      "sha256": "ccae55229f91e4723fa745148aac580ad5110d0bc3bbdf7be72cfe2a78016fd9",
+      "gzip_sha256": "bf1031c2eaf11a40c1f5dcd278f2679dced050dc30cf602561438c05917592e5"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/legacy_2.bin",
+      "archive": "legacy_2.bin.gz",
+      "sha256": "87edeae7442591b8af68718f810bce2c75ffcb064c10f30ac532289d6a529a53",
+      "gzip_sha256": "cb962d851314fc5a37814c6bc712fac370a8b3e29f1547432e4043830969bf6a"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/legacy_0.1.bin",
+      "archive": "legacy_0.1.bin.gz",
+      "sha256": "dab9cba222ee6aa6e4802f17e57ea16de1143480b5a5ae37ecb68e8b72b6723a",
+      "gzip_sha256": "1671980611ed8bab9e089066df7c71c38b28ffe72e1fd46367494c3896e84e8f"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/legacy_0.006.bin",
+      "archive": "legacy_0.006.bin.gz",
+      "sha256": "2349a6ce970d215c4486eae41235845a840dd057f23399b850b7d6b6b8aeade4",
+      "gzip_sha256": "456192cfcbb58ace7dc269f3418af11e6b31a187db8ad1dd8a914ecdd6bc1215"
+    },
+    {
+      "source": "/tmp/pair-birth-root01/legacy_0.002.bin",
+      "archive": "legacy_0.002.bin.gz",
+      "sha256": "781e58d544af846b195efba714ca5794c8fa20b68ca6bbb4f0e64a9efb99d367",
+      "gzip_sha256": "7a9d3610f1115fbf45559f37a44eda57de80e9356ac9bc72b7713749406cb532"
+    },
+    {
+      "source": "/tmp/fast-fuel-composition-audit.md",
+      "archive": "fast-fuel-composition-audit.md.gz",
+      "sha256": "5a138804cef3f3708d92fdb5872e7b4c0907b839d3dc48be7480de47e0cf2500",
+      "gzip_sha256": "98c335a6a87e274f7fb98dd2f29133fff8f4d4cc5a30ee9ee82ba15da0832f75"
+    },
+    {
+      "source": "/tmp/pb-birth-profile01/production_reference_0.002.bin",
+      "archive": "production_reference_0.002.bin.gz",
+      "sha256": "781e58d544af846b195efba714ca5794c8fa20b68ca6bbb4f0e64a9efb99d367",
+      "gzip_sha256": "7a9d3610f1115fbf45559f37a44eda57de80e9356ac9bc72b7713749406cb532"
+    },
+    {
+      "source": "/tmp/pb-birth-profile01/production_reference_0.006.bin",
+      "archive": "production_reference_0.006.bin.gz",
+      "sha256": "2349a6ce970d215c4486eae41235845a840dd057f23399b850b7d6b6b8aeade4",
+      "gzip_sha256": "456192cfcbb58ace7dc269f3418af11e6b31a187db8ad1dd8a914ecdd6bc1215"
+    },
+    {
+      "source": "/tmp/pb-birth-profile01/production_reference_0.1.bin",
+      "archive": "production_reference_0.1.bin.gz",
+      "sha256": "dab9cba222ee6aa6e4802f17e57ea16de1143480b5a5ae37ecb68e8b72b6723a",
+      "gzip_sha256": "1671980611ed8bab9e089066df7c71c38b28ffe72e1fd46367494c3896e84e8f"
+    },
+    {
+      "source": "/tmp/pb-birth-profile01/production_reference_2.bin",
+      "archive": "production_reference_2.bin.gz",
+      "sha256": "87edeae7442591b8af68718f810bce2c75ffcb064c10f30ac532289d6a529a53",
+      "gzip_sha256": "cb962d851314fc5a37814c6bc712fac370a8b3e29f1547432e4043830969bf6a"
+    },
+    {
+      "source": "/home/cloud/research/pB11_reaction/src/fusion_thermal_birth.cpp",
+      "archive": "fusion_thermal_birth.cpp.gz",
+      "sha256": "0954bc4a533e1a840546f9eca7c756b856dd35f3c646c6b78d3a38da78071b18",
+      "gzip_sha256": "b77c7078c3cb343e82dffa8616134a4d820b504dba48c7ecd8f7921d1a43fce8"
+    },
+    {
+      "source": "/home/cloud/research/pB11_reaction/include/fusion_thermal_birth.h",
+      "archive": "fusion_thermal_birth.h.gz",
+      "sha256": "c5f67d7332d69726979f7bcf7f595eccf7efee4996aae6c3b58a445f8c0ad317",
+      "gzip_sha256": "b2594e3ae0abbb834e8029dd850435e64f5a4312af2c008cf28456b4395a1635"
+    },
+    {
+      "source": "/home/cloud/research/pB11_reaction/fortran/fusion_thermal_birth_fortran.f90",
+      "archive": "fusion_thermal_birth_fortran.f90.gz",
+      "sha256": "e7e71b88b5155670e0a4d4df9fd3b0e4a117ae6f8c1ade73c912dbdf1cba2f02",
+      "gzip_sha256": "30f17a79c0dd7c2209acbe10a19e5d51745ffa4d02e4d1e8069d4a443ab609c6"
+    },
+    {
+      "source": "/home/cloud/research/pB11_reaction/tests/test_fusion_thermal_pair_birth.cpp",
+      "archive": "test_fusion_thermal_pair_birth.cpp.gz",
+      "sha256": "b2bb054a11ce0580cf02141007ecc0e3d25039164143f3fb12ab2ab54ca4b48b",
+      "gzip_sha256": "7b6d9df80b116eb63a22b2c8fb6d316318ba89eb9c0608c94425d74327a170f1"
+    },
+    {
+      "source": "/home/cloud/research/pB11_reaction/tests/test_fusion_thermal_pair_birth_fortran.f90",
+      "archive": "test_fusion_thermal_pair_birth_fortran.f90.gz",
+      "sha256": "aaf7f030a9c077d055ba4b8147fcff901afd5ce65f1c263486732e42a71c9099",
+      "gzip_sha256": "3591a903986d70837fbcf9d97013e60853e09236976d0a04f42a2d18afaf8647"
+    },
+    {
+      "source": "/home/cloud/research/pB11_reaction/CMakeLists.txt",
+      "archive": "CMakeLists.txt.gz",
+      "sha256": "81871f8e60e4b5c2392e160a7ca9bfc64dc0c75b655fe7577cbedb20b9d32b83",
+      "gzip_sha256": "4b3193b2e9f11b0122cbc06381a8212a01964b79e954ccc4b080b679fa886394"
+    }
+  ]
+}

@@ -98,6 +98,7 @@ module fusion_thermal_birth_fortran
   end type fusion_thermal_birth_v1
 
   public :: fusion_thermal_birth_grid
+  public :: fusion_thermal_pair_birth_grid
 
   interface
      function c_fusion_thermal_birth_grid(channel, kT_J, options, cells, &
@@ -113,6 +114,22 @@ module fusion_thermal_birth_fortran
        type(c_ptr), value :: out
        integer(c_int) :: status
      end function c_fusion_thermal_birth_grid
+
+     function c_fusion_thermal_pair_birth_grid(channel, kTa_J, kTb_J, &
+          correlation_order, options, cells, edges, birth, out) bind(C, &
+          name="fusion_c_thermal_pair_birth_grid") result(status)
+       import :: c_double, c_int, c_ptr
+       integer(c_int), value :: channel
+       real(c_double), value :: kTa_J
+       real(c_double), value :: kTb_J
+       integer(c_int), value :: correlation_order
+       type(c_ptr), value :: options
+       integer(c_int), value :: cells
+       type(c_ptr), value :: edges
+       type(c_ptr), value :: birth
+       type(c_ptr), value :: out
+       integer(c_int) :: status
+     end function c_fusion_thermal_pair_birth_grid
   end interface
 
 contains
@@ -178,5 +195,44 @@ contains
        call clear_thermal_birth(out)
     end if
   end subroutine fusion_thermal_birth_grid
+
+  subroutine fusion_thermal_pair_birth_grid(channel, kTa_J, kTb_J, &
+       correlation_order, options, edges_J, birth, out, status)
+    integer(c_int), intent(in) :: channel, correlation_order
+    real(c_double), intent(in) :: kTa_J, kTb_J
+    type(fusion_thermal_birth_options_v1), intent(in), target :: options
+    real(c_double), intent(in), target, contiguous :: edges_J(:)
+    real(c_double), intent(out), target, contiguous :: birth(:,:)
+    type(fusion_thermal_birth_v1), intent(out), target :: out
+    integer(c_int), intent(out) :: status
+
+    integer(c_int) :: cells, expected_edges
+    type(c_ptr) :: options_ptr, edges_ptr, birth_ptr, out_ptr
+
+    call clear_thermal_birth(out)
+    birth = 0.0_c_double
+    status = PB11_STATUS_INVALID_ARGUMENT
+
+    ! Infer the C cell count from the first birth extent and validate every
+    ! assumed-shape extent before taking C_LOC; malformed zero-size actual
+    ! arrays remain safe.
+    if (size(birth, 1, kind=c_int) < 1_c_int) return
+    if (size(birth, 1, kind=c_int) >= huge(cells)) return
+    cells = size(birth, 1, kind=c_int)
+    expected_edges = cells + 1_c_int
+    if (size(edges_J, kind=c_int) /= expected_edges) return
+    if (size(birth, 2, kind=c_int) /= FUSION_THERMAL_BIRTH_SPECIES) return
+
+    options_ptr = c_loc(options)
+    edges_ptr = c_loc(edges_J(1))
+    birth_ptr = c_loc(birth(1,1))
+    out_ptr = c_loc(out)
+    status = c_fusion_thermal_pair_birth_grid(channel, kTa_J, kTb_J, &
+         correlation_order, options_ptr, cells, edges_ptr, birth_ptr, out_ptr)
+    if (status /= PB11_STATUS_OK) then
+       birth = 0.0_c_double
+       call clear_thermal_birth(out)
+    end if
+  end subroutine fusion_thermal_pair_birth_grid
 
 end module fusion_thermal_birth_fortran

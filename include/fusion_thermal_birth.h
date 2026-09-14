@@ -70,6 +70,25 @@ typedef struct fusion_thermal_birth_v1 {
 int fusion_c_thermal_birth_grid(int channel,double kT_J,
  const fusion_thermal_birth_options_v1 *options,int cells,const double *edges_J,
  double *birth,fusion_thermal_birth_v1 *out);
+/* Two zero-drift Maxwellian reactant pools, kTa/kTb[J]>0 in canonical
+ * channel order. Integrates the correlation of relative velocity and CM
+ * velocity, retaining the same isotropic outgoing-event closure as above.
+ * correlation_order4..32 integrates the residual CM polar cosine, required
+ * even for equal T. Equal T follows the original evaluator exactly.
+ * Other options, grid units, error clearing and finite-tail rules are shared.
+ * relative_max_J bounds relative energy. cm_max_kT bounds the INDEPENDENT
+ * residual CM Gaussian with kTcm=M*Ta*Tb/(ma*Tb+mb*Ta), not total CM speed.
+ * cm_retained_probability, cm_tail_probability and cm_tail_energy_moment_J
+ * refer to that residual distribution (energy = M*|W|^2/2). They do not bound
+ * omitted product energy or the complete correlated CM tail. Rate/debit
+ * discrepancies compare against the existing full unequal-T rate model.
+ * Coefficients contain no density or identical-pair counting factor. Caller
+ * distinguishes distinct pools from self-reactions and applies counting once.
+ * This supplies energy marginals only, not beam/pitch or coupled burn state.
+ */
+int fusion_c_thermal_pair_birth_grid(int channel,double kTa_J,double kTb_J,
+ int correlation_order,const fusion_thermal_birth_options_v1 *options,
+ int cells,const double *edges_J,double *birth,fusion_thermal_birth_v1 *out);
 #ifdef __cplusplus
 }
 #endif

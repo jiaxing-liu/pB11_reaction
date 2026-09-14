@@ -107,16 +107,18 @@ int parent(int ch,R E,R C,double ma,double mb,fusion_reaction_parent_v1&out){
  return fusion_c_reaction_parent(ch,FUSION_REACTANT_CLASSICAL_BUDGET,pa,pb,&out);
 }
 }
-extern "C" int fusion_c_thermal_birth_grid(int ch,double T,const fusion_thermal_birth_options_v1*op,
+static int pair_birth_impl(int ch,double Ta,double Tb,int correlation_order,const fusion_thermal_birth_options_v1*op,
  int n,const double*edges,double*birth,fusion_thermal_birth_v1*out){
+ double T=Ta;
  if(out)*out={};
  if(n>0&&n<=100000&&birth)std::fill(birth,birth+7*n,0.);
  if(!out||!birth)return PB11_STATUS_NULL_OUTPUT;
- if(!op||!edges||n<1||n>100000||!finite_value(T))return PB11_STATUS_INVALID_ARGUMENT;
+ if(!op||!edges||n<1||n>100000||!finite_value(Ta)||!finite_value(Tb))return PB11_STATUS_INVALID_ARGUMENT;
+ if(correlation_order<4||correlation_order>32)return PB11_STATUS_INVALID_ARGUMENT;
  const auto&o=*op;
  for(double x:{o.relative_max_J,o.cm_max_kT,o.ground_state_q_J,o.cutoff_J,o.l1_fraction,o.relative_phase,o.narrow_peak_fraction,o.continuum_peak_scale})
   if(!finite_value(x))return PB11_STATUS_INVALID_ARGUMENT;
- if(T<=0||o.relative_max_J<=0||o.cm_max_kT<8||o.cm_max_kT>80||o.ground_state_q_J<0||
+ if(Ta<=0||Tb<=0||o.relative_max_J<=0||o.cm_max_kT<8||o.cm_max_kT>80||o.ground_state_q_J<0||
     o.cutoff_J<.001*mev||o.cutoff_J>.01*mev||o.l1_fraction<0||o.l1_fraction>1||
     o.narrow_peak_fraction<0||o.narrow_peak_fraction>1||o.continuum_peak_scale<0||o.continuum_peak_scale>2)
   return PB11_STATUS_OUT_OF_RANGE;
@@ -129,13 +131,33 @@ extern "C" int fusion_c_thermal_birth_grid(int ch,double T,const fusion_thermal_
   fusion_nuclear_mass_v1 ma{},mb{},products[3]{};
   fusion_c_nuclear_mass(reaction.reactant_ids[0],&ma);fusion_c_nuclear_mass(reaction.reactant_ids[1],&mb);
   for(int j=0;j<reaction.product_count;++j)fusion_c_nuclear_mass(reaction.product_ids[j],&products[j]);
+  const bool correlated=Ta!=Tb;
+  const R mass_sum=R(ma.mass_kg)+mb.mass_kg;
+  const R reduced=R(ma.mass_kg)*mb.mass_kg/mass_sum;
+  const R velocity_variance=R(Ta)/ma.mass_kg+R(Tb)/mb.mass_kg;
+  const R drift=(R(Ta)-Tb)/(mass_sum*velocity_variance);
+  double cm_temperature=Ta;
+  if(correlated){
+   T=double(reduced*velocity_variance);
+   cm_temperature=double(mass_sum*R(Ta)*Tb/(R(ma.mass_kg)*Tb+R(mb.mass_kg)*Ta));
+   if(!finite_value(T)||!finite_value(cm_temperature)||T<=0||cm_temperature<=0)
+    return PB11_STATUS_NUMERICAL_FAILURE;
+  }
   fusion_rate_model_v1 reference{};
-  st=fusion_c_thermal_pair_maxwellian_model(ch,o.continuation,o.pb_low,ma.mass_kg,mb.mass_kg,T,T,&reference);if(st)return st;
+  st=fusion_c_thermal_pair_maxwellian_model(ch,o.continuation,o.pb_low,ma.mass_kg,mb.mass_kg,Ta,Tb,&reference);if(st)return st;
   fusion_reaction_parent_v1 maximum{};
-  st=parent(ch,o.relative_max_J,R(T)*o.cm_max_kT,ma.mass_kg,mb.mass_kg,maximum);if(st)return st;
+  R max_cm=R(T)*o.cm_max_kT;
+  if(correlated){
+   R speed=std::abs(drift)*std::sqrt(2*R(o.relative_max_J)/reduced)+
+     std::sqrt(2*R(cm_temperature)*o.cm_max_kT/mass_sum);
+   max_cm=mass_sum*speed*speed/2;
+  }
+  st=parent(ch,o.relative_max_J,max_cm,ma.mass_kg,mb.mass_kg,maximum);if(st)return st;
   if(ch==0&&(maximum.available_cm_energy_J>12*mev||o.ground_state_q_J>reaction.q_J))return PB11_STATUS_OUT_OF_RANGE;
-  auto cm=cm_nodes(T,o);auto nodes=fusion_detail::gauss_legendre(o.relative_order);
+  auto cm=cm_nodes(cm_temperature,o);auto nodes=fusion_detail::gauss_legendre(o.relative_order);
   auto angular=fusion_detail::gauss_legendre(o.ncos);auto knots=relative_knots(T,o.relative_max_J,ch);
+  auto directions=correlated?fusion_detail::gauss_legendre(correlation_order):
+    std::vector<fusion_detail::QuadNode>{{0,2}};
   Mapper map(n,edges);fusion_thermal_birth_v1 result{};
   R rate=0,ea=0,eb=0,max_shift=0,shell_shift=0;
   R M=R(ma.mass_kg)+mb.mass_kg,mu=R(ma.mass_kg)*mb.mass_kg/M;
@@ -161,11 +183,25 @@ extern "C" int fusion_c_thermal_birth_grid(int ch,double T,const fusion_thermal_
      if(flow>0){st=fusion_detail::alpha_events(2,o.fsci_policy,A0,o.cutoff_J,o.l1_fraction,o.relative_phase,o.nq,o.ncos,low);if(st)return st;}
      if(fbroad>0){st=fusion_detail::alpha_events(o.broad_mode,o.fsci_policy,A0,o.cutoff_J,o.l1_fraction,o.relative_phase,o.nq,o.ncos,broad);if(st)return st;}
     }
-    for(auto cq:cm){R w=wr*cq.weight;if(w==0)continue;
-     fusion_reaction_parent_v1 par{};st=parent(ch,E,cq.kinetic,ma.mass_kg,mb.mass_kg,par);if(st)return st;
+    for(auto cq:cm)for(auto direction:directions){R w=wr*cq.weight;
+     if(correlated)w*=R(direction.w)/2;
+     if(w==0)continue;
+     fusion_reaction_parent_v1 par{};
+     if(correlated){
+      // u lies along x; the residual CM Gaussian has polar cosine direction.x.
+      R u=std::sqrt(2*E/mu),v=std::sqrt(2*cq.kinetic/M);
+      R vx=drift*u+v*direction.x,vy=v*std::sqrt(1-R(direction.x)*direction.x);
+      double pa[3]={double(ma.mass_kg*(vx+R(mb.mass_kg)/M*u)),double(ma.mass_kg*vy),0};
+      double pb[3]={double(mb.mass_kg*(vx-R(ma.mass_kg)/M*u)),double(mb.mass_kg*vy),0};
+      st=fusion_c_reaction_parent(ch,FUSION_REACTANT_CLASSICAL_BUDGET,pa,pb,&par);
+     }else st=parent(ch,E,cq.kinetic,ma.mass_kg,mb.mass_kg,par);
+     if(st)return st;
      R A=par.available_cm_energy_J,beta=std::abs(R(par.boost_velocity_m_s[2]))/c;
-     rate+=w;ea+=w*(R(ma.mass_kg)/M*cq.kinetic+R(mb.mass_kg)/M*E);
-     eb+=w*(R(mb.mass_kg)/M*cq.kinetic+R(ma.mass_kg)/M*E);
+     if(correlated){R v2=0;for(double v:par.boost_velocity_m_s)v2+=R(v)*v;beta=std::sqrt(v2)/c;}
+     rate+=w;
+     if(correlated){ea+=w*par.classical_kinetic_J[0];eb+=w*par.classical_kinetic_J[1];}
+     else {ea+=w*(R(ma.mass_kg)/M*cq.kinetic+R(mb.mass_kg)/M*E);
+      eb+=w*(R(mb.mass_kg)/M*cq.kinetic+R(ma.mass_kg)/M*E);}
      max_shift=std::max(max_shift,std::abs(A-(R(reaction.q_J)+E))/(R(reaction.q_J)+E));
      if(ch!=0){fusion_particle_four_vector_v1 pair[2]{};double direction[3]={0,0,1};
       st=fusion_c_two_body_cm(products[0].mass_kg,products[1].mass_kg,double(A),direction,pair);if(st)return st;
@@ -194,7 +230,7 @@ extern "C" int fusion_c_thermal_birth_grid(int ch,double T,const fusion_thermal_
   result.cm_retained_probability=double(cmprob);
   R X=o.cm_max_kT,tail=std::erfc(std::sqrt(X))+2/std::sqrt(pi)*std::sqrt(X)*std::exp(-X);
   result.cm_tail_probability=double(tail);
-  result.cm_tail_energy_moment_J=double(R(T)*(1.5L*tail+2/std::sqrt(pi)*X*std::sqrt(X)*std::exp(-X)));
+  result.cm_tail_energy_moment_J=double(R(cm_temperature)*(1.5L*tail+2/std::sqrt(pi)*X*std::sqrt(X)*std::exp(-X)));
   result.max_cm_energy_shift_fraction=double(max_shift);result.max_shell_remap_fraction=double(shell_shift);
   if(result.reference_reactivity_m3_s>0)result.relative_rate_discrepancy=double(rate/result.reference_reactivity_m3_s-1);
   else if(rate>0)return PB11_STATUS_NUMERICAL_FAILURE;
@@ -237,4 +273,13 @@ extern "C" int fusion_c_thermal_birth_grid(int ch,double T,const fusion_thermal_
       return PB11_STATUS_NUMERICAL_FAILURE;
   std::copy(mapped.begin(),mapped.end(),birth);*out=result;return PB11_STATUS_OK;
  }catch(...){return PB11_STATUS_EXCEPTION;}
+}
+
+extern "C" int fusion_c_thermal_birth_grid(int ch,double T,const fusion_thermal_birth_options_v1*op,
+ int n,const double*edges,double*birth,fusion_thermal_birth_v1*out){
+ return pair_birth_impl(ch,T,T,4,op,n,edges,birth,out);
+}
+extern "C" int fusion_c_thermal_pair_birth_grid(int ch,double Ta,double Tb,int correlation_order,
+ const fusion_thermal_birth_options_v1*op,int n,const double*edges,double*birth,fusion_thermal_birth_v1*out){
+ return pair_birth_impl(ch,Ta,Tb,correlation_order,op,n,edges,birth,out);
 }

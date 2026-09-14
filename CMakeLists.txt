@@ -484,6 +484,10 @@ if(BUILD_TESTING)
     add_executable(study_coupled_thermal tools/study_coupled_thermal.cpp)
     target_link_libraries(study_coupled_thermal PRIVATE pb11::pb11)
 
+    add_executable(test_fusion_thermal_pair_birth tests/test_fusion_thermal_pair_birth.cpp)
+    target_link_libraries(test_fusion_thermal_pair_birth PRIVATE pb11::pb11)
+    add_test(NAME fusion_thermal_pair_birth_tests COMMAND test_fusion_thermal_pair_birth)
+
     add_executable(test_fusion_thermal_birth tests/test_fusion_thermal_birth.cpp)
     target_link_libraries(test_fusion_thermal_birth PRIVATE pb11::pb11)
     add_test(NAME fusion_thermal_birth_tests COMMAND test_fusion_thermal_birth)
@@ -657,6 +661,13 @@ if(BUILD_TESTING)
             Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod")
         target_link_libraries(test_fusion_coupled_thermal_fortran PRIVATE pb11::fusion_coupled_thermal_fortran)
         add_test(NAME fusion_coupled_thermal_fortran_binding_tests COMMAND test_fusion_coupled_thermal_fortran)
+
+        add_executable(test_fusion_thermal_pair_birth_fortran tests/test_fusion_thermal_pair_birth_fortran.f90)
+        set_target_properties(test_fusion_thermal_pair_birth_fortran PROPERTIES
+            LINKER_LANGUAGE Fortran
+            Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod")
+        target_link_libraries(test_fusion_thermal_pair_birth_fortran PRIVATE pb11::fusion_thermal_birth_fortran)
+        add_test(NAME fusion_thermal_pair_birth_fortran_binding_tests COMMAND test_fusion_thermal_pair_birth_fortran)
 
         add_executable(test_fusion_thermal_birth_fortran tests/test_fusion_thermal_birth_fortran.f90)
         set_target_properties(test_fusion_thermal_birth_fortran PROPERTIES
