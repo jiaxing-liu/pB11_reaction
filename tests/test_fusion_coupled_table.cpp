@@ -6,6 +6,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <algorithm>
+#include <limits>
 using R=long double;
 void need(bool p,const char*m){if(!p)throw std::runtime_error(m);}
 void ok(int s,const char*m){need(s==0,m);}
@@ -30,6 +31,11 @@ int main(){try{
   std::vector<double>snew(6*n,99),tnew(6*n,99);std::array<double,6>nextN{};nextN.fill(99);fusion_coupled_thermal_v1 result{};
   int status=tabulated?fusion_c_coupled_thermal_table_trial(dt,&options,tables.data(),n,edge,v.N.data(),v.Ue,v.Ui,ne,z2,1,&carbon,logs.data(),v.s.data(),v.t.data(),zero.data(),zero.data(),nextN.data(),snew.data(),tnew.data(),&result):fusion_c_coupled_thermal_trial(dt,&options,n,edge,v.N.data(),v.Ue,v.Ui,ne,z2,1,&carbon,logs.data(),v.s.data(),v.t.data(),zero.data(),zero.data(),nextN.data(),snew.data(),tnew.data(),&result);
   if(status){need(std::all_of(snew.begin(),snew.end(),[](double x){return x==0;})&&std::all_of(tnew.begin(),tnew.end(),[](double x){return x==0;}),"clear failed kinetic output");for(double x:nextN)need(x==0,"clear failed thermal output");need(result.electron_energy_J_m3==0&&result.ion_energy_J_m3==0,"clear result");return status;}
+  fusion_thermal_increment_v1 increment{};
+  ok(fusion_c_coupled_thermal_increment(&result.ledger,result.inert_ion_heat_J_m3,&increment),"actual coupled thermal increments");
+  auto reconstruct=[](double old,double amount,double next){return std::abs(R(old)+amount-next)<=16*std::numeric_limits<double>::epsilon()*(std::abs(R(old))+std::abs(R(next)));};
+  for(int i=0;i<6;++i)need(reconstruct(v.N[i],increment.thermal_number_m3[i],nextN[i]),"actual particle reconstruction");
+  need(reconstruct(v.Ue,increment.electron_energy_J_m3,result.electron_energy_J_m3)&&reconstruct(v.Ui,increment.ion_energy_J_m3,result.ion_energy_J_m3),"actual energy reconstruction including carbon");
   v.N=nextN;v.Ue=result.electron_energy_J_m3;v.Ui=result.ion_energy_J_m3;v.s.swap(snew);v.t.swap(tnew);for(double x:result.inert_ion_heat_J_m3)v.carbon+=x;return status;
  };
  ok(trial(direct,false,edges.data(),o),"direct first");ok(trial(table,true,edges.data(),o),"table first");

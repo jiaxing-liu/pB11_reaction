@@ -1,0 +1,30 @@
+{
+  "files": {
+    "thermal-increment-test.log": "13855fb6175af9ede65e9e217f97d73ca3541bff69af5f48b9b19ca9748fd848",
+    "thermal-increment-ifx-config.log": "5496e953d81bcb0537a58ca1e661b671920e70c266bc64392b283d296bcc2492",
+    "thermal-increment-ifx-build.log": "31d3e0723f0a6a985a5a9090b231f5f7b1a4fc4b916eea802b94693b21e8d03d",
+    "thermal-increment-handoff-test.log": "ab8316c6d17b51782ee9ef4c7fb232d489ac4139502d3ff93cd53e7828e14fd0",
+    "consumer.c": "9e9f0336292e4cfe2403117090dd4ac0229370eafd24dc6e6c3e79bc9e2e6f8e",
+    "thermal-increment-ifx-test.log": "aa8a12fd1c475aa6727f2d0e4227d27f9ed1de1866336ebefde998571330b59e",
+    "gnu-LastTest.log": "ac7096f1d8e18497200b63e71e75fbe9cf8f4d25af60e2809865210ab912f6c3",
+    "thermal-increment-build.log": "9387bc605fc8d75ca61b54398daae165b6a6c69bf0be702db821f731cf97c75c",
+    "thermal-increment-gnu-build.log": "7b95cb904f9cc92457878700c1e110ce5ca562cc8b9b39cb7a3d376ddf9cf190",
+    "thermal-increment-gnu-test.log": "a23218663d59312768df8aa9aaad734ae6c5a52fddacd8cb3351cf142f344e8c",
+    "thermal-increment-handoff-build.log": "cfebe1c5183c0bdde803d043641d73c5aacd6fd4cf8b31475ea3a660e2aad97a",
+    "thermal-increment-consumer.log": "b225865cd2941c99dd6270d92dd795f3585135ba56804456e6bf6f57d6e4aedd",
+    "thermal-increment-nof-test.log": "a382a3785e2dca3e2462faeb0138a99a1f300b1bbe0a92f495a954ffe1f5befa",
+    "thermal-increment-nof-build.log": "a49083955a1d6063fc984135c4452e65cea987c9234c3855fafcc7f0637294ef",
+    "thermal-increment-config.log": "891c414c2864aab73bf5a94e30c863a29a649072ee7e47f2f3f1e904af0ed59c",
+    "thermal-increment-nof-config.log": "983fa03efb3aa245909d688dd4388c7f58ce001478555191d823118e25764dbd",
+    "ifx-r8-LastTest.log": "151e40a41abd53bd3be51117a6098b73b3f9c639282405dfeef0e9f8edb20bef"
+  },
+  "verified_source_sha256": {
+    "include/fusion_coupled_thermal.h": "67abb7c198ff4ce567e97bfb5719308b49a50a4211a4952dabddd72c5f054765",
+    "src/fusion_coupled_thermal.cpp": "d786a808d65c58fd88f61d8288e57dd86e0da9a3ab2adf8e0fcac39e254d381c",
+    "fortran/fusion_coupled_thermal_fortran.f90": "0180dda9b9a583761f910e8865f96f53c564154ae55713819fd5b991c2e24665",
+    "tests/test_fusion_thermal_increment.cpp": "d98cace1992264e03281c535a8165ffd5b8b243f8d1b5e98ed1b731647310bb7",
+    "tests/test_fusion_coupled_table.cpp": "5d0a0070e26913ed342761e268fa5d290f939baad13b627f8611dd0fbcbeacfe",
+    "tests/test_fusion_coupled_thermal.cpp": "c0b860573c8f69c88d9a2bd094b784a765b2308a78d0a35966b684e2d484784a",
+    "tests/test_fusion_coupled_thermal_fortran.f90": "71dc4023f9fcdce86aeb0d8d527ab47aedeb0c105f297a7bfde75ec6965c3c96"
+  }
+}

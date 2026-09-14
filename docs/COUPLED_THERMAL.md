@@ -172,3 +172,27 @@ immutable, validated tables. It checks channel, model options and exact grid;
 there is no silent extrapolation or fallback. See [THERMAL_BIRTH_TABLE.md](THERMAL_BIRTH_TABLE.md)
 for sampled error semantics, evolving direct/table comparisons and limitations.
 The original entry point still evaluates the direct quadrature each trial.
+
+
+## Explicit fluid increments for host source assembly
+
+`fusion_c_coupled_thermal_increment` maps a validated complete source ledger
+plus six inert-ion heat amounts to signed thermal particle and electron/ion
+energy increments. The64-byte `fusion_thermal_increment_v1` has six number
+amounts and two energy amounts; the existing result layout remains unchanged.
+The Fortran wrapper uses explicit C kinds and validates inert-array extent.
+
+For each thermal species dN=handoff-consumed. Electron dU sums the electron
+heat column. Ion dU sums all network-ion and inert heat, adds handoff fluid
+energy and subtracts consumed thermal energy. The mixed-pool handoff correction
+is already in the corresponding heat column and is counted exactly once.
+External birth and escape ledger fields describe fast particles and must not
+be added directly to the thermal fluid. Units are per step m^-3 and J/m^3.
+
+The helper uses explicit amounts, preserving weak sources that disappear in
+final-minus-initial background subtraction. It checks finite fields and the
+ledger's sign conventions, and rejects nonrepresentable output; it does not
+validate full reaction stoichiometry/kinetic closure or advance any state.
+Use a ledger from a successful validated operator. It does not supply host
+time/volume conversion, particle transport, charge closure or acceptance.
+Evidence: `validation/thermal-increment`.

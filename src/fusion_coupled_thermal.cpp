@@ -185,3 +185,26 @@ extern "C" int fusion_c_coupled_thermal_table_trial(double dt,const fusion_coupl
  const double*external,const double*escape,double*new_thermal,double*new_s,double*new_t,fusion_coupled_thermal_v1*out){
  return coupled_trial(dt,op,tables,true,n,edges,thermal,Ue,Ui,ne,charge2,ninert,inert,logs,old_s,old_t,external,escape,new_thermal,new_s,new_t,out);
 }
+
+extern "C" int fusion_c_coupled_thermal_increment(const fusion_source_ledger_v1*ledger,
+ const double*inert,fusion_thermal_increment_v1*out){
+ if(!out)return PB11_STATUS_NULL_OUTPUT;
+ *out={};
+ if(!ledger||!inert)return BAD;
+ auto copy=*ledger;
+ // Check all ledger fields, treating only the documented heat fields as signed.
+ for(double&h:copy.heat_to_bath_J_m3){if(!finite_value(h))return BAD;h=0;}
+ bool valid=true;ledger_fields(copy,[&](double v){if(!nonnegative(v))valid=false;});
+ if(!valid)return BAD;
+ for(int i=0;i<6;++i)if(!finite_value(inert[i]))return BAD;
+ fusion_thermal_increment_v1 result{};R electron=0,ion=0;
+ for(int i=0;i<6;++i){
+  if(!put(R(ledger->handed_off_number_m3[i])-ledger->thermal_consumed_number_m3[i],result.thermal_number_m3[i]))return NUM;
+  electron+=ledger->heat_to_bath_J_m3[i*7];
+  ion+=R(ledger->handed_off_energy_J_m3[i])-ledger->thermal_consumed_energy_J_m3[i];
+  ion+=inert[i];
+  for(int j=1;j<7;++j)ion+=ledger->heat_to_bath_J_m3[i*7+j];
+ }
+ if(!put(electron,result.electron_energy_J_m3)||!put(ion,result.ion_energy_J_m3))return NUM;
+ *out=result;return PB11_STATUS_OK;
+}

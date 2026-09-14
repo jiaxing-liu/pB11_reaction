@@ -72,8 +72,16 @@ module fusion_coupled_thermal_fortran
      integer(c_int) :: handoff_projected(6)
   end type fusion_coupled_thermal_v1
 
+  ! Exact C layout: eight consecutive c_double values.
+  type, bind(C), public :: fusion_thermal_increment_v1
+     real(c_double) :: thermal_number_m3(6)
+     real(c_double) :: electron_energy_J_m3
+     real(c_double) :: ion_energy_J_m3
+  end type fusion_thermal_increment_v1
+
   public :: fusion_coupled_thermal_trial
   public :: fusion_coupled_thermal_table_trial
+  public :: fusion_coupled_thermal_increment
 
   interface
      function c_fusion_c_coupled_thermal_trial(dt_s, options, cells, edges, &
@@ -136,6 +144,15 @@ module fusion_coupled_thermal_fortran
        type(c_ptr), value :: out
        integer(c_int) :: status
      end function c_fusion_c_coupled_thermal_table_trial
+
+     function c_fusion_c_coupled_thermal_increment(ledger, inert_heat, out) &
+          bind(C, name="fusion_c_coupled_thermal_increment") result(status)
+       import :: c_int, c_ptr
+       type(c_ptr), value :: ledger
+       type(c_ptr), value :: inert_heat
+       type(c_ptr), value :: out
+       integer(c_int) :: status
+     end function c_fusion_c_coupled_thermal_increment
   end interface
 
 contains
@@ -176,6 +193,14 @@ contains
     out%handoff_mean_error = 0.0_c_double
     out%handoff_projected = 0_c_int
   end subroutine clear_coupled
+
+  subroutine clear_increment(out)
+    type(fusion_thermal_increment_v1), intent(out) :: out
+
+    out%thermal_number_m3 = 0.0_c_double
+    out%electron_energy_J_m3 = 0.0_c_double
+    out%ion_energy_J_m3 = 0.0_c_double
+  end subroutine clear_increment
 
   logical function valid_cells(cells)
     integer(c_int), intent(in) :: cells
@@ -436,5 +461,22 @@ contains
             trial_t_m3, out)
     end if
   end subroutine fusion_coupled_thermal_table_trial
+
+  subroutine fusion_coupled_thermal_increment(ledger, inert_heat_J_m3, out, &
+       status)
+    type(fusion_source_ledger_v1), intent(in), target :: ledger
+    real(c_double), intent(in), target, contiguous :: inert_heat_J_m3(:)
+    type(fusion_thermal_increment_v1), intent(out), target :: out
+    integer(c_int), intent(out) :: status
+
+    call clear_increment(out)
+    status = PB11_STATUS_INVALID_ARGUMENT
+    if (size(inert_heat_J_m3, kind=c_size_t) /= &
+         int(FUSION_COUPLED_THERMAL_SPECIES, c_size_t)) return
+
+    status = c_fusion_c_coupled_thermal_increment(c_loc(ledger), &
+         c_loc(inert_heat_J_m3(1)), c_loc(out))
+    if (status /= PB11_STATUS_OK) call clear_increment(out)
+  end subroutine fusion_coupled_thermal_increment
 
 end module fusion_coupled_thermal_fortran

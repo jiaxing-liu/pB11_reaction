@@ -1,0 +1,67 @@
+Start testing: Sep 14 09:06 CST
+----------------------------------------------------------
+17/59 Testing: fusion_coupled_thermal_tests
+17/59 Test: fusion_coupled_thermal_tests
+Command: "/tmp/m3-ifx-r8/test_fusion_coupled_thermal"
+Directory: /tmp/m3-ifx-r8
+"fusion_coupled_thermal_tests" start time: Sep 14 09:06 CST
+Output:
+----------------------------------------------------------
+PASS: coupled thermal identity, DT source/energy closure, inert-ion heat, rejection and repeatability tests
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_coupled_thermal_tests" end time: Sep 14 09:06 CST
+"fusion_coupled_thermal_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/59 Testing: fusion_thermal_increment_tests
+19/59 Test: fusion_thermal_increment_tests
+Command: "/tmp/m3-ifx-r8/test_fusion_thermal_increment"
+Directory: /tmp/m3-ifx-r8
+"fusion_thermal_increment_tests" start time: Sep 14 09:06 CST
+Output:
+----------------------------------------------------------
+Thermal increment signed accounting and weak-signal tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_thermal_increment_tests" end time: Sep 14 09:06 CST
+"fusion_thermal_increment_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/59 Testing: fusion_coupled_table_tests
+20/59 Test: fusion_coupled_table_tests
+Command: "/tmp/m3-ifx-r8/test_fusion_coupled_table"
+Directory: /tmp/m3-ifx-r8
+"fusion_coupled_table_tests" start time: Sep 14 09:06 CST
+Output:
+----------------------------------------------------------
+Coupled table/direct parity and failure tests passed; carbon relative difference=4.8013e-05
+<end of output>
+Test time =   0.84 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_coupled_table_tests" end time: Sep 14 09:06 CST
+"fusion_coupled_table_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+46/59 Testing: fusion_coupled_thermal_fortran_binding_tests
+46/59 Test: fusion_coupled_thermal_fortran_binding_tests
+Command: "/tmp/m3-ifx-r8/test_fusion_coupled_thermal_fortran"
+Directory: /tmp/m3-ifx-r8
+"fusion_coupled_thermal_fortran_binding_tests" start time: Sep 14 09:06 CST
+Output:
+----------------------------------------------------------
+All Fortran coupled-thermal tests passed
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"fusion_coupled_thermal_fortran_binding_tests" end time: Sep 14 09:06 CST
+"fusion_coupled_thermal_fortran_binding_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Sep 14 09:06 CST

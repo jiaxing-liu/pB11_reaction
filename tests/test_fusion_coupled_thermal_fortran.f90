@@ -22,6 +22,8 @@ program test_fusion_coupled_thermal_fortran
   call verify_table_wrong_extent_clear_outputs()
   call verify_table_all_channels_closed_identity()
   call verify_table_dt_null_rejected()
+  call verify_increment_mapping()
+  call verify_increment_wrong_extent_clear()
 
   if (failures /= 0) then
      write(*, '(I0, A)') failures, &
@@ -88,6 +90,15 @@ contains
     out%handoff_mean_error = value
     out%handoff_projected = int(value, c_int)
   end subroutine fill_coupled
+
+  subroutine fill_increment(out, value)
+    type(fusion_thermal_increment_v1), intent(out) :: out
+    real(c_double), intent(in) :: value
+
+    out%thermal_number_m3 = value
+    out%electron_energy_J_m3 = value
+    out%ion_energy_J_m3 = value
+  end subroutine fill_increment
 
   logical function ledger_is_zero(ledger)
     type(fusion_source_ledger_v1), intent(in) :: ledger
@@ -208,6 +219,7 @@ contains
   subroutine verify_layout()
     type(fusion_coupled_thermal_options_v1) :: options
     type(fusion_coupled_thermal_v1) :: out
+    type(fusion_thermal_increment_v1) :: increment
     type(fusion_inert_ion_v1) :: inert
     type(fusion_thermal_birth_options_v1) :: birth
     type(fusion_source_ledger_v1) :: ledger
@@ -225,6 +237,9 @@ contains
     call check(c_sizeof(out) == 1224_c_size_t .and. &
          c_sizeof(out) == 153_c_size_t * c_sizeof(dummy), &
          'coupled result has the 1224-byte C ABI layout')
+    call check(c_sizeof(increment) == 64_c_size_t .and. &
+         c_sizeof(increment) == 8_c_size_t * c_sizeof(dummy), &
+         'thermal increment has the 64-byte C ABI layout')
   end subroutine verify_layout
 
   subroutine verify_no_reaction_with_inert()
@@ -508,5 +523,75 @@ contains
          coupled_is_zero(out), &
          'missing enabled DT table clears every output')
   end subroutine verify_table_dt_null_rejected
+
+  subroutine verify_increment_mapping()
+    type(fusion_source_ledger_v1), target :: ledger
+    real(c_double), target :: inert_heat(6)
+    type(fusion_thermal_increment_v1), target :: out
+    real(c_double) :: expected_numbers(6), expected_electron, expected_ion
+    integer :: i, j
+    integer(c_int) :: status
+
+    call fill_ledger(ledger, 0.0_c_double)
+    ledger%handed_off_number_m3 = 0.0_c_double
+    ledger%handed_off_number_m3(2) = 2.5_c_double
+    ledger%handed_off_energy_J_m3 = 0.0_c_double
+    ledger%handed_off_energy_J_m3(2) = 3.5_c_double
+    ledger%heat_to_bath_J_m3 = 0.0_c_double
+    do i = 1, 6
+       ledger%heat_to_bath_J_m3((i - 1) * 7 + 1) = &
+            real(i, c_double)
+       do j = 2, 7
+          ledger%heat_to_bath_J_m3((i - 1) * 7 + j) = &
+               real(i - j, c_double) / 4.0_c_double
+       end do
+    end do
+    inert_heat = [0.5_c_double, -0.75_c_double, 1.25_c_double, &
+         -1.5_c_double, 2.0_c_double, -2.25_c_double]
+    expected_numbers = ledger%handed_off_number_m3 - &
+         ledger%thermal_consumed_number_m3
+    expected_electron = 0.0_c_double
+    expected_ion = 0.0_c_double
+    do i = 1, 6
+       expected_electron = expected_electron + &
+            ledger%heat_to_bath_J_m3((i - 1) * 7 + 1)
+       expected_ion = expected_ion + inert_heat(i) + &
+            ledger%handed_off_energy_J_m3(i) - &
+            ledger%thermal_consumed_energy_J_m3(i) + &
+            sum(ledger%heat_to_bath_J_m3((i - 1) * 7 + 2:(i - 1) * 7 + 7))
+    end do
+    call fill_increment(out, -99.0_c_double)
+
+    call fusion_coupled_thermal_increment(ledger, inert_heat, out, status)
+
+    call check(status == PB11_STATUS_OK, &
+         'signed ledger maps to a thermal increment')
+    call check(all(out%thermal_number_m3 == expected_numbers), &
+         'increment particle change is handed-off minus thermal-consumed')
+    call check(near(out%electron_energy_J_m3, expected_electron), &
+         'increment electron energy sums the electron heat columns')
+    call check(near(out%ion_energy_J_m3, expected_ion), &
+         'increment ion energy counts ion heat, inert heat, and handoff once')
+  end subroutine verify_increment_mapping
+
+  subroutine verify_increment_wrong_extent_clear()
+    type(fusion_source_ledger_v1), target :: ledger
+    real(c_double), target :: bad_inert_heat(5)
+    type(fusion_thermal_increment_v1), target :: out
+    integer(c_int) :: status
+
+    call fill_ledger(ledger, 0.0_c_double)
+    bad_inert_heat = 1.0_c_double
+    call fill_increment(out, -77.0_c_double)
+
+    call fusion_coupled_thermal_increment(ledger, bad_inert_heat, out, status)
+
+    call check(status == PB11_STATUS_INVALID_ARGUMENT, &
+         'increment rejects an inert heat array with the wrong extent')
+    call check(all(out%thermal_number_m3 == 0.0_c_double) .and. &
+         out%electron_energy_J_m3 == 0.0_c_double .and. &
+         out%ion_energy_J_m3 == 0.0_c_double, &
+         'wrong inert heat extent clears the complete increment')
+  end subroutine verify_increment_wrong_extent_clear
 
 end program test_fusion_coupled_thermal_fortran

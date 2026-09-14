@@ -28,6 +28,21 @@ typedef struct fusion_coupled_thermal_v1 {
  double handoff_L1[6], handoff_mean_error[6];
  int handoff_projected[6];
 } fusion_coupled_thermal_v1;
+/* Signed FLUID increments for one step, derived from explicit source amounts.
+ * This preserves weak source signals even when final-old thermal inventories
+ * would round to zero. Number m^-3, energies J/m^3; no division by dt/volume.
+ * This does not advance state or validate complete nuclear/kinetic conservation.
+ * Use a validated coupled ledger. All ledger amounts must be finite and
+ * nonnegative except the signed heat fields; inert_heat[6] is signed/required.
+ * Handoff energy corrections are already in heat_to_bath and counted once.
+ * External births/escape are FAST amounts, not direct fluid sources.
+ * Inputs/output must not overlap. All output fields clear on failure. */
+typedef struct fusion_thermal_increment_v1 {
+ double thermal_number_m3[6];
+ double electron_energy_J_m3, ion_energy_J_m3;
+} fusion_thermal_increment_v1;
+int fusion_c_coupled_thermal_increment(const fusion_source_ledger_v1 *ledger,
+ const double inert_heat_J_m3[6],fusion_thermal_increment_v1 *out);
 /* Stateless local trial: common thermal-ion temperature, separate electrons.
  * Thermal ion energy includes the six network species AND explicit inert ions.
  * Inert densities do not evolve here. Electron density is supplied/frozen for

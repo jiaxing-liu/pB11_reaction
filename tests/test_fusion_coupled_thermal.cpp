@@ -723,6 +723,16 @@ void test_mixed_pool_handoff_uses_self_consistent_target() {
     require(handed_number > 0.0 && handed_energy > 0.0,
             "mixed-pool handoff returns positive alpha fluid amount");
 
+    fusion_thermal_increment_v1 increment{};
+    require(fusion_c_coupled_thermal_increment(&trial.result.ledger,
+                trial.result.inert_ion_heat_J_m3, &increment) == PB11_STATUS_OK,
+            "actual projected handoff increment");
+    require(increment.thermal_number_m3[FUSION_HELIUM4] == handed_number,
+            "handoff fluid number counted once");
+    require(close_scaled(inputs.ion_energy_J_m3 + increment.ion_energy_J_m3,
+                         trial.result.ion_energy_J_m3, 4e-15, 0.0),
+            "handoff and signed correction reconstruct ion energy once");
+
     double final_thermal_number = 0.0;
     for (double value : trial.thermal_number) final_thermal_number += value;
     const double final_common_ti =
