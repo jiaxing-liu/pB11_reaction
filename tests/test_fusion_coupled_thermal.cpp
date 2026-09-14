@@ -1,5 +1,7 @@
 #include "fusion_coupled_thermal.h"
+#include "fusion_coulomb.h"
 #include "fusion_handoff.h"
+#include "fusion_two_component.h"
 #include "fusion_network.h"
 #include "fusion_nuclear_data.h"
 #include "fusion_rate_model.h"
@@ -209,6 +211,22 @@ int call_trial(const Inputs& inputs, double dt_s, Trial& trial) {
         &trial.result);
 }
 
+int call_table_policy(const Inputs& inputs, double dt_s, Trial& trial, bool effective) {
+    const fusion_birth_table_v1* tables[5]{};
+    const auto fn = effective ? fusion_c_coupled_thermal_table_trial_effective_charge
+                              : fusion_c_coupled_thermal_table_trial;
+    return fn(
+        dt_s, &inputs.options, tables, inputs.grid.cells(), inputs.grid.edges.data(),
+        inputs.thermal_number.data(), inputs.electron_energy_J_m3,
+        inputs.ion_energy_J_m3, inputs.electron_density_m3,
+        inputs.thermal_charge_squared.data(), inputs.inert_count,
+        inputs.inert_count > 0 ? inputs.inert.data() : nullptr,
+        inputs.coulomb_logs.data(), inputs.old_s.data(), inputs.old_t.data(),
+        inputs.external_birth.data(), inputs.escape.data(),
+        trial.thermal_number.data(), trial.s.data(), trial.t.data(),
+        &trial.result);
+}
+
 bool zero_ledger(const fusion_source_ledger_v1& ledger) {
     for (double value : ledger.events_m3)
         if (value != 0.0) return false;
@@ -407,6 +425,42 @@ void require_outputs_cleared(const Trial& trial, const std::string& label) {
     for (double value : trial.t)
         require(value == 0.0, label + " clears T output");
     require(zero_result(trial.result), label + " clears result output");
+}
+
+void test_explicit_effective_charge_policy() {
+    Inputs in;
+    in.thermal_number[FUSION_HELIUM4] = 1.e18;
+    in.electron_density_m3 = 2.22e20;
+    in.electron_energy_J_m3 = 1.5 * in.electron_density_m3 * 5*kKeVJ;
+    in.ion_energy_J_m3 = 1.5 * 1.21e20 * 10*kKeVJ;
+    const int cell = nearest_cell(in.grid,3.5*kMeVJ);
+    in.old_s[FUSION_HELIUM4*in.grid.cells()+cell] = 1.e14;
+    auto strict=make_trial(in),same=make_trial(in),effective=make_trial(in);
+    require(call_table_policy(in,1.e-5,strict,false)==PB11_STATUS_OK,"strict physical table trial");
+    require(call_table_policy(in,1.e-5,same,true)==PB11_STATUS_OK,"effective variant physical input");
+    require(strict.s==same.s && strict.t==same.t &&
+      strict.result.electron_energy_J_m3==same.result.electron_energy_J_m3 &&
+      strict.result.ion_energy_J_m3==same.result.ion_energy_J_m3,"policy physical-input parity");
+    in.thermal_charge_squared[FUSION_HELIUM4]=4.04;
+    auto rejected=make_trial(in);
+    require(call_table_policy(in,1.e-5,rejected,false)!=PB11_STATUS_OK,"strict rejects supernuclear charge moment");
+    require_outputs_cleared(rejected,"strict charge rejection");
+    require(call_table_policy(in,1.e-5,effective,true)==PB11_STATUS_OK,"explicit effective factor accepted");
+    require_finite_result(effective,"effective charge");
+    const double h0=sum_heat(strict.result.ledger,FUSION_HELIUM4,FUSION_HELIUM4+1,FUSION_HELIUM4+2);
+    const double h1=sum_heat(effective.result.ledger,FUSION_HELIUM4,FUSION_HELIUM4+1,FUSION_HELIUM4+2);
+    require(h1>h0 && h0>0,"effective factor changes collision heat and is not clamped");
+    const double u0=fast_energy(in.grid,in.old_s,in.old_t,FUSION_HELIUM4);
+    const double u1=fast_energy(in.grid,effective.s,effective.t,FUSION_HELIUM4);
+    const double delta=effective.result.electron_energy_J_m3-in.electron_energy_J_m3+
+        effective.result.ion_energy_J_m3-in.ion_energy_J_m3+u1-u0;
+    require(std::abs(delta)/u0<1.e-10,"effective collision energy closure");
+    for(double invalid:{-1.,std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::infinity()}) {
+        in.thermal_charge_squared[FUSION_HELIUM4]=invalid;
+        rejected=make_trial(in);
+        require(call_table_policy(in,1.e-5,rejected,true)!=PB11_STATUS_OK,"bad effective factor rejected");
+        require_outputs_cleared(rejected,"effective charge rejection");
+    }
 }
 
 void test_no_reaction_no_fast_is_identity() {
@@ -751,25 +805,161 @@ void test_mixed_pool_handoff_uses_self_consistent_target() {
 }
 
 void test_negative_thermal_energy_and_invalid_inputs_reject_and_clear() {
-    Inputs extreme;
-    extreme.options = make_options(Channels{{0, 0, 0, 0, 0}});
-    extreme.thermal_number = Species{{0.0, 1.0e20, 1.0e20, 0.0, 0.0, 0.0}};
-    extreme.electron_density_m3 = 2.0e20;
-    extreme.electron_energy_J_m3 = 1.5 * extreme.electron_density_m3 *
-                                   (1.0e-3 * kElectronVoltJ);
-    extreme.ion_energy_J_m3 = 1.5 *
-                              (extreme.thermal_number[FUSION_DEUTERON] +
-                               extreme.thermal_number[FUSION_TRITON] +
-                               extreme.inert[0].density_m3) *
-                              (1.0e-3 * kElectronVoltJ);
-    const int alpha_cell = nearest_cell(extreme.grid, 3.5 * kMeVJ);
-    extreme.old_s[static_cast<std::size_t>(FUSION_HELIUM4) *
-                      extreme.grid.cells() +
-                  static_cast<std::size_t>(alpha_cell)] =
-        1.0e20;
-    Trial negative_energy = make_trial(extreme);
-    require(call_trial(extreme, 1.0e3, negative_energy) != PB11_STATUS_OK,
-            "extreme collision step rejects negative thermal energy");
+    // This is the former "extreme" case.  The hot alpha deposits a large,
+    // finite amount into cold baths; it is a valid successful trial, not a
+    // negative-thermal-energy rejection.  The returned bath ledgers close the
+    // fast/thermal energy exchange at returned double precision.
+    Inputs cold;
+    cold.options = make_options(Channels{{0, 0, 0, 0, 0}});
+    cold.thermal_number = Species{{0.0, 1.0e20, 1.0e20, 0.0, 0.0, 0.0}};
+    cold.electron_density_m3 = 2.0e20;
+    cold.electron_energy_J_m3 = 1.5 * cold.electron_density_m3 *
+                                (1.0e-3 * kElectronVoltJ);
+    cold.ion_energy_J_m3 = 1.5 *
+                           (cold.thermal_number[FUSION_DEUTERON] +
+                            cold.thermal_number[FUSION_TRITON] +
+                            cold.inert[0].density_m3) *
+                           (1.0e-3 * kElectronVoltJ);
+    const int hot_alpha_cell = nearest_cell(cold.grid, 3.5 * kMeVJ);
+    cold.old_s[static_cast<std::size_t>(FUSION_HELIUM4) * cold.grid.cells() +
+               static_cast<std::size_t>(hot_alpha_cell)] = 1.0e20;
+    Trial cold_trial = make_trial(cold);
+    require(call_trial(cold, 1.0e3, cold_trial) == PB11_STATUS_OK,
+            "hot-alpha/cold-bath collision step returns OK");
+    require_finite_result(cold_trial, "hot-alpha/cold-bath trial");
+    const double cold_electron_heat =
+        sum_heat(cold_trial.result.ledger, FUSION_HELIUM4, 0, 1);
+    const double cold_network_ion_heat =
+        sum_heat(cold_trial.result.ledger, FUSION_HELIUM4, 1, kBaths);
+    const double cold_inert_heat =
+        cold_trial.result.inert_ion_heat_J_m3[FUSION_HELIUM4];
+    require(cold_electron_heat > 0.0 &&
+                cold_network_ion_heat + cold_inert_heat > 0.0,
+            "hot-alpha/cold-bath trial records positive bath heat");
+    const double cold_initial_fast =
+        fast_energy(cold.grid, cold.old_s, cold.old_t, FUSION_HELIUM4);
+    const double cold_final_fast =
+        fast_energy(cold.grid, cold_trial.s, cold_trial.t, FUSION_HELIUM4);
+    require(close_scaled(cold_trial.result.electron_energy_J_m3 -
+                             cold.electron_energy_J_m3,
+                         cold_electron_heat, 3.0e-8, 1.0e-10),
+            "hot-alpha/cold-bath electron heat closes");
+    require(close_scaled(cold_trial.result.ion_energy_J_m3 -
+                             cold.ion_energy_J_m3,
+                         cold_network_ion_heat + cold_inert_heat, 3.0e-8,
+                         1.0e-10),
+            "hot-alpha/cold-bath ion heat closes");
+    const double cold_total_delta =
+        cold_trial.result.electron_energy_J_m3 - cold.electron_energy_J_m3 +
+        cold_trial.result.ion_energy_J_m3 - cold.ion_energy_J_m3 +
+        cold_final_fast - cold_initial_fast;
+    const double cold_total_scale =
+        std::abs(cold.electron_energy_J_m3) +
+        std::abs(cold.ion_energy_J_m3) + cold_initial_fast + cold_final_fast +
+        cold_electron_heat + cold_network_ion_heat + cold_inert_heat;
+    require(std::abs(cold_total_delta) <= 3.0e-8 * cold_total_scale,
+            "hot-alpha/cold-bath total energy closes");
+
+    // Use hot 10-keV baths and a huge cold alpha inventory in the first 1-eV
+    // cell.  A raw two-component call with the same Coulomb coefficients is successful
+    // and exposes negative bath heat larger than each available reservoir;
+    // the coupled trial must therefore reject when Ue or Ui would go below
+    // zero.  This diagnostic distinguishes that physical branch from an FP
+    // coefficient/ledger failure, whose outputs would not be available.
+    Inputs overdraw;
+    overdraw.options = make_options(Channels{{0, 0, 0, 0, 0}});
+    const double hot_temperature = 10.0 * kKeVJ;
+    overdraw.electron_energy_J_m3 =
+        1.5 * overdraw.electron_density_m3 * hot_temperature;
+    overdraw.ion_energy_J_m3 =
+        1.5 * (overdraw.thermal_number[FUSION_DEUTERON] +
+               overdraw.thermal_number[FUSION_TRITON] +
+               overdraw.inert[0].density_m3) * hot_temperature;
+    overdraw.old_s[static_cast<std::size_t>(FUSION_HELIUM4) *
+                   overdraw.grid.cells()] = 1.0e24;
+    constexpr int raw_baths = kBaths + 1;  // electron, six network ions, C
+    fusion_nuclear_mass_v1 alpha_mass{};
+    fusion_nuclear_mass_v1 electron_mass{};
+    require(fusion_c_nuclear_mass(FUSION_HELIUM4, &alpha_mass) ==
+                PB11_STATUS_OK,
+            "alpha mass is available for raw two-component diagnostic");
+    require(fusion_c_nuclear_mass(FUSION_MASS_ELECTRON, &electron_mass) ==
+                PB11_STATUS_OK,
+            "electron mass is available for raw two-component diagnostic");
+    std::array<fusion_maxwellian_bath_v1, raw_baths> raw_bath{};
+    raw_bath[0] = {overdraw.electron_density_m3, electron_mass.mass_kg, 1.0,
+                   hot_temperature, 15.0};
+    for (int species = 0; species < kSpecies; ++species) {
+        fusion_nuclear_mass_v1 mass{};
+        require(fusion_c_nuclear_mass(species, &mass) == PB11_STATUS_OK,
+                "network mass is available for raw two-component diagnostic");
+        raw_bath[species + 1] = {
+            overdraw.thermal_number[species], mass.mass_kg,
+            overdraw.thermal_charge_squared[species], hot_temperature, 15.0};
+    }
+    raw_bath[kBaths] = {overdraw.inert[0].density_m3,
+                        overdraw.inert[0].mass_kg,
+                        overdraw.inert[0].mean_charge_squared,
+                        hot_temperature, 15.0};
+    std::array<double, raw_baths> raw_temperature{};
+    for (int bath = 0; bath < raw_baths; ++bath)
+        raw_temperature[bath] = raw_bath[bath].kT_J;
+    const int raw_cells = overdraw.grid.cells();
+    std::vector<double> raw_diffusion(static_cast<std::size_t>(raw_baths) *
+                                      (raw_cells - 1));
+    for (int bath = 0; bath < raw_baths; ++bath) {
+        for (int face = 0; face < raw_cells - 1; ++face) {
+            fusion_coulomb_energy_v1 coefficient{};
+            require(fusion_c_coulomb_energy(
+                        overdraw.grid.edges[static_cast<std::size_t>(face + 1)],
+                        alpha_mass.mass_kg, alpha_mass.nuclear_charge,
+                        &raw_bath[bath], &coefficient) == PB11_STATUS_OK,
+                    "raw two-component Coulomb coefficient is finite");
+            raw_diffusion[static_cast<std::size_t>(bath) * (raw_cells - 1) +
+                          static_cast<std::size_t>(face)] =
+                coefficient.diffusion_J2_s;
+        }
+    }
+    std::vector<double> raw_old(raw_cells, 0.0), raw_birth(raw_cells, 0.0),
+        raw_escape(raw_cells, 0.0), raw_trial(raw_cells, -7.0),
+        raw_heat(raw_baths, -7.0);
+    raw_old[0] = 1.0e24;
+    std::vector<double> raw_transfer(raw_cells,0.),raw_old_t(raw_cells,0.),raw_trial_t(raw_cells,0.);
+    for(int cell=0;cell<raw_cells;++cell) {
+        long double total=0;
+        for(int bath=1;bath<raw_baths;++bath) {
+            double rate=0;
+            require(fusion_c_coulomb_transfer_rate(cell_center(overdraw.grid,cell),
+                alpha_mass.mass_kg,alpha_mass.nuclear_charge,&raw_bath[bath],&rate)==PB11_STATUS_OK,
+                "raw internal transfer coefficient succeeds");
+            total+=rate;
+        }
+        raw_transfer[cell]=static_cast<double>(total);
+    }
+    fusion_two_component_ledger_v1 raw_ledger{};
+    const double overdraw_dt = 1.0e3;
+    require(fusion_c_two_component_trial(
+                raw_cells, raw_baths, overdraw_dt,
+                overdraw.grid.edges.data(), raw_old.data(),raw_old_t.data(),
+                raw_temperature.data(), raw_diffusion.data(), raw_birth.data(),raw_birth.data(),
+                raw_escape.data(),raw_transfer.data(),raw_trial.data(),raw_trial_t.data(),raw_heat.data(),
+                &raw_ledger) == PB11_STATUS_OK,
+            "raw hot-bath two-component step returns OK before coupled reservoir check");
+    double raw_electron_heat = raw_heat[0];
+    double raw_ion_heat = 0.0;
+    for (int bath = 1; bath < raw_baths; ++bath)
+        raw_ion_heat += raw_heat[bath];
+    require(std::isfinite(raw_electron_heat) && std::isfinite(raw_ion_heat) &&
+                raw_electron_heat < -overdraw.electron_energy_J_m3 &&
+                raw_ion_heat < -overdraw.ion_energy_J_m3,
+            "raw hot-bath two-component heat overdraws both thermal reservoirs");
+    require(std::isfinite(raw_ledger.total.energy_balance_error_J_m3),
+            "raw hot-bath two-component ledger residual is finite");
+
+    Trial negative_energy = make_trial(overdraw);
+    require(call_trial(overdraw, overdraw_dt, negative_energy) ==
+                PB11_STATUS_NUMERICAL_FAILURE,
+            "hot-bath collision step rejects negative thermal energy");
     require_outputs_cleared(negative_energy,
                             "negative-thermal-energy rejection");
 
@@ -832,6 +1022,7 @@ void test_clipped_charged_birth_grid_rejects_and_clears() {
 
 int main() {
     try {
+        test_explicit_effective_charge_policy();
         test_no_reaction_no_fast_is_identity();
         test_dt_burn_slowing_accounting_and_repeatability();
         test_inert_heat_is_separate_and_closes();

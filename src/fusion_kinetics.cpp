@@ -7,10 +7,13 @@
 namespace {
 using Real=long double;
 bool finite(Real value) {return std::isfinite(value);}
+// Finite subnormal amounts use IEEE rounding, as the returned distribution
+// already does. All balances are checked in long double before publication;
+// overflow and nonfinite values remain failures, with no density/energy floor.
 bool output_value(Real value,double &out) {
     if (!finite(value) || std::abs(value)>std::numeric_limits<double>::max()) return false;
     out=static_cast<double>(value);
-    return value==0 || out!=0;
+    return true;
 }
 void bernoulli_pair(Real w,Real &positive,Real &negative) {
     // B(w)=w/(exp(w)-1); B(-w)=B(w)+w. No overflowing exp(+large w).
@@ -92,6 +95,8 @@ extern "C" int fusion_c_energy_fp_trial(int n,int nb,double dt,
             if (!finite(state[i]) || state[i]<0) return PB11_STATUS_NUMERICAL_FAILURE;
         }
         std::vector<double> output(n),heat_output(nb);
+        std::vector<Real> underflow_error(n,0);
+        Real number_round=0,energy_round=0;
         for (int i=0;i<n;++i) {
             // IEEE underflow of a positive tail is allowed; the total particle
             // and energy residuals below still bound any rounding loss. This
@@ -99,6 +104,11 @@ extern "C" int fusion_c_energy_fp_trial(int n,int nb,double dt,
             if (state[i]>std::numeric_limits<double>::max())
                 return PB11_STATUS_NUMERICAL_FAILURE;
             output[i]=static_cast<double>(state[i]);
+            if (state[i]<std::numeric_limits<double>::min())
+                underflow_error[i]=std::abs(state[i]-static_cast<Real>(output[i]));
+            const Real loss=static_cast<Real>(escape[i])+(i==0?thermalization:0.);
+            number_round+=underflow_error[i]*(1+static_cast<Real>(dt)*loss);
+            energy_round+=energy[i]*underflow_error[i]*(1+static_cast<Real>(dt)*loss);
             state[i]=output[i]; // Ledger describes the actual returned precision.
         }
         Real net_heat=0,heat_scale=0;
@@ -108,8 +118,17 @@ extern "C" int fusion_c_energy_fp_trial(int n,int nb,double dt,
                 const auto index=static_cast<std::size_t>(b)*nf+f;
                 const Real flux=left[index]*state[f]-right[index]*state[f+1];
                 bath_heat-=dt*(energy[f+1]-energy[f])*flux;
+                energy_round+=dt*(energy[f+1]-energy[f])*
+                    (left[index]*underflow_error[f]+right[index]*underflow_error[f+1]);
             }
-            if (!output_value(bath_heat,heat_output[b])) return PB11_STATUS_NUMERICAL_FAILURE;
+            // Match positive-tail state rounding: a finite bath exchange below
+            // double range may round to zero. Keep overflow/nonfinite rejection;
+            // recompute the energy residual with the RETURNED heat below.
+            if (!finite(bath_heat) || std::abs(bath_heat)>std::numeric_limits<double>::max())
+                return PB11_STATUS_NUMERICAL_FAILURE;
+            heat_output[b]=static_cast<double>(bath_heat);
+            if (std::abs(bath_heat)<std::numeric_limits<double>::min())
+                energy_round+=std::abs(bath_heat-static_cast<Real>(heat_output[b]));
             net_heat+=heat_output[b]; heat_scale+=std::abs(heat_output[b]);
         }
         Real n0=0,n1=0,e0=0,e1=0,nborn=0,eborn=0,nesc=0,eesc=0;
@@ -124,8 +143,16 @@ extern "C" int fusion_c_energy_fp_trial(int n,int nb,double dt,
         const Real er=e1-e0-eborn+eesc+eth+net_heat;
         const Real nscale=n0+nborn+nesc+nth+n1;
         const Real escale=e0+e1+eborn+eesc+eth+heat_scale;
-        if (!finite(nr) || !finite(er) || std::abs(nr)>1e-10L*nscale || std::abs(er)>1e-10L*escale)
+        // A purely subnormal component cannot satisfy a relative-only bound.
+        // Account only for measured IEEE state/heat rounding, propagated through
+        // the same linear balance operator; no user-tuned absolute floor.
+        if (!finite(nr) || !finite(er) || !finite(number_round) || !finite(energy_round) ||
+            std::abs(nr)>1e-10L*nscale+number_round ||
+            std::abs(er)>1e-10L*escale+energy_round)
             return PB11_STATUS_NUMERICAL_FAILURE;
+        // Balance tests above use long double before diagnostic rounding. A
+        // residual smaller than a double subnormal may be reported as zero;
+        // Every ledger field uses ordinary IEEE rounding below double range.
         fusion_kinetic_ledger_v1 result{};
         if (!output_value(n0,result.initial_number_m3) || !output_value(n1,result.final_number_m3) ||
             !output_value(e0,result.initial_energy_J_m3) || !output_value(e1,result.final_energy_J_m3) ||

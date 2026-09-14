@@ -81,6 +81,7 @@ module fusion_coupled_thermal_fortran
 
   public :: fusion_coupled_thermal_trial
   public :: fusion_coupled_thermal_table_trial
+  public :: fusion_coupled_thermal_table_trial_effective_charge
   public :: fusion_coupled_thermal_increment
 
   interface
@@ -144,6 +145,39 @@ module fusion_coupled_thermal_fortran
        type(c_ptr), value :: out
        integer(c_int) :: status
      end function c_fusion_c_coupled_thermal_table_trial
+
+     function c_fusion_c_coupled_thermal_table_trial_effective_charge( &
+          dt_s, options, tables, cells, edges, thermal_number, &
+          electron_energy, ion_energy, electron_density, &
+          thermal_charge_squared, inert_count, inert, coulomb_logs, old_s, &
+          old_t, external_birth, escape, trial_thermal_number, trial_s, &
+          trial_t, out) bind(C, &
+          name="fusion_c_coupled_thermal_table_trial_effective_charge") &
+          result(status)
+       import :: c_double, c_int, c_ptr
+       real(c_double), value :: dt_s
+       type(c_ptr), value :: options
+       type(c_ptr), value :: tables
+       integer(c_int), value :: cells
+       type(c_ptr), value :: edges
+       type(c_ptr), value :: thermal_number
+       real(c_double), value :: electron_energy
+       real(c_double), value :: ion_energy
+       real(c_double), value :: electron_density
+       type(c_ptr), value :: thermal_charge_squared
+       integer(c_int), value :: inert_count
+       type(c_ptr), value :: inert
+       type(c_ptr), value :: coulomb_logs
+       type(c_ptr), value :: old_s
+       type(c_ptr), value :: old_t
+       type(c_ptr), value :: external_birth
+       type(c_ptr), value :: escape
+       type(c_ptr), value :: trial_thermal_number
+       type(c_ptr), value :: trial_s
+       type(c_ptr), value :: trial_t
+       type(c_ptr), value :: out
+       integer(c_int) :: status
+     end function c_fusion_c_coupled_thermal_table_trial_effective_charge
 
      function c_fusion_c_coupled_thermal_increment(ledger, inert_heat, out) &
           bind(C, name="fusion_c_coupled_thermal_increment") result(status)
@@ -461,6 +495,70 @@ contains
             trial_t_m3, out)
     end if
   end subroutine fusion_coupled_thermal_table_trial
+
+  subroutine fusion_coupled_thermal_table_trial_effective_charge( &
+       dt_s, options, tables, cells, edges_J, thermal_number_m3, &
+       electron_energy_J_m3, ion_energy_J_m3, electron_density_m3, &
+       thermal_charge_squared, inert_count, inert, coulomb_logs, old_s_m3, &
+       old_t_m3, external_birth_m3_s, escape_s_inv, &
+       trial_thermal_number_m3, trial_s_m3, trial_t_m3, out, status)
+    real(c_double), intent(in) :: dt_s
+    type(fusion_coupled_thermal_options_v1), intent(in), target :: options
+    type(c_ptr), intent(in), target, contiguous :: tables(:)
+    integer(c_int), intent(in) :: cells
+    real(c_double), intent(in), target, contiguous :: edges_J(:)
+    real(c_double), intent(in), target, contiguous :: thermal_number_m3(:)
+    real(c_double), intent(in) :: electron_energy_J_m3
+    real(c_double), intent(in) :: ion_energy_J_m3
+    real(c_double), intent(in) :: electron_density_m3
+    real(c_double), intent(in), target, contiguous :: &
+         thermal_charge_squared(:)
+    integer(c_int), intent(in) :: inert_count
+    type(fusion_inert_ion_v1), intent(in), target, contiguous :: inert(:)
+    real(c_double), intent(in), target, contiguous :: coulomb_logs(:,:)
+    real(c_double), intent(in), target, contiguous :: old_s_m3(:,:)
+    real(c_double), intent(in), target, contiguous :: old_t_m3(:,:)
+    real(c_double), intent(in), target, contiguous :: external_birth_m3_s(:,:)
+    real(c_double), intent(in), target, contiguous :: escape_s_inv(:,:)
+    real(c_double), intent(out), target, contiguous :: &
+         trial_thermal_number_m3(:)
+    real(c_double), intent(out), target, contiguous :: trial_s_m3(:,:)
+    real(c_double), intent(out), target, contiguous :: trial_t_m3(:,:)
+    type(fusion_coupled_thermal_v1), intent(out), target :: out
+    integer(c_int), intent(out) :: status
+
+    type(c_ptr) :: options_ptr, tables_ptr, edges_ptr, thermal_number_ptr
+    type(c_ptr) :: thermal_charge_squared_ptr, inert_ptr, coulomb_logs_ptr
+    type(c_ptr) :: old_s_ptr, old_t_ptr, external_birth_ptr, escape_ptr
+    type(c_ptr) :: trial_thermal_number_ptr, trial_s_ptr, trial_t_ptr
+    type(c_ptr) :: out_ptr
+
+    call clear_trial_outputs(trial_thermal_number_m3, trial_s_m3, trial_t_m3, out)
+    call prepare_trial_arguments(options, cells, edges_J, thermal_number_m3, &
+         thermal_charge_squared, inert_count, inert, coulomb_logs, old_s_m3, &
+         old_t_m3, external_birth_m3_s, escape_s_inv, trial_thermal_number_m3, &
+         trial_s_m3, trial_t_m3, options_ptr, edges_ptr, thermal_number_ptr, &
+         thermal_charge_squared_ptr, inert_ptr, coulomb_logs_ptr, old_s_ptr, &
+         old_t_ptr, external_birth_ptr, escape_ptr, trial_thermal_number_ptr, &
+         trial_s_ptr, trial_t_ptr, tables_ptr, status, &
+         tables=tables)
+    if (status /= PB11_STATUS_OK) return
+    out_ptr = c_loc(out)
+    inert_ptr = c_null_ptr
+    if (inert_count > 0_c_int) inert_ptr = c_loc(inert(1))
+
+    status = c_fusion_c_coupled_thermal_table_trial_effective_charge( &
+         dt_s, options_ptr, tables_ptr, cells, edges_ptr, &
+         thermal_number_ptr, electron_energy_J_m3, ion_energy_J_m3, &
+         electron_density_m3, thermal_charge_squared_ptr, inert_count, &
+         inert_ptr, coulomb_logs_ptr, old_s_ptr, old_t_ptr, &
+         external_birth_ptr, escape_ptr, trial_thermal_number_ptr, &
+         trial_s_ptr, trial_t_ptr, out_ptr)
+    if (status /= PB11_STATUS_OK) then
+       call clear_trial_outputs(trial_thermal_number_m3, trial_s_m3, &
+            trial_t_m3, out)
+    end if
+  end subroutine fusion_coupled_thermal_table_trial_effective_charge
 
   subroutine fusion_coupled_thermal_increment(ledger, inert_heat_J_m3, out, &
        status)

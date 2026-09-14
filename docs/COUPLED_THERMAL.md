@@ -196,3 +196,37 @@ validate full reaction stoichiometry/kinetic closure or advance any state.
 Use a ledger from a successful validated operator. It does not supply host
 time/volume conversion, particle transport, charge closure or acceptance.
 Evidence: `validation/thermal-increment`.
+
+## Explicit effective collision-strength variant
+
+`fusion_c_coupled_thermal_table_trial_effective_charge` is an additive,
+table-backed entry point for callers that intentionally provide an effective
+thermal collision strength. Its `thermal_charge_squared[6]` inputs must be
+finite and nonnegative, but may exceed the canonical nuclear `Z_i^2`. Values
+are used as supplied: the function does not clip or otherwise correct them.
+The direct `fusion_c_coupled_thermal_trial` and physical table
+`fusion_c_coupled_thermal_table_trial` entry points retain strict physical
+validation, including the `Z_i^2` upper bound.
+
+The effective variant changes only the network thermal-bath collision factor.
+Electron density remains an explicit frozen input; canonical fast-particle
+charges, nuclear rates, reaction stoichiometry, Q/ledger bookkeeping and
+finite-output/conservation checks are unchanged. Collision heat can change,
+but the returned thermal/fast energy closure is still checked. The caller
+must document and calibrate this model assumption; the entry point is not a
+charge-state or ionization solver. All other table-trial units, table
+matching, trial ownership and failure-clearing semantics apply.
+
+For BALDUR's legacy `atomc2`/`ofit` path, the charge-square fit uses
+`max(zq,pz**2*1.01)`. For He4 (`pz=2`) this floor gives `4.04`; it is a
+legacy transport regularizer, not a physical charge-state moment `<Z^2>`.
+Use the effective entry point only when that approximation is intended and
+recorded by the caller.
+
+The focused regression in `tests/test_fusion_coupled_thermal.cpp` rejects
+negative, NaN and +Inf effective factors and clears outputs; verifies
+bit-identical strict/effective results for physical input; verifies that the
+strict table call rejects He4 `4.04` while the explicit effective call accepts
+it; and checks that collision heat is not clamped and that thermal/fast
+energy closes. This is library-level evidence only; it does not claim a full
+BALDUR host-driver or production coupled run.

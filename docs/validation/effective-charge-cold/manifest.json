@@ -1,0 +1,19 @@
+{
+  "parent": "14fc78a59fc0a448313fe7d238322af4af0d4ee4",
+  "source_sha256": {
+    "docs/COUPLED_THERMAL.md": "639a9a3c9f4d6c2588516a882d105c43488e4b9e40a1da732920313ae38c3844",
+    "docs/KINETIC_PRIMITIVES.md": "6bc20d9c5bec7b54dccff88fd532b1c78ddc4f9e094b7f1e72f48495d018f597",
+    "fortran/fusion_coupled_thermal_fortran.f90": "daf8d231047a17fa15b9ddf649cc32d758bfab40e3afc0d4468e8a3cb04b6d45",
+    "include/fusion_coupled_thermal.h": "c90aaec4983c6171a5403a4ba66ccfc3ed30d844c1e51046914667b133a1f653",
+    "include/fusion_kinetics.h": "a4279341575828c3075c1e4c857537cf95a0c9e5e9134ccac06604455231c86f",
+    "include/fusion_two_component.h": "ebaea56b139f6f57f5eb5ed53a6b3507fa5c262e163a5e30015deae90c807c1d",
+    "src/fusion_coupled_thermal.cpp": "32514f9e3ddaf233abae96cd49902fe2db06d62078d8db6386ef885e1d493caa",
+    "src/fusion_kinetics.cpp": "e287b0bcf298007ffe88a55d51fa02e42ae45e04cadaaa478680ee32eb5f6e70",
+    "src/fusion_two_component.cpp": "84228ef8036d179861c09c98534c98a04b67c31821432e07b53544fb684e0265",
+    "tests/test_fusion_coupled_thermal.cpp": "4e8740ce276a31bb77fd4fc4e2e0c11ba51d4f043eeba3823bd13bf2c627b816",
+    "tests/test_fusion_kinetics.cpp": "c8eda6306a7ce3fd7380720932a8532993bf93ffab81d153d56d89a209d46476"
+  },
+  "c11_consumer": "strict compile/link/run passed",
+  "host_parent": "8ddc6d8",
+  "scope": "effective collision factors and IEEE underflow; host injection only"
+}

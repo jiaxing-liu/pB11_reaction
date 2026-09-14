@@ -40,7 +40,8 @@ int fusion_c_coulomb_transfer_rate(double energy_J, double mass_kg,
  * fields are exactly zero. Transfer N and carried energy are internal; do not
  * add them to a bath or host source. Per-bath heat is S+T collision heat.
  * Inputs/output arrays must not overlap. Explicit old/trial state, no hidden
- * counters. Positive per-cell transfer-source tails may round below double
+ * counters. Finite subnormal ledger amounts use IEEE double rounding.
+ * Positive per-cell transfer-source tails may round below double
  * range; the combined N/U residual check still bounds this rounding loss.
  * For valid dimensions nonnull output arrays and ledger zero on
  * any failure. Bath arrays may be NULL at baths=0, diffusion at cells=1.

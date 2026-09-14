@@ -109,3 +109,24 @@ C11 program `docs/validation/m3-c-caller.c` (compile with cc, link with c++).
 `pb11::fusion_kinetics_fortran` exports explicit c_double/c_int types and
 handles empty arrays and noncontiguous Fortran sections. No BALDUR stateful
 kinetic coupling is claimed by these ABI checks.
+
+## Floating-point underflow in cold trace components
+
+Finite FP states, bath heat and scalar ledgers follow IEEE double rounding below
+subnormal range; nonfinite values, overflow, negative states and nonpositive
+pivots still reject. This is not a physical population/energy cutoff. The FP
+balance is evaluated in long double using the returned population and heat.
+For subnormal states only, the exact conversion error |N_long-N_double| is
+propagated through the discrete particle and energy balance operators, including
+escape, first-cell thermalization and all bath face-flux coefficients. Actual
+subnormal bath-heat conversion error is also included. These measured errors
+supplement the existing relative residual bound; no arbitrary absolute tolerance
+is introduced. Diagnostic residuals are rounded only after this check. The
+combined two-component step independently checks its full S+T balances.
+
+The real cold-host injection probe exposed bath heat 1.46245e-326 J/m3,
+energy residual -4.93559e-328 J/m3 and internal S-to-T energy transfer
+2.66772e-325 J/m3. Strict nonzero representability of these quantities aborted
+otherwise resolved multi-MeV alpha evolution. Tests now cover a weak bath beside
+a resolved bath, trace energy with an unrepresentable residual, and a one-cell
+birth amount below half a double subnormal. Overflow rejection is retained.

@@ -38,6 +38,10 @@ typedef struct fusion_kinetic_ledger_v1 {
  * state, counters or file I/O. A host must preserve its accepted grid/state.
  * Bath arrays may be NULL when baths=0; diffusion may be NULL when cells=1.
  * For valid dimensions, non-NULL output arrays/ledger are zeroed on failure.
+ * Finite subnormal state, heat and ledger values follow IEEE double rounding.
+ * Balance checks use extended precision with measured subnormal conversion
+ * errors propagated through the discrete operator; no physical floor is used.
+ * Nonfinite values and overflow reject; tiny diagnostic residuals may round zero.
  * All inputs must be finite/nonnegative, dt>0, kT>0. Returns PB11_STATUS_*.
  */
 int fusion_c_energy_fp_trial(int cells, int baths, double dt_s,

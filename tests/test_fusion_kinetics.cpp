@@ -441,6 +441,53 @@ void test_zero_invalid_and_overflow() {
           "unrepresentable trial output is rejected and cleared");
 }
 
+
+// A finite trace bath can exchange less than one double subnormal without
+// invalidating the resolved distribution or the energy exchange with other baths.
+void test_unrepresentable_birth_amount() {
+    const double edges[2]{0.,2.e-13},old[1]{0.},birth[1]{1.e-320},zero[1]{0.};
+    double state[1]{-1.};fusion_kinetic_ledger_v1 ledger{};
+    const int status=fusion_c_energy_fp_trial(1,0,1.e-5,edges,old,nullptr,nullptr,
+        birth,zero,0.,state,nullptr,&ledger);
+    const long double amount=static_cast<long double>(birth[0])*1.e-5L;
+    check(amount>0. && amount<std::numeric_limits<double>::denorm_min()/2.L,
+        "source amount is independently below returned precision");
+    check(status==PB11_STATUS_OK && state[0]==0.,
+        "actual underflow rounding bound accepts subnormal source amount");
+}
+
+void test_residual_underflow() {
+    const double edges[3]{1.e-13,2.e-13,3.e-13}, old[2]{0.,1.e-300};
+    const double temperature[1]{1.e-13}, diffusion[1]{1.e-26},zero[2]{0.,0.};
+    double state[2]{},heat[1]{};fusion_kinetic_ledger_v1 ledger{};
+    const int status=fusion_c_energy_fp_trial(2,1,1.e-3,edges,old,temperature,
+        diffusion,zero,zero,0.,state,heat,&ledger);
+    check(status==PB11_STATUS_OK,"validated subnormal balance residual may round to zero");
+    if(status!=PB11_STATUS_OK)return;
+    check(ledger.initial_energy_J_m3>0. && ledger.final_energy_J_m3>0. && heat[0]>0.,
+        "trace energy and bath heat are retained above double range");
+    const long double balance=1.5e-13L*state[0]+2.5e-13L*state[1]+heat[0]-2.5e-313L;
+    check(std::abs(balance)<1.e-10L*2.5e-313L,"independent long double trace energy closure");
+}
+
+void test_bath_heat_underflow() {
+    const double edges[3]{1.,2.,3.}, old[2]{0.,1.}, temperature[2]{1.,1.};
+    const double diffusion[2]{1.,1.e-320}, zero[2]{0.,0.};
+    double state[2]{}, heat[2]{};
+    fusion_kinetic_ledger_v1 ledger{};
+    const int status=fusion_c_energy_fp_trial(2,2,1.e-6,edges,old,
+        temperature,diffusion,zero,zero,0.,state,heat,&ledger);
+    check(status==PB11_STATUS_OK,"subnormal bath heat does not abort resolved step");
+    if(status!=PB11_STATUS_OK)return;
+    check(heat[0]>0. && heat[1]==0.,"resolved heat retained and unrepresentable trace rounds to zero");
+    const long double trace=static_cast<long double>(heat[0])*diffusion[1]/diffusion[0];
+    check(trace>0. && trace<std::numeric_limits<double>::denorm_min()/2.L,
+        "independent proportional-bath heat lies below double range");
+    check(std::abs(state[0]+state[1]-1.)<1.e-14,"trace bath preserves particles");
+    const long double balance=1.5L*state[0]+2.5L*state[1]+heat[0]+heat[1]-2.5L;
+    check(std::abs(balance)<1.e-14L,"returned precision energy balance remains bounded");
+}
+
 }  // namespace
 
 int main() {
@@ -448,6 +495,9 @@ int main() {
     test_common_bath_equilibrium_and_reflection();
     test_bath_exchange_and_energy_ledger();
     test_time_refinement();
+    test_bath_heat_underflow();
+    test_residual_underflow();
+    test_unrepresentable_birth_amount();
     test_zero_invalid_and_overflow();
 
     if (failures != 0) {

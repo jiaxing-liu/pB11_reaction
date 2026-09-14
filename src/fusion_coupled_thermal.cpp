@@ -48,7 +48,7 @@ int validate_options(const fusion_coupled_thermal_options_v1&o){
 }
 namespace {
 int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
- const fusion_birth_table_v1*const*tables,bool table_mode,
+ const fusion_birth_table_v1*const*tables,bool table_mode,bool effective_charge,
  int n,const double*edges,const double*thermal,double Ue,double Ui,double ne,const double*charge2,
  int ninert,const fusion_inert_ion_v1*inert,const double*logs,const double*old_s,const double*old_t,
  const double*external,const double*escape,double*new_thermal,double*new_s,double*new_t,fusion_coupled_thermal_v1*out){
@@ -66,7 +66,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
  for(int i=0;i<6*nb;++i)if(!finite_value(logs[i])||logs[i]<=0)return PB11_STATUS_OUT_OF_RANGE;
  try{
   std::array<fusion_nuclear_mass_v1,8> mass{};for(int i=0;i<8;++i){st=fusion_c_nuclear_mass(i,&mass[i]);if(st)return st;}
-  R Npool=0,Ninert=0;for(int i=0;i<6;++i){if(!nonnegative(thermal[i])||!nonnegative(charge2[i])||charge2[i]>mass[i].nuclear_charge*mass[i].nuclear_charge)return BAD;Npool+=thermal[i];}
+  R Npool=0,Ninert=0;for(int i=0;i<6;++i){if(!nonnegative(thermal[i])||!nonnegative(charge2[i])||(!effective_charge&&charge2[i]>mass[i].nuclear_charge*mass[i].nuclear_charge))return BAD;Npool+=thermal[i];}
   for(int j=0;j<ninert;++j){if(!nonnegative(inert[j].density_m3)||!finite_value(inert[j].mass_kg)||inert[j].mass_kg<=0||!nonnegative(inert[j].mean_charge_squared))return BAD;Ninert+=inert[j].density_m3;}
   Npool+=Ninert;if(Npool<=0)return PB11_STATUS_OUT_OF_RANGE;
   double Ti=0,Te=0;if(!put(R(Ui)/(1.5L*Npool),Ti)||!put(R(Ue)/(1.5L*ne),Te)||Ti<=0||Te<=0)return NUM;
@@ -177,13 +177,20 @@ extern "C" int fusion_c_coupled_thermal_trial(double dt,const fusion_coupled_the
  int n,const double*edges,const double*thermal,double Ue,double Ui,double ne,const double*charge2,
  int ninert,const fusion_inert_ion_v1*inert,const double*logs,const double*old_s,const double*old_t,
  const double*external,const double*escape,double*new_thermal,double*new_s,double*new_t,fusion_coupled_thermal_v1*out){
- return coupled_trial(dt,op,nullptr,false,n,edges,thermal,Ue,Ui,ne,charge2,ninert,inert,logs,old_s,old_t,external,escape,new_thermal,new_s,new_t,out);
+ return coupled_trial(dt,op,nullptr,false,false,n,edges,thermal,Ue,Ui,ne,charge2,ninert,inert,logs,old_s,old_t,external,escape,new_thermal,new_s,new_t,out);
 }
 extern "C" int fusion_c_coupled_thermal_table_trial(double dt,const fusion_coupled_thermal_options_v1*op,
  const fusion_birth_table_v1*const*tables,int n,const double*edges,const double*thermal,double Ue,double Ui,double ne,const double*charge2,
  int ninert,const fusion_inert_ion_v1*inert,const double*logs,const double*old_s,const double*old_t,
  const double*external,const double*escape,double*new_thermal,double*new_s,double*new_t,fusion_coupled_thermal_v1*out){
- return coupled_trial(dt,op,tables,true,n,edges,thermal,Ue,Ui,ne,charge2,ninert,inert,logs,old_s,old_t,external,escape,new_thermal,new_s,new_t,out);
+ return coupled_trial(dt,op,tables,true,false,n,edges,thermal,Ue,Ui,ne,charge2,ninert,inert,logs,old_s,old_t,external,escape,new_thermal,new_s,new_t,out);
+}
+
+extern "C" int fusion_c_coupled_thermal_table_trial_effective_charge(double dt,const fusion_coupled_thermal_options_v1*op,
+ const fusion_birth_table_v1*const*tables,int n,const double*edges,const double*thermal,double Ue,double Ui,double ne,const double*charge2,
+ int ninert,const fusion_inert_ion_v1*inert,const double*logs,const double*old_s,const double*old_t,
+ const double*external,const double*escape,double*new_thermal,double*new_s,double*new_t,fusion_coupled_thermal_v1*out){
+ return coupled_trial(dt,op,tables,true,true,n,edges,thermal,Ue,Ui,ne,charge2,ninert,inert,logs,old_s,old_t,external,escape,new_thermal,new_s,new_t,out);
 }
 
 extern "C" int fusion_c_coupled_thermal_increment(const fusion_source_ledger_v1*ledger,

@@ -112,6 +112,23 @@ int fusion_c_coupled_thermal_table_trial(double dt_s,
  const double *old_s_m3,const double *old_t_m3,const double *external_birth_m3_s,
  const double *escape_s_inv,double trial_thermal_number_m3[6],
  double *trial_s_m3,double *trial_t_m3,fusion_coupled_thermal_v1 *out);
+/* Explicit effective-collision-strength variant. The six thermal_charge_squared
+ * inputs are nonnegative effective bath factors, not necessarily physical charge
+ * moments; they may exceed bare nuclear Z^2 (e.g. a legacy transport regularizer).
+ * No clamping or correction is applied. Ne, canonical fast-particle charges,
+ * reaction stoichiometry and all conservation/finite-output checks are unchanged.
+ * The standard APIs above retain the physical Z^2 upper-bound validation.
+ * Caller must document/calibrate this approximation; it is not a charge-state
+ * solver. All other table-trial ownership, units and failure semantics apply. */
+int fusion_c_coupled_thermal_table_trial_effective_charge(double dt_s,
+ const fusion_coupled_thermal_options_v1 *options,
+ const fusion_birth_table_v1 *const *tables,int cells,const double *edges_J,
+ const double thermal_number_m3[6],double electron_energy_J_m3,double ion_energy_J_m3,
+ double electron_density_m3,const double thermal_charge_squared[6],
+ int inert_count,const fusion_inert_ion_v1 *inert,const double *coulomb_logs,
+ const double *old_s_m3,const double *old_t_m3,const double *external_birth_m3_s,
+ const double *escape_s_inv,double trial_thermal_number_m3[6],
+ double *trial_s_m3,double *trial_t_m3,fusion_coupled_thermal_v1 *out);
 #ifdef __cplusplus
 }
 #endif

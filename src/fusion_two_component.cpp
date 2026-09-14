@@ -17,17 +17,16 @@ bool finite_positive(double value) {
     return std::isfinite(value) && value > 0.0;
 }
 
-/* Keep the same representability rule as fusion_c_energy_fp_trial's ledger
- * conversion: a nonzero long-double quantity must remain nonzero in double.
- * This also rejects overflow and all nonfinite values before an output is
- * committed. */
+/* Match the FP kernel's IEEE underflow policy for finite trace inventories.
+ * The combined S+T balances are recomputed in long double before publication;
+ * no unrepresentable overflow or nonfinite value is accepted. */
 bool put_double(Real value, double& destination) {
     if (!std::isfinite(value) ||
         std::abs(value) > static_cast<Real>(std::numeric_limits<double>::max())) {
         return false;
     }
     destination = static_cast<double>(value);
-    return value == 0.0L || destination != 0.0;
+    return true;
 }
 
 void clear_outputs(int cells, int baths, double* trial_s, double* trial_t,
