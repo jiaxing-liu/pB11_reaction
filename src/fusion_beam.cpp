@@ -129,7 +129,13 @@ double integrate(const Kernel &k,double lo,double hi,bool nuclear,
     Real total=0,errors=0;
     for(std::size_t i=1;i<cuts.size();++i) {
         double err=0;
-        const double value=Integrator::integrate(f,cuts[i-1],cuts[i],15,tolerance,&err);
+        // Keep the integration measure in the integrand. On a very narrow
+        // physical interval an unscaled error estimate can otherwise force
+        // repeated subdivision or falsely fail the final relative-error gate.
+        // The physical cuts, quadrature rule, depth and tolerance are unchanged.
+        const double mid=(cuts[i]+cuts[i-1])/2,half=(cuts[i]-cuts[i-1])/2;
+        auto normalized=[&](double y){return half*f(mid+half*y);};
+        const double value=Integrator::integrate(normalized,-1.,1.,15,tolerance,&err);
         if(!std::isfinite(value) || !std::isfinite(err) || value<0)
             throw PB11_STATUS_NUMERICAL_FAILURE;
         total+=value; errors+=err;

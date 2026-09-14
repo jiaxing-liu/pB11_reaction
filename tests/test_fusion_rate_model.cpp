@@ -478,6 +478,59 @@ void beam_subnormal_tail_regression(
                  "canonical DT total remains fit-dominated", 1e-9);
 }
 
+void baldur_zone39_beam_regression(
+    const std::array<double, FUSION_SPECIES_COUNT> &masses) {
+    // Exact BALDUR zone 39 input: triton projectile, deuteron target,
+    // chDT3, endpoint-S continuation, and TB low-energy pB policy.
+    constexpr double projectile_energy = 1.1768500517434364e-14;
+    constexpr double target_kT = 8.6808179066013538e-18;
+    constexpr double reference_rate = 2.868440203337139e-22;
+    fusion_rate_model_v1 result{};
+    require(fusion_c_beam_maxwellian_model(
+                FUSION_DT_ALPHAN, FUSION_ENDPOINT_S, FUSION_PB_LOW_TB,
+                masses[FUSION_TRITON], masses[FUSION_DEUTERON],
+                projectile_energy, target_kT, &result) == PB11_STATUS_OK,
+            "BALDUR zone39 beam model status");
+    check_model(result);
+    check_segment_sum(result);
+    require_near(result.total.resolved_reactivity_m3_s, reference_rate,
+                 "BALDUR zone39 total K", 2e-11);
+}
+
+void tiny_projectile_beam_regression(
+    const std::array<double, FUSION_SPECIES_COUNT> &masses) {
+    constexpr double projectile_energy = 1e-9 * kev;
+    constexpr double target_temperatures[] = {.1 * kev, 1 * kev, 10 * kev};
+
+    fusion_rate_model_v1 nearby{};
+    for (double target_kT : target_temperatures) {
+        fusion_rate_model_v1 result{};
+        require(fusion_c_beam_maxwellian_model(
+                    FUSION_DT_ALPHAN, FUSION_ENDPOINT_S, FUSION_PB_LOW_TB,
+                    masses[FUSION_TRITON], masses[FUSION_DEUTERON],
+                    projectile_energy, target_kT, &result) == PB11_STATUS_OK,
+                "tiny projectile beam model status");
+        check_model(result);
+        check_segment_sum(result);
+        require(std::isfinite(result.total.resolved_reactivity_m3_s) &&
+                    result.total.resolved_reactivity_m3_s > 0,
+                "tiny projectile beam rate is finite and nonzero");
+        if (target_kT == .1 * kev) nearby = result;
+    }
+
+    fusion_rate_model_v1 zero_energy{};
+    require(fusion_c_beam_maxwellian_model(
+                FUSION_DT_ALPHAN, FUSION_ENDPOINT_S, FUSION_PB_LOW_TB,
+                masses[FUSION_TRITON], masses[FUSION_DEUTERON], 0,
+                .1 * kev, &zero_energy) == PB11_STATUS_OK,
+            "zero projectile energy beam model status");
+    check_model(zero_energy);
+    check_segment_sum(zero_energy);
+    require_near(nearby.total.resolved_reactivity_m3_s,
+                 zero_energy.total.resolved_reactivity_m3_s,
+                 "zero projectile energy nearby smooth limit", 1e-7);
+}
+
 void fill_model(fusion_rate_model_v1 &x, double value) {
     x.total.resolved_reactivity_m3_s = value;
     x.fit.resolved_reactivity_m3_s = value;
@@ -634,6 +687,8 @@ int main() {
         unequal_temperature_swap(masses);
         fast_beam_check(masses);
         beam_subnormal_tail_regression(masses);
+        baldur_zone39_beam_regression(masses);
+        tiny_projectile_beam_regression(masses);
         invalid_inputs();
         std::cout << "All fusion rate-model tests passed\n";
         return 0;
