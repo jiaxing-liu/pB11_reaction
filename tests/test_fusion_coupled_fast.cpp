@@ -83,6 +83,33 @@ Grid make_grid() {
     return grid;
 }
 
+Grid make_subnormal_spill_grid() {
+    // Keep a real zero lower boundary and use the same 257-cell geometric
+    // grid as the physical fast-D spill fixture.  Its upper edge is 25 MeV;
+    // only the far-tail alpha coefficient is subnormal.
+    constexpr int cells = 257;
+    const double first_edge = 2.0e-6 * kElectronVoltJ;
+    const double maximum = 25.0 * kMeVJ;
+    const double ratio =
+        std::pow(maximum / first_edge, 1.0 / static_cast<double>(cells - 1));
+
+    Grid grid;
+    grid.edges.resize(static_cast<std::size_t>(cells) + 1);
+    grid.edges[0] = 0.0;
+    grid.edges[1] = first_edge;
+    for (int edge = 2; edge <= cells; ++edge)
+        grid.edges[static_cast<std::size_t>(edge)] =
+            first_edge * std::pow(ratio, static_cast<double>(edge - 1));
+    grid.edges.back() = maximum;
+    require(grid.cells() == cells, "subnormal spill grid cell count");
+    require(grid.edges.front() == 0.0 && grid.edges.back() == maximum,
+            "subnormal spill grid bounds");
+    for (std::size_t edge = 1; edge < grid.edges.size(); ++edge)
+        require(grid.edges[edge] > grid.edges[edge - 1],
+                "subnormal spill grid is strictly increasing");
+    return grid;
+}
+
 double cell_center(const Grid& grid, int cell) {
     return 0.5 * (grid.edges[static_cast<std::size_t>(cell)] +
                   grid.edges[static_cast<std::size_t>(cell + 1)]);
@@ -694,6 +721,66 @@ void test_late_charged_spill_rejects_and_retains_inputs() {
             "late charged-spill failure retains caller inputs");
 }
 
+Inputs make_subnormal_spill_inputs(double old_fast_deuteron) {
+    Inputs inputs;
+    inputs.grid = make_subnormal_spill_grid();
+    inputs.thermal_number.fill(0.0);
+    inputs.thermal_number[FUSION_TRITON] = 1.0e19;
+    inputs.electron_density_m3 = 1.0e19;
+    const double kT = 10.0 * kKeVJ;
+    inputs.electron_energy_J_m3 = 1.5 * inputs.electron_density_m3 * kT;
+    inputs.ion_energy_J_m3 = 1.5 * inputs.thermal_number[FUSION_TRITON] * kT;
+    inputs.thermal_charge_squared = {{1.0, 1.0, 1.0, 4.0, 4.0, 25.0}};
+
+    const std::size_t fast_size =
+        static_cast<std::size_t>(kSpecies) * inputs.grid.cells();
+    inputs.coulomb_logs.assign(static_cast<std::size_t>(kSpecies) * kBaths,
+                               15.0);
+    inputs.old_s.assign(fast_size, 0.0);
+    inputs.old_t.assign(fast_size, 0.0);
+    inputs.external_birth.assign(fast_size, 0.0);
+    inputs.escape.assign(fast_size, 0.0);
+    inputs.options = make_options({{0, 0, 0, 0, 0}});
+    inputs.fast_options = make_fast_options({{0, 0, 0, 1, 0}});
+    inputs.fast_options.angular_order = 16;
+    inputs.fast_options.angular_max_exponent = 40.0;
+
+    constexpr double projectile_keV = 4538.1174509712828;
+    const int d_cell = nearest_cell(inputs.grid, projectile_keV * kKeVJ);
+    require(d_cell == 242, "subnormal spill fixture selects D cell 242");
+    require(close_scaled(cell_center(inputs.grid, d_cell),
+                         projectile_keV * kKeVJ, 1.0e-12),
+            "subnormal spill fixture selects the diagnosed D center");
+    const std::size_t d_index = static_cast<std::size_t>(FUSION_DEUTERON) *
+                                    inputs.grid.cells() +
+                                static_cast<std::size_t>(d_cell);
+    inputs.old_s[d_index] = old_fast_deuteron;
+    return inputs;
+}
+
+void test_subnormal_fast_dt_spill_bound() {
+    constexpr double dt = 1.0e-4;
+    constexpr double subnormal_old_s = 2.9601203997565862e-291;
+    Inputs tiny = make_subnormal_spill_inputs(subnormal_old_s);
+    Trial accepted = make_trial(tiny);
+    require(call_fast(tiny, dt, accepted) == PB11_STATUS_OK,
+            "double-zero fast DT spill is accepted");
+    require_finite_trial(accepted, "double-zero fast DT spill");
+    require(accepted.result.ledger.events_m3[FUSION_DT_ALPHAN] > 0.0,
+            "double-zero fast DT spill still records an event");
+    require(accepted.result.ledger.fast_consumed_number_m3[FUSION_DEUTERON] >
+                0.0 &&
+                accepted.result.ledger.thermal_consumed_number_m3[
+                    FUSION_TRITON] > 0.0,
+            "double-zero fast DT spill records both reactant debits");
+
+    Inputs representable = make_subnormal_spill_inputs(1.0e15);
+    Trial rejected = make_trial(representable);
+    require(call_fast(representable, dt, rejected) == PB11_STATUS_OUT_OF_RANGE,
+            "representable fast DT spill remains an out-of-range rejection");
+    require_cleared(rejected, "representable fast DT spill");
+}
+
 
 void test_diagnosed_fast_interfaces() {
  Inputs inputs;inputs.fast_options=make_fast_options({{0,0,0,1,0}});inputs.fast_options.angular_order=16;
@@ -765,6 +852,7 @@ int main() {
         test_deterministic_retry_and_input_immutability();
         test_source_state_atomic_acceptance();
         test_late_charged_spill_rejects_and_retains_inputs();
+        test_subnormal_fast_dt_spill_bound();
         std::cout << "PASS: coupled fast DT accounting, parity, rollback, "
                      "source-state acceptance and late spill tests\n";
         return 0;

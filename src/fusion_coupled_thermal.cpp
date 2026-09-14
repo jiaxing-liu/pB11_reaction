@@ -133,21 +133,44 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
    beam.broad_mode=op->birth.broad_mode;beam.fsci_policy=op->birth.fsci_policy;
    beam.relative_order=op->birth.relative_order;beam.angular_order=fastop->angular_order;beam.nq=op->birth.nq;beam.ncos=op->birth.ncos;
    const double fastTi=Ti;
-   auto sample=[&](int ch,int slot,int k,fusion_beam_birth_v1&value)->int{
+   std::array<R,6> spill_number_bound{},spill_energy_bound{};
+   auto sample=[&](int ch,int slot,int k,fusion_beam_birth_v1&value,bool bound_spill)->int{
     beam.pb_low=ch==0?op->birth.pb_low:FUSION_PB_LOW_TB;
     int code=fusion_c_beam_birth_grid(ch,slot,fast_energy[k],fastTi,&beam,n,edges,spectrum.data(),&value);if(code)return code;
     auto&r=value.spectrum;double rate_error=std::abs(r.relative_rate_discrepancy),debit_error=r.relative_reactant_energy_discrepancy;
     result.max_source_rate_discrepancy=std::max(result.max_source_rate_discrepancy,rate_error);result.max_source_debit_discrepancy=std::max(result.max_source_debit_discrepancy,debit_error);
     if(rate_error>op->max_source_rate_error||debit_error>op->max_source_debit_error)return NUM;
-    for(int i=0;i<6;++i)if(r.below_number_m3_s[i]>0||r.above_number_m3_s[i]>0)return PB11_STATUS_OUT_OF_RANGE;
+    if(bound_spill)for(int i=0;i<6;++i){
+     if(r.below_number_m3_s[i]==0&&r.above_number_m3_s[i]==0&&
+        r.below_energy_J_m3_s[i]==0&&r.above_energy_J_m3_s[i]==0)continue;
+     // No edge can consume more than its entire accepted fast inventory.
+     // Upper-neighbor coefficients also bound a subnormal moment rounded to
+     // zero. Summing over competing channels overestimates the possible spill.
+     double lower_rate=std::nextafter(r.reactivity_m3_s,0.);
+     if(lower_rate<=0)return PB11_STATUS_OUT_OF_RANGE;
+     auto upper=[](double x)->R{return std::nextafter(x,std::numeric_limits<double>::infinity());};
+     R scale=R(fast_initial[k])/lower_rate;
+     spill_number_bound[i]+=scale*(upper(r.below_number_m3_s[i])+upper(r.above_number_m3_s[i]));
+     spill_energy_bound[i]+=scale*(upper(r.below_energy_J_m3_s[i])+upper(r.above_energy_J_m3_s[i]));
+    }
     return PB11_STATUS_OK;
    };
    for(int ch=0;ch<5;++ch)if(fastop->channels[ch])for(int slot=0;slot<2;++slot){
     const auto&r=reactions[ch];if(slot==1&&r.reactant_ids[0]==r.reactant_ids[1])continue;
     int projectile=r.reactant_ids[slot],target=r.reactant_ids[1-slot];if(trialNi[target]==0)continue;
-    for(int j=0;j<n;++j){int k=projectile*n+j;if(fast_initial[k]==0)continue;fusion_beam_birth_v1 value{};st=sample(ch,slot,k,value);if(st)return st;
+    for(int j=0;j<n;++j){int k=projectile*n+j;if(fast_initial[k]==0)continue;fusion_beam_birth_v1 value{};st=sample(ch,slot,k,value,true);if(st)return st;
      links.push_back({k,target,value.spectrum.reactivity_m3_s,value.spectrum.reactant_energy_moment_J_m3_s[1-slot]});meta.push_back({ch,slot,k});
     }
+   }
+   // Permit only spill whose conservative full-consumption bounds, including
+   // step-equivalent source rates, cannot be represented by the public double
+   // state. Factor two keeps margin for positive long-double arithmetic.
+   // This is not an adjustable tail tolerance: every representable spill fails.
+   R source_scale=std::max(R(1),R(1)/dt);
+   for(int i=0;i<6;++i){
+    R nb=2*source_scale*spill_number_bound[i],eb=2*source_scale*spill_energy_bound[i];
+    if(!std::isfinite(nb)||!std::isfinite(eb)||nb>std::numeric_limits<double>::max()||eb>std::numeric_limits<double>::max()||
+       double(nb)!=0||double(eb)!=0)return PB11_STATUS_OUT_OF_RANGE;
    }
    if(!links.empty()){
     double targetU[6]{},afterN[6]{},afterU[6]{};
@@ -165,7 +188,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
     fp_s=surviving_s.data();fp_t=surviving_t.data();fast_birth.assign(6*n,0);
     std::array<R,6> fastNremoved{},fastEremoved{},targetNremoved{},targetEremoved{};
     for(size_t e=0;e<links.size();++e){if(loss[e]==0)continue;const auto&m=meta[e];const auto&link=links[e];if(link.reactivity_m3_s<=0)return NUM;
-     fusion_beam_birth_v1 value{};st=sample(m.channel,m.slot,m.index,value);if(st)return st;
+     fusion_beam_birth_v1 value{};st=sample(m.channel,m.slot,m.index,value,false);if(st)return st;
      const auto&r=value.spectrum;if(r.reactivity_m3_s!=link.reactivity_m3_s||r.reactant_energy_moment_J_m3_s[1-m.slot]!=link.target_energy_reactivity_J_m3_s)return NUM;
      R amount=loss[e],scale=amount/link.reactivity_m3_s;int projectile=m.index/n;
      fast_events[m.channel]+=amount;fastNremoved[projectile]+=amount;fastEremoved[projectile]+=amount*centers[m.index%n];
