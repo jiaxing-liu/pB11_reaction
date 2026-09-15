@@ -106,6 +106,7 @@ module fusion_beam_birth_table_fortran
   public :: fusion_birth_table_control_v1
   public :: fusion_birth_coefficients_v1
 
+  public :: fusion_beam_birth_table_matches_request
   public :: fusion_beam_birth_table_create
   public :: fusion_beam_birth_table_destroy
   public :: fusion_beam_birth_table_info
@@ -115,6 +116,14 @@ module fusion_beam_birth_table_fortran
   public :: fusion_beam_birth_table_unpack
 
   interface
+    function c_beam_matches(table,channel,slot,energy,lower,upper,source,control,cells,edges,matches) &
+        bind(C,name="fusion_c_beam_birth_table_matches_request") result(status)
+      import :: c_ptr,c_int,c_double
+      type(c_ptr),value :: table,source,control,edges,matches
+      integer(c_int),value :: channel,slot,cells
+      real(c_double),value :: energy,lower,upper
+      integer(c_int) :: status
+    end function
      function c_fusion_beam_birth_table_create(channel, projectile_slot, &
           projectile_energy_J, lower_kT_J, upper_kT_J, source, control, &
           cells, edges, out) bind(C, &
@@ -188,6 +197,29 @@ module fusion_beam_birth_table_fortran
   end interface
 
 contains
+
+  subroutine fusion_beam_birth_table_matches_request(table,channel,slot,energy,lower,upper, &
+       source,control,edges,matches,status)
+    type(c_ptr),intent(in) :: table
+    integer(c_int),intent(in) :: channel,slot
+    real(c_double),intent(in) :: energy,lower,upper
+    type(fusion_beam_birth_options_v1),intent(in),target :: source
+    type(fusion_birth_table_control_v1),intent(in),target :: control
+    real(c_double),intent(in),contiguous,target :: edges(:)
+    logical,intent(out) :: matches
+    integer(c_int),intent(out) :: status
+    integer(c_int),target :: answer
+    integer(c_size_t) :: cells
+    matches=.false.
+    status=PB11_STATUS_INVALID_ARGUMENT
+    cells=size(edges,kind=c_size_t)-1_c_size_t
+    if(cells<1_c_size_t.or.cells>100000_c_size_t)return
+    answer=0
+    status=c_beam_matches(table,channel,slot,energy,lower,upper,c_loc(source),c_loc(control), &
+      int(cells,c_int),c_loc(edges(1)),c_loc(answer))
+    if(status==PB11_STATUS_OK)matches=answer==1
+  end subroutine
+
 
   subroutine clear_beam_birth_table_info(info)
     type(fusion_beam_birth_table_info_v1), intent(out) :: info

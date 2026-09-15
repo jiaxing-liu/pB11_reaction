@@ -8,7 +8,6 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
-#include <cctype>
 #include <iostream>
 #include <limits>
 #include <memory>
@@ -371,6 +370,301 @@ struct Evaluation {
   std::vector<double> grid;
   fusion_birth_coefficients_v1 coefficients{};
 };
+
+struct MatchRequest {
+  int channel = 0;
+  int slot = 0;
+  double projectile_energy_J = 0;
+  double lower_kT_J = 0;
+  double upper_kT_J = 0;
+  fusion_beam_birth_options_v1 source{};
+  fusion_birth_table_control_v1 control{};
+  int cells = 0;
+  std::vector<double> edges;
+};
+
+MatchRequest ordinary_match_request(const Fixture &fixture) {
+  MatchRequest request;
+  request.channel = fixture.channel;
+  request.slot = fixture.slot;
+  request.projectile_energy_J = fixture.projectile_energy_J;
+  request.lower_kT_J = fixture.lower_kT_J;
+  request.upper_kT_J = fixture.upper_kT_J;
+  request.source = fixture.options;
+  request.control = fixture.control;
+  request.cells = static_cast<int>(fixture.edges.size() - 1);
+  request.edges = fixture.edges;
+  return request;
+}
+
+void expect_match_call(const fusion_beam_birth_table_v1 *table,
+                       int channel, int slot, double projectile_energy_J,
+                       double lower_kT_J, double upper_kT_J,
+                       const fusion_beam_birth_options_v1 *source,
+                       const fusion_birth_table_control_v1 *control, int cells,
+                       const double *edges, int expected_status,
+                       int expected_matches, const std::string &where) {
+  int matches = 123;
+  const int status = fusion_c_beam_birth_table_matches_request(
+      table, channel, slot, projectile_energy_J, lower_kT_J, upper_kT_J,
+      source, control, cells, edges, &matches);
+  check(status == expected_status,
+        where + " status=" + std::to_string(status));
+  check(matches == expected_matches,
+        where + " matches=" + std::to_string(matches));
+}
+
+void expect_match_request(const fusion_beam_birth_table_v1 *table,
+                          const MatchRequest &request, int expected_status,
+                          int expected_matches, const std::string &where) {
+  expect_match_call(
+      table, request.channel, request.slot, request.projectile_energy_J,
+      request.lower_kT_J, request.upper_kT_J, &request.source,
+      &request.control, request.cells, request.edges.data(), expected_status,
+      expected_matches, where);
+}
+
+double next_up(double value) {
+  return std::nextafter(value, std::numeric_limits<double>::infinity());
+}
+
+void test_matches_request(const Fixture &fixture,
+                          const std::vector<unsigned char> &bytes) {
+  const MatchRequest ordinary = ordinary_match_request(fixture);
+  expect_match_request(fixture.table.get(), ordinary, PB11_STATUS_OK, 1,
+                       "exact ordinary request");
+
+  auto source_mismatch = [&](const std::string &name, const auto &mutate) {
+    MatchRequest request = ordinary;
+    mutate(request.source);
+    expect_match_request(fixture.table.get(), request, PB11_STATUS_OK, 0,
+                         name);
+  };
+  source_mismatch("source.relative_max_J", [](auto &source) {
+    source.relative_max_J = next_up(source.relative_max_J);
+  });
+  source_mismatch("source.angular_max_exponent", [](auto &source) {
+    source.angular_max_exponent = next_up(source.angular_max_exponent);
+  });
+  source_mismatch("source.ground_state_q_J", [](auto &source) {
+    source.ground_state_q_J = next_up(source.ground_state_q_J);
+  });
+  source_mismatch("source.cutoff_J", [](auto &source) {
+    source.cutoff_J = next_up(source.cutoff_J);
+  });
+  source_mismatch("source.l1_fraction", [](auto &source) {
+    source.l1_fraction = next_up(source.l1_fraction);
+  });
+  source_mismatch("source.relative_phase", [](auto &source) {
+    source.relative_phase = next_up(source.relative_phase);
+  });
+  source_mismatch("source.narrow_peak_fraction", [](auto &source) {
+    source.narrow_peak_fraction = next_up(source.narrow_peak_fraction);
+  });
+  source_mismatch("source.continuum_peak_scale", [](auto &source) {
+    source.continuum_peak_scale = next_up(source.continuum_peak_scale);
+  });
+  source_mismatch("source.continuation", [](auto &source) {
+    source.continuation = 2;
+  });
+  // pb_low=1 is deliberately invalid for this non-pB channel; request
+  // matching still reports a clean mismatch without validating the request.
+  source_mismatch("source.pb_low (invalid request)", [](auto &source) {
+    source.pb_low = 1;
+  });
+  source_mismatch("source.remainder_policy", [](auto &source) {
+    source.remainder_policy = 1;
+  });
+  source_mismatch("source.broad_mode", [](auto &source) {
+    source.broad_mode = 1;
+  });
+  source_mismatch("source.fsci_policy", [](auto &source) {
+    source.fsci_policy = 1;
+  });
+  source_mismatch("source.relative_order", [](auto &source) {
+    source.relative_order = 8;
+  });
+  source_mismatch("source.angular_order", [](auto &source) {
+    source.angular_order = 8;
+  });
+  source_mismatch("source.nq", [](auto &source) { source.nq = 8; });
+  source_mismatch("source.ncos", [](auto &source) { source.ncos = 8; });
+
+  auto control_mismatch = [&](const std::string &name, const auto &mutate) {
+    MatchRequest request = ordinary;
+    mutate(request.control);
+    expect_match_request(fixture.table.get(), request, PB11_STATUS_OK, 0,
+                         name);
+  };
+  control_mismatch("control.max_rate_error", [](auto &control) {
+    control.max_rate_error = next_up(control.max_rate_error);
+  });
+  control_mismatch("control.max_debit_error", [](auto &control) {
+    control.max_debit_error = next_up(control.max_debit_error);
+  });
+  control_mismatch("control.max_number_L1", [](auto &control) {
+    control.max_number_L1 = next_up(control.max_number_L1);
+  });
+  control_mismatch("control.max_energy_L1", [](auto &control) {
+    control.max_energy_L1 = next_up(control.max_energy_L1);
+  });
+  control_mismatch("control.max_direct_rate_discrepancy", [](auto &control) {
+    control.max_direct_rate_discrepancy = next_up(control.max_direct_rate_discrepancy);
+  });
+  control_mismatch("control.max_direct_debit_discrepancy", [](auto &control) {
+    control.max_direct_debit_discrepancy = next_up(control.max_direct_debit_discrepancy);
+  });
+  control_mismatch("control.max_knots", [](auto &control) {
+    control.max_knots += 1;
+  });
+  control_mismatch("control.max_evaluations", [](auto &control) {
+    control.max_evaluations += 1;
+  });
+  // max_depth=25 is deliberately outside the constructor domain; it must
+  // still be treated as a different cache request rather than an API error.
+  control_mismatch("control.max_depth (invalid request)", [](auto &control) {
+    control.max_depth = 25;
+  });
+
+  auto scalar_mismatch = [&](const std::string &name,
+                             const auto &mutate) {
+    MatchRequest request = ordinary;
+    mutate(request);
+    expect_match_request(fixture.table.get(), request, PB11_STATUS_OK, 0,
+                         name);
+  };
+  scalar_mismatch("lower temperature limit", [](auto &request) {
+    request.lower_kT_J = std::nextafter(request.lower_kT_J, 0.0);
+  });
+  scalar_mismatch("upper temperature limit", [](auto &request) {
+    request.upper_kT_J = next_up(request.upper_kT_J);
+  });
+  scalar_mismatch("channel", [](auto &request) { request.channel = 2; });
+  scalar_mismatch("projectile slot", [](auto &request) {
+    request.slot = 1;
+  });
+  scalar_mismatch("projectile energy", [](auto &request) {
+    request.projectile_energy_J = next_up(request.projectile_energy_J);
+  });
+  scalar_mismatch("cell count", [](auto &request) { request.cells = 7; });
+  for (size_t j = 0; j < ordinary.edges.size(); ++j) {
+    MatchRequest request = ordinary;
+    request.edges[j] = next_up(request.edges[j]);
+    expect_match_request(fixture.table.get(), request, PB11_STATUS_OK, 0,
+                         "grid edge " + std::to_string(j));
+  }
+
+  const double nan = std::numeric_limits<double>::quiet_NaN();
+  auto nan_mismatch = [&](const std::string &name, const auto &mutate) {
+    MatchRequest request = ordinary;
+    mutate(request);
+    expect_match_request(fixture.table.get(), request, PB11_STATUS_OK, 0,
+                         name);
+  };
+  nan_mismatch("NaN projectile energy", [&](auto &request) {
+    request.projectile_energy_J = nan;
+  });
+  nan_mismatch("NaN lower temperature limit", [&](auto &request) {
+    request.lower_kT_J = nan;
+  });
+  nan_mismatch("NaN upper temperature limit", [&](auto &request) {
+    request.upper_kT_J = nan;
+  });
+  nan_mismatch("NaN source.relative_max_J", [&](auto &request) {
+    request.source.relative_max_J = nan;
+  });
+  nan_mismatch("NaN source.angular_max_exponent", [&](auto &request) {
+    request.source.angular_max_exponent = nan;
+  });
+  nan_mismatch("NaN source.ground_state_q_J", [&](auto &request) {
+    request.source.ground_state_q_J = nan;
+  });
+  nan_mismatch("NaN source.cutoff_J", [&](auto &request) {
+    request.source.cutoff_J = nan;
+  });
+  nan_mismatch("NaN source.l1_fraction", [&](auto &request) {
+    request.source.l1_fraction = nan;
+  });
+  nan_mismatch("NaN source.relative_phase", [&](auto &request) {
+    request.source.relative_phase = nan;
+  });
+  nan_mismatch("NaN source.narrow_peak_fraction", [&](auto &request) {
+    request.source.narrow_peak_fraction = nan;
+  });
+  nan_mismatch("NaN source.continuum_peak_scale", [&](auto &request) {
+    request.source.continuum_peak_scale = nan;
+  });
+  nan_mismatch("NaN control.max_rate_error", [&](auto &request) {
+    request.control.max_rate_error = nan;
+  });
+  nan_mismatch("NaN control.max_debit_error", [&](auto &request) {
+    request.control.max_debit_error = nan;
+  });
+  nan_mismatch("NaN control.max_number_L1", [&](auto &request) {
+    request.control.max_number_L1 = nan;
+  });
+  nan_mismatch("NaN control.max_energy_L1", [&](auto &request) {
+    request.control.max_energy_L1 = nan;
+  });
+  nan_mismatch("NaN control.max_direct_rate_discrepancy",
+               [&](auto &request) {
+                 request.control.max_direct_rate_discrepancy = nan;
+               });
+  nan_mismatch("NaN control.max_direct_debit_discrepancy",
+               [&](auto &request) {
+                 request.control.max_direct_debit_discrepancy = nan;
+               });
+  for (size_t j = 0; j < ordinary.edges.size(); ++j) {
+    nan_mismatch("NaN grid edge " + std::to_string(j),
+                 [&, j](auto &request) { request.edges[j] = nan; });
+  }
+
+  check(fusion_c_beam_birth_table_matches_request(
+            fixture.table.get(), ordinary.channel, ordinary.slot,
+            ordinary.projectile_energy_J, ordinary.lower_kT_J,
+            ordinary.upper_kT_J, &ordinary.source, &ordinary.control,
+            ordinary.cells, ordinary.edges.data(), nullptr) ==
+            PB11_STATUS_NULL_OUTPUT,
+        "null matches pointer status");
+
+  expect_match_call(nullptr, ordinary.channel, ordinary.slot,
+                    ordinary.projectile_energy_J, ordinary.lower_kT_J,
+                    ordinary.upper_kT_J, &ordinary.source, &ordinary.control,
+                    ordinary.cells, ordinary.edges.data(),
+                    PB11_STATUS_INVALID_ARGUMENT, 0, "null table");
+  expect_match_call(fixture.table.get(), ordinary.channel, ordinary.slot,
+                    ordinary.projectile_energy_J, ordinary.lower_kT_J,
+                    ordinary.upper_kT_J, nullptr, &ordinary.control,
+                    ordinary.cells, ordinary.edges.data(),
+                    PB11_STATUS_INVALID_ARGUMENT, 0, "null source");
+  expect_match_call(fixture.table.get(), ordinary.channel, ordinary.slot,
+                    ordinary.projectile_energy_J, ordinary.lower_kT_J,
+                    ordinary.upper_kT_J, &ordinary.source, nullptr,
+                    ordinary.cells, ordinary.edges.data(),
+                    PB11_STATUS_INVALID_ARGUMENT, 0, "null control");
+  expect_match_call(fixture.table.get(), ordinary.channel, ordinary.slot,
+                    ordinary.projectile_energy_J, ordinary.lower_kT_J,
+                    ordinary.upper_kT_J, &ordinary.source, &ordinary.control,
+                    ordinary.cells, nullptr, PB11_STATUS_INVALID_ARGUMENT, 0,
+                    "null grid");
+  for (const int cells : {-1, 0, 100001})
+    expect_match_call(fixture.table.get(), ordinary.channel, ordinary.slot,
+                      ordinary.projectile_energy_J, ordinary.lower_kT_J,
+                      ordinary.upper_kT_J, &ordinary.source, &ordinary.control,
+                      cells, ordinary.edges.data(),
+                      PB11_STATUS_INVALID_ARGUMENT, 0,
+                      "invalid cells " + std::to_string(cells));
+
+  fusion_beam_birth_table_v1 *raw = nullptr;
+  check(fusion_c_beam_birth_table_unpack(bytes.data(), bytes.size(), &raw) ==
+            PB11_STATUS_OK &&
+            raw,
+        "matcher imported table unpack");
+  owner<fusion_beam_birth_table_v1> imported(raw,
+                                              fusion_c_beam_birth_table_destroy);
+  expect_match_request(imported.get(), ordinary, PB11_STATUS_OK, 1,
+                       "exact imported request");
+}
 
 Evaluation evaluate(const fusion_beam_birth_table_v1 *table, int cells,
                     double temperature) {
@@ -817,11 +1111,13 @@ int main() {
           "ordinary info for layout");
     const WireLayout layout = locate_wire(bytes, info);
     test_identity_and_roundtrip(fixture, bytes, layout);
+    test_matches_request(fixture, bytes);
     test_null_and_short_buffer(fixture, bytes);
     test_wire_rejections(fixture, bytes, layout);
     test_subnormal_roundtrip();
     std::cout << "PASS: beam persistence identity, canonical roundtrip, parity, "
-                 "atomic failures, malformed wires, semantic guards, subnormals\n";
+                 "request matching, atomic failures, malformed wires, "
+                 "semantic guards, subnormals\n";
     return 0;
   } catch (const std::exception &error) {
     std::cerr << "FAIL: " << error.what() << '\n';

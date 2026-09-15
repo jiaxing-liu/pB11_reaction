@@ -176,6 +176,25 @@ bool beam_birth_table_matches(const fusion_beam_birth_table_v1*t,int channel,
 }
 }
 
+extern "C" int fusion_c_beam_birth_table_matches_request(
+ const fusion_beam_birth_table_v1*t,int channel,int slot,double energy,
+ double lower,double upper,const fusion_beam_birth_options_v1*source,
+ const fusion_birth_table_control_v1*control,int cells,const double*edges,int*matches){
+ if(!matches)return PB11_STATUS_NULL_OUTPUT;
+ *matches=0;
+ if(!t||!source||!control||!edges||cells<1||cells>100000)return BAD;
+ if(!fusion_detail::beam_birth_table_matches(t,channel,slot,energy,*source,cells,edges))
+  return PB11_STATUS_OK;
+ const auto&a=t->info.control;const auto&b=*control;
+ *matches=t->info.lower_kT_J==lower&&t->info.upper_kT_J==upper&&
+  a.max_rate_error==b.max_rate_error&&a.max_debit_error==b.max_debit_error&&
+  a.max_number_L1==b.max_number_L1&&a.max_energy_L1==b.max_energy_L1&&
+  a.max_direct_rate_discrepancy==b.max_direct_rate_discrepancy&&
+  a.max_direct_debit_discrepancy==b.max_direct_debit_discrepancy&&
+  a.max_knots==b.max_knots&&a.max_evaluations==b.max_evaluations&&a.max_depth==b.max_depth;
+ return PB11_STATUS_OK;
+}
+
 // Canonical, bounded byte representation of an immutable sampled source table.
 namespace {
 constexpr uint64_t beam_magic=0x3142544e4f495346ULL,beam_format=1;

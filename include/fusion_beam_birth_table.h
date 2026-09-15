@@ -52,6 +52,19 @@ int fusion_c_beam_birth_table_info(const fusion_beam_birth_table_v1 *table,
  fusion_beam_birth_table_info_v1 *out);
 int fusion_c_beam_birth_table_evaluate(const fusion_beam_birth_table_v1 *table,
  double target_kT_J,int cells,double *birth,fusion_birth_coefficients_v1 *out);
+/* Exact constructor-request comparison for safe caller-owned cache reuse.
+ * Returns OK with *matches=0 for a different request; OK with 1 only when
+ * channel, slot, energy, full grid, both temperature limits, every source
+ * option and every construction control match numerically (no tolerance).
+ * Null arguments or cells outside1..100000 return INVALID_ARGUMENT, except
+ * null matches returns NULL_OUTPUT. No integration, allocation or mutation.
+ * NaN request fields cannot match a valid table. This does not certify
+ * off-sample accuracy or choose an out-of-domain policy. */
+int fusion_c_beam_birth_table_matches_request(const fusion_beam_birth_table_v1 *table,
+ int channel,int projectile_slot,double projectile_energy_J,
+ double lower_kT_J,double upper_kT_J,const fusion_beam_birth_options_v1 *source,
+ const fusion_birth_table_control_v1 *control,int cells,const double *edges_J,
+ int *matches);
 /* Stable process-lifetime ASCII SHA256 string (64 hex characters plus NUL).
  * Conservatively identifies source/header content and Boost version. It is
  * not binary provenance, authentication, or an accuracy certificate. */

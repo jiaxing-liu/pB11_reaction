@@ -85,3 +85,20 @@ Fortran exposes `fusion_beam_birth_table_pack_size/pack/unpack` with explicit
 `c_size_t` lengths and caller-owned contiguous `integer(c_int8_t)` byte arrays.
 Pack uses `intent(inout)` to preserve buffers on early rejection. Wrappers
 reject lengths beyond the actual array before forming a C pointer.
+
+
+## Exact request matching for caller-owned caches
+
+`fusion_c_beam_birth_table_matches_request` compares every constructor input:
+channel, projectile slot/energy, full energy grid, temperature interval, named
+source options and all accuracy/resource controls. It returns OK with matches0
+for a different request, including invalid numeric request values; null inputs
+and invalid cell extents are argument errors. NaNs never match a valid table.
+Equality is numerical, without a tolerance; signed zeros compare equal.
+The Fortran wrapper derives cells from the supplied edge array and returns a
+logical result. Neither interface integrates, mutates nor selects a fallback.
+
+A successful unpack alone does not establish suitability for another request.
+Callers should require a matching request before reuse. Import still verifies
+the current kernel identity; a source change may intentionally invalidate an
+older cache even when the reaction equations themselves are unchanged.
