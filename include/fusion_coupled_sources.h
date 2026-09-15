@@ -83,6 +83,36 @@ int fusion_c_coupled_sources_floor_trial(double dt_s,
  fusion_beam_table_usage_v1 *usage,
  const fusion_coupled_floor_limits_v1 *floor_limits,
  fusion_birth_floor_ledger_v1 *floor_ledger);
+
+/* Explicit domain coverage policy. STRICT preserves the existing used-table
+ * out-of-range error. DIRECT_OUTSIDE uses the original direct full source only
+ * when the actual post-thermal-burn ion kT is outside a valid matching table.
+ * Invalid/mismatched/duplicate entries and table evaluation errors still reject.
+ * No temperature clamping, extrapolation or relaxed numerical gate.
+ * Both floor pointers null disables the provisional floor; otherwise both are
+ * required. All ordinary outputs and the mandatory outside-domain counter clear
+ * on failure. The counter counts actual direct source calls caused by a present
+ * out-of-domain table, and is a subset of usage.direct_evaluations. Missing
+ * entries remain ordinary direct calls. Existing APIs and structs unchanged. */
+enum { FUSION_BEAM_TABLE_STRICT=0, FUSION_BEAM_TABLE_DIRECT_OUTSIDE=1 };
+int fusion_c_coupled_sources_covered_trial(double dt_s,
+ const fusion_coupled_thermal_options_v1 *options,
+ const fusion_fast_target_options_v1 *fast_options,
+ const fusion_birth_table_v1 *const *thermal_tables,
+ int beam_table_count, const fusion_beam_table_entry_v1 *beam_tables,
+ int effective_charge, int cells, const double *edges_J,
+ const double thermal_number_m3[6], double electron_energy_J_m3,
+ double ion_energy_J_m3, double electron_density_m3,
+ const double thermal_charge_squared[6], int inert_count,
+ const fusion_inert_ion_v1 *inert, const double *coulomb_logs,
+ const double *old_s_m3, const double *old_t_m3,
+ const double *external_birth_m3_s, const double *escape_s_inv,
+ double new_thermal_m3[6], double *new_s_m3, double *new_t_m3,
+ fusion_coupled_thermal_v1 *out, fusion_handoff_diagnostics_v1 *diagnostics,
+ fusion_beam_table_usage_v1 *usage,
+ const fusion_coupled_floor_limits_v1 *floor_limits,
+ fusion_birth_floor_ledger_v1 *floor_ledger,
+ int table_domain_policy, uint64_t *outside_domain_direct_evaluations);
 #ifdef __cplusplus
 }
 #endif

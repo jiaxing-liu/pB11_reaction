@@ -49,3 +49,32 @@ This includes local coupled FP work but is not a complete BALDUR speed benchmark
 Full-discharge table selection, construction budgets, temperature coverage and
 convergence remain caller-level validation work. No assertion of ignition, ash
 transport completion or nonthermal discharge convergence follows from this test.
+
+
+## Explicit table temperature coverage policy
+
+`fusion_c_coupled_sources_covered_trial` adds a caller-selected domain policy
+without changing existing entry points or structs. STRICT preserves the old
+used-table out-of-range error. DIRECT_OUTSIDE calls the same direct full-source
+kernel only when the actual post-thermal-burn fast-target kT lies outside a
+valid, exactly matching table. Invalid tables, duplicate entries, mismatched
+source/grid/energy and direct or table evaluation failures still reject.
+Temperature is never clamped or extrapolated; no accuracy gate is relaxed.
+
+Both floor pointers null selects the ordinary non-floor operator. Otherwise
+both are required and preserve the existing numerical-floor contract. The
+mandatory uint64 output counts actual direct evaluations caused by a present
+out-of-domain table. It is a subset of usage.direct_evaluations and clears with
+all other outputs on failure. Missing entries are ordinary direct evaluations.
+The direct ISO_C_BINDING declaration is exported from the existing
+fusion_coupled_sources_floor_fortran module. All handles remain borrowed.
+Caller model identity must include the coverage policy.
+
+D132 verification includes inside/strict parity, outside/direct complete result
+parity, a thermal-burn-induced domain crossing from an initially in-domain bath,
+valid and mismatched floor pointers, numerical-gate failure propagation, invalid
+configuration and complete failure clearing. Host two-zone GNU/Intel tests cover
+rejection and accepted diagnostics. A real DD two-step22.5us comparison has seven
+physical CSVs byte-identical to direct-only, with50recorded outside calls; strict
+mode rejects at step2/zone1/status3. This is bounded coverage validation, not
+physical convergence or a full pB discharge.

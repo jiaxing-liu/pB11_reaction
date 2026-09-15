@@ -44,7 +44,9 @@ module fusion_coupled_sources_floor_fortran
   public :: PB11_STATUS_OUT_OF_RANGE, PB11_STATUS_NUMERICAL_FAILURE
   public :: PB11_STATUS_EXCEPTION, PB11_STATUS_UNKNOWN_METHOD
 
-  public :: c_fusion_c_coupled_sources_floor_trial
+  public :: c_fusion_c_coupled_sources_floor_trial, c_fusion_c_coupled_sources_covered_trial
+  integer(c_int),parameter,public :: FUSION_BEAM_TABLE_STRICT=0_c_int
+  integer(c_int),parameter,public :: FUSION_BEAM_TABLE_DIRECT_OUTSIDE=1_c_int
 
   interface
      function c_fusion_c_coupled_sources_floor_trial( &
@@ -87,6 +89,48 @@ module fusion_coupled_sources_floor_fortran
        type(c_ptr), value :: floor_ledger
        integer(c_int) :: status
      end function c_fusion_c_coupled_sources_floor_trial
+     function c_fusion_c_coupled_sources_covered_trial( &
+          dt_s, options, fast_options, thermal_tables, beam_table_count, &
+          beam_tables, effective_charge, cells, edges, thermal_number, &
+          electron_energy, ion_energy, electron_density, &
+          thermal_charge_squared, inert_count, inert, coulomb_logs, old_s, &
+          old_t, external_birth, escape, new_thermal_number, new_s, new_t, &
+          out, diagnostics, usage, floor_limits, floor_ledger, table_domain_policy, outside_count) &
+          bind(C, name="fusion_c_coupled_sources_covered_trial") result(status)
+       import :: c_double, c_int, c_ptr
+       real(c_double), value :: dt_s
+       type(c_ptr), value :: options
+       type(c_ptr), value :: fast_options
+       type(c_ptr), value :: thermal_tables
+       integer(c_int), value :: beam_table_count
+       type(c_ptr), value :: beam_tables
+       integer(c_int), value :: effective_charge
+       integer(c_int), value :: cells
+       type(c_ptr), value :: edges
+       type(c_ptr), value :: thermal_number
+       real(c_double), value :: electron_energy
+       real(c_double), value :: ion_energy
+       real(c_double), value :: electron_density
+       type(c_ptr), value :: thermal_charge_squared
+       integer(c_int), value :: inert_count
+       type(c_ptr), value :: inert
+       type(c_ptr), value :: coulomb_logs
+       type(c_ptr), value :: old_s
+       type(c_ptr), value :: old_t
+       type(c_ptr), value :: external_birth
+       type(c_ptr), value :: escape
+       type(c_ptr), value :: new_thermal_number
+       type(c_ptr), value :: new_s
+       type(c_ptr), value :: new_t
+       type(c_ptr), value :: out
+       type(c_ptr), value :: diagnostics
+       type(c_ptr), value :: usage
+       type(c_ptr), value :: floor_limits
+       type(c_ptr), value :: floor_ledger
+       integer(c_int), value :: table_domain_policy
+       type(c_ptr), value :: outside_count
+       integer(c_int) :: status
+     end function c_fusion_c_coupled_sources_covered_trial
   end interface
 
 end module fusion_coupled_sources_floor_fortran

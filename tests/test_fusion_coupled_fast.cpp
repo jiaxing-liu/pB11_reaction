@@ -353,6 +353,31 @@ bool same_result(const fusion_coupled_thermal_v1& left,
                       std::begin(right.handoff_projected));
 }
 
+bool same_diagnostics(const fusion_handoff_diagnostics_v1& left,
+                      const fusion_handoff_diagnostics_v1& right) {
+    return same_array(left.candidate_number_m3, right.candidate_number_m3,
+                      kSpecies) &&
+           same_array(left.candidate_energy_J_m3, right.candidate_energy_J_m3,
+                      kSpecies) &&
+           same_array(left.transferred_number_m3,
+                      right.transferred_number_m3, kSpecies) &&
+           same_array(left.transferred_energy_J_m3,
+                      right.transferred_energy_J_m3, kSpecies) &&
+           same_array(left.target_kT_J, right.target_kT_J, kSpecies) &&
+           std::equal(std::begin(left.tested), std::end(left.tested),
+                      std::begin(right.tested));
+}
+
+bool same_usage(const fusion_beam_table_usage_v1& left,
+                const fusion_beam_table_usage_v1& right) {
+    return left.direct_evaluations == right.direct_evaluations &&
+           left.table_evaluations == right.table_evaluations &&
+           left.max_validated_rate_error == right.max_validated_rate_error &&
+           left.max_validated_debit_error == right.max_validated_debit_error &&
+           left.max_validated_number_L1 == right.max_validated_number_L1 &&
+           left.max_validated_energy_L1 == right.max_validated_energy_L1;
+}
+
 void require_finite_trial(const Trial& trial, const std::string& label) {
     for (double value : trial.thermal_number)
         require(std::isfinite(value) && value >= 0.0,
@@ -889,6 +914,17 @@ void test_explicit_full_source_tables() {
             in.external_birth.data(),in.escape.data(),out.thermal_number.data(),out.s.data(),out.t.data(),
             &out.result,&diagnostic,&usage);
     };
+    auto evaluate_covered=[&](const std::vector<fusion_beam_table_entry_v1>& list,Trial& out,
+                              int policy,uint64_t* outside,
+                              const fusion_coupled_floor_limits_v1* limits=nullptr,
+                              fusion_birth_floor_ledger_v1* floor=nullptr){
+        return fusion_c_coupled_sources_covered_trial(1e-4,&in.options,&in.fast_options,nullptr,
+            int(list.size()),list.empty()?nullptr:list.data(),0,n,in.grid.edges.data(),
+            in.thermal_number.data(),in.electron_energy_J_m3,in.ion_energy_J_m3,in.electron_density_m3,
+            in.thermal_charge_squared.data(),0,nullptr,in.coulomb_logs.data(),in.old_s.data(),in.old_t.data(),
+            in.external_birth.data(),in.escape.data(),out.thermal_number.data(),out.s.data(),out.t.data(),
+            &out.result,&diagnostic,&usage,limits,floor,policy,outside);
+    };
     Trial direct=make_trial(in),empty=make_trial(in),tabulated=make_trial(in);
     require(call_fast(in,1e-4,direct)==0,"source-table direct reference");
     require(evaluate({},empty)==0&&same_result(direct.result,empty.result)&&
@@ -934,6 +970,156 @@ void test_explicit_full_source_tables() {
     require(close_scaled(direct.result.ledger.events_m3[3],tabulated.result.ledger.events_m3[3],1e-4),"combined thermal/fast events");
     require(usage.table_evaluations==3&&usage.direct_evaluations==0,"post-thermal source uses selected beam tables");
     in=original;
+
+    auto same_floor=[](const fusion_birth_floor_ledger_v1&a,const fusion_birth_floor_ledger_v1&b){
+        for(int i=0;i<6;++i){
+            if(a.born_number_m3[i]!=b.born_number_m3[i]||a.born_energy_J_m3[i]!=b.born_energy_J_m3[i]||
+               a.mapped_number_m3[i]!=b.mapped_number_m3[i]||a.mapped_energy_J_m3[i]!=b.mapped_energy_J_m3[i]||
+               a.ion_energy_correction_J_m3[i]!=b.ion_energy_correction_J_m3[i]||
+               a.energy_residual_J_m3[i]!=b.energy_residual_J_m3[i])return false;
+        }
+        return a.remaining_ion_energy_J_m3==b.remaining_ion_energy_J_m3;
+    };
+    auto covered_rejected=[&](const std::vector<fusion_beam_table_entry_v1>&list,const std::string&label,
+                             int policy=FUSION_BEAM_TABLE_STRICT,
+                             const fusion_coupled_floor_limits_v1*limits=nullptr,
+                             fusion_birth_floor_ledger_v1*floor=nullptr,bool null_counter=false){
+        Trial out=make_trial(in);usage={7,7,7,7,7,7};diagnostic={};diagnostic.candidate_number_m3[0]=7;
+        uint64_t counter=77;
+        if(floor){*floor={};floor->born_number_m3[0]=7;floor->remaining_ion_energy_J_m3=7;}
+        int status=evaluate_covered(list,out,policy,null_counter?nullptr:&counter,limits,floor);
+        require(status!=PB11_STATUS_OK,label+" rejects");require_cleared(out,label);
+        require(usage.direct_evaluations==0&&usage.table_evaluations==0&&usage.max_validated_rate_error==0&&
+            usage.max_validated_debit_error==0&&usage.max_validated_number_L1==0&&usage.max_validated_energy_L1==0&&
+            same_diagnostics(diagnostic,fusion_handoff_diagnostics_v1{}),label+" clears diagnostics/usage");
+        if(floor)require(same_floor(*floor,fusion_birth_floor_ledger_v1{}),label+" clears floor ledger");
+        if(!null_counter)require(counter==0,label+" clears outside counter");
+    };
+
+    // The old entry point still rejects a used table outside its domain.  The
+    // covered entry point preserves that strict behavior and adds an opt-in
+    // direct-source policy with complete output parity.
+    in=original;
+    Trial legacy_inside=make_trial(in),strict_inside=make_trial(in),direct_inside=make_trial(in);
+    uint64_t outside_counter=99;
+    require(evaluate(entries,legacy_inside)==0,"legacy in-domain covered fixture");
+    const auto legacy_diagnostic=diagnostic;const auto legacy_usage=usage;
+    require(evaluate_covered(entries,strict_inside,FUSION_BEAM_TABLE_STRICT,&outside_counter)==0,
+        "covered strict in-domain fixture");
+    const auto strict_diagnostic=diagnostic;const auto strict_usage=usage;
+    require(outside_counter==0&&same_result(legacy_inside.result,strict_inside.result)&&
+        legacy_inside.thermal_number==strict_inside.thermal_number&&legacy_inside.s==strict_inside.s&&
+        legacy_inside.t==strict_inside.t&&same_diagnostics(legacy_diagnostic,strict_diagnostic)&&
+        same_usage(legacy_usage,strict_usage),"covered strict is legacy-exact inside the table");
+    outside_counter=99;
+    require(evaluate_covered(entries,direct_inside,FUSION_BEAM_TABLE_DIRECT_OUTSIDE,&outside_counter)==0,
+        "covered direct policy in-domain fixture");
+    require(outside_counter==0&&same_result(legacy_inside.result,direct_inside.result)&&
+        legacy_inside.thermal_number==direct_inside.thermal_number&&legacy_inside.s==direct_inside.s&&
+        legacy_inside.t==direct_inside.t&&same_diagnostics(legacy_diagnostic,diagnostic)&&
+        same_usage(legacy_usage,usage),"covered direct policy is legacy-exact inside the table");
+
+    in=original;in.ion_energy_J_m3*=1.1;
+    Trial legacy_outside=make_trial(in),strict_outside=make_trial(in);
+    require(evaluate(entries,legacy_outside)==PB11_STATUS_OUT_OF_RANGE,
+        "legacy used out-of-domain table remains an error");
+    require_cleared(legacy_outside,"legacy out-of-domain table");
+    outside_counter=77;
+    require(evaluate_covered(entries,strict_outside,FUSION_BEAM_TABLE_STRICT,&outside_counter)==PB11_STATUS_OUT_OF_RANGE,
+        "covered strict used out-of-domain table remains an error");
+    require_cleared(strict_outside,"covered strict out-of-domain table");
+    require(outside_counter==0&&usage.direct_evaluations==0&&usage.table_evaluations==0&&
+        same_diagnostics(diagnostic,fusion_handoff_diagnostics_v1{}),"strict failure clears coverage diagnostics");
+
+
+    const auto original_outside_options=in.options;
+    in.options.max_source_rate_error=0;in.options.max_source_debit_error=0;
+    Trial gate_direct=make_trial(in),gate_covered=make_trial(in);
+    const int gate_status=evaluate({},gate_direct);
+    require(gate_status==PB11_STATUS_NUMERICAL_FAILURE,"zero source gate direct rejection");
+    outside_counter=99;
+    require(evaluate_covered(entries,gate_covered,FUSION_BEAM_TABLE_DIRECT_OUTSIDE,&outside_counter)==gate_status,
+        "coverage policy must not mask direct numerical gate errors");
+    require_cleared(gate_covered,"covered direct gate rejection");
+    require(outside_counter==0&&usage.direct_evaluations==0&&usage.table_evaluations==0,
+        "direct gate failure clears provisional coverage counts");
+    in.options=original_outside_options;
+    Trial direct_reference=make_trial(in),direct_fallback=make_trial(in);
+    const int direct_reference_status=evaluate({},direct_reference);
+    require(direct_reference_status==0,"direct source reference outside table status="+
+        std::to_string(direct_reference_status));
+    const auto reference_diagnostic=diagnostic;const auto reference_usage=usage;
+    outside_counter=0;
+    require(evaluate_covered(entries,direct_fallback,FUSION_BEAM_TABLE_DIRECT_OUTSIDE,&outside_counter)==0,
+        "covered direct fallback outside table");
+    require(outside_counter>0&&outside_counter<=static_cast<uint64_t>(usage.direct_evaluations)&&
+        usage.table_evaluations==0&&same_result(direct_reference.result,direct_fallback.result)&&
+        direct_reference.thermal_number==direct_fallback.thermal_number&&direct_reference.s==direct_fallback.s&&
+        direct_reference.t==direct_fallback.t&&same_diagnostics(reference_diagnostic,diagnostic)&&
+        same_usage(reference_usage,usage),"direct fallback has full direct-source parity and bounded counter");
+
+    in=original;
+    Trial empty_covered=make_trial(in),empty_legacy=make_trial(in);outside_counter=99;
+    require(evaluate_covered({},empty_covered,FUSION_BEAM_TABLE_DIRECT_OUTSIDE,&outside_counter)==0,
+        "covered empty entries direct source");
+    const auto empty_diagnostic=diagnostic;const auto empty_usage=usage;
+    require(evaluate({},empty_legacy)==0,"legacy empty entries direct source");
+    require(outside_counter==0&&same_result(empty_covered.result,empty_legacy.result)&&
+        empty_covered.thermal_number==empty_legacy.thermal_number&&empty_covered.s==empty_legacy.s&&
+        empty_covered.t==empty_legacy.t&&same_diagnostics(empty_diagnostic,diagnostic)&&
+        same_usage(empty_usage,usage),"empty covered entries preserve direct parity");
+
+    fusion_coupled_floor_limits_v1 limits{.5,.5};fusion_birth_floor_ledger_v1 floor{};
+    Trial floor_reference=make_trial(in),floor_covered=make_trial(in);
+    fusion_birth_floor_ledger_v1 reference_floor{};
+    require(fusion_c_coupled_sources_floor_trial(1e-4,&in.options,&in.fast_options,nullptr,
+        0,nullptr,0,n,in.grid.edges.data(),in.thermal_number.data(),in.electron_energy_J_m3,
+        in.ion_energy_J_m3,in.electron_density_m3,in.thermal_charge_squared.data(),0,nullptr,
+        in.coulomb_logs.data(),in.old_s.data(),in.old_t.data(),in.external_birth.data(),in.escape.data(),
+        floor_reference.thermal_number.data(),floor_reference.s.data(),floor_reference.t.data(),
+        &floor_reference.result,&diagnostic,&usage,&limits,&reference_floor)==0,"legacy valid floor reference");
+    const auto floor_diagnostic=diagnostic;const auto floor_usage=usage;
+    require(evaluate_covered({},floor_covered,FUSION_BEAM_TABLE_DIRECT_OUTSIDE,&outside_counter,&limits,&floor)==0,
+        "covered valid floor call");
+    require(outside_counter==0&&same_result(floor_reference.result,floor_covered.result)&&
+        floor_reference.thermal_number==floor_covered.thermal_number&&floor_reference.s==floor_covered.s&&
+        floor_reference.t==floor_covered.t&&same_floor(reference_floor,floor)&&
+        same_diagnostics(floor_diagnostic,diagnostic)&&same_usage(floor_usage,usage),"valid floor legacy parity");
+    Trial both_null_floor=make_trial(in);outside_counter=99;
+    require(evaluate_covered({},both_null_floor,FUSION_BEAM_TABLE_STRICT,&outside_counter,nullptr,nullptr)==0,
+        "both null floor pointers preserve direct source");
+    covered_rejected(entries,"floor limits without floor ledger",FUSION_BEAM_TABLE_STRICT,&limits,nullptr);
+    covered_rejected(entries,"floor ledger without floor limits",FUSION_BEAM_TABLE_STRICT,nullptr,&floor);
+    covered_rejected(entries,"invalid coverage policy",77);
+    covered_rejected(entries,"missing mandatory outside counter",FUSION_BEAM_TABLE_STRICT,nullptr,nullptr,true);
+
+    auto covered_bad=entries;covered_bad.push_back(entries[0]);covered_rejected(covered_bad,"covered duplicate entry");
+    in.grid.edges[n-1]=std::nextafter(in.grid.edges[n-1],in.grid.edges[n]);
+    covered_rejected(entries,"covered bad grid");in=original;
+    in.options.birth.cutoff_J*=1.01;covered_rejected(entries,"covered bad source options");in=original;
+
+    // A thermal burn can move the actual fast-source temperature outside a
+    // narrow table after the table's initial temperature was in-domain.
+    in.options.channels[3]=1;in.thermal_number[FUSION_DEUTERON]=5e19;
+    in.ion_energy_J_m3=double(1.5L*(static_cast<long double>(in.thermal_number[FUSION_DEUTERON])+in.thermal_number[FUSION_TRITON])*lower*(1.0L+1.e-12L));
+    const long double postburn_initial_ti=static_cast<long double>(in.ion_energy_J_m3)/
+        (1.5L*(static_cast<long double>(in.thermal_number[FUSION_DEUTERON])+in.thermal_number[FUSION_TRITON]));
+    require(postburn_initial_ti>=static_cast<long double>(lower)&&
+        postburn_initial_ti<=1.05L*static_cast<long double>(lower),
+        "post-burn fixture starts inside the narrow table domain");
+    Trial postburn_strict=make_trial(in),postburn_reference=make_trial(in),postburn_fallback=make_trial(in);
+    require(call_fast(in,1e-4,postburn_reference)==0,"post-burn direct source reference");
+    outside_counter=77;
+    int postburn_status=evaluate_covered(entries,postburn_strict,FUSION_BEAM_TABLE_STRICT,&outside_counter);
+    require(postburn_status==PB11_STATUS_OUT_OF_RANGE,"post-burn strict table domain check");
+    require_cleared(postburn_strict,"post-burn strict table");
+    require(evaluate_covered(entries,postburn_fallback,FUSION_BEAM_TABLE_DIRECT_OUTSIDE,&outside_counter)==0,
+        "post-burn direct fallback");
+    require(outside_counter>0&&same_result(postburn_reference.result,postburn_fallback.result)&&
+        postburn_reference.thermal_number==postburn_fallback.thermal_number&&postburn_reference.s==postburn_fallback.s&&
+        postburn_reference.t==postburn_fallback.t,"post-burn fallback matches direct source");
+    in=original;
+
     auto rejected=[&](const std::vector<fusion_beam_table_entry_v1>& list,const std::string& label,int effective=0){
         Trial out=make_trial(in);usage={7,7,7,7,7,7};diagnostic.candidate_number_m3[0]=7;
         require(evaluate(list,out,effective)!=0,label+" rejects");require_cleared(out,label);
