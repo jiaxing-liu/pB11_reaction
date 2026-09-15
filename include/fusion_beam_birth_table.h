@@ -3,6 +3,7 @@
 #include "fusion_birth_table.h"
 #include "fusion_beam_birth.h"
 #include <stdint.h>
+#include <stddef.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,6 +52,28 @@ int fusion_c_beam_birth_table_info(const fusion_beam_birth_table_v1 *table,
  fusion_beam_birth_table_info_v1 *out);
 int fusion_c_beam_birth_table_evaluate(const fusion_beam_birth_table_v1 *table,
  double target_kT_J,int cells,double *birth,fusion_birth_coefficients_v1 *out);
+/* Stable process-lifetime ASCII SHA256 string (64 hex characters plus NUL).
+ * Conservatively identifies source/header content and Boost version. It is
+ * not binary provenance, authentication, or an accuracy certificate. */
+const char *fusion_c_beam_birth_table_kernel_identity(void);
+/* Portable immutable-table bytes, not file I/O or host restart. Version1 uses
+ * explicit little-endian binary64/integer fields, full sparse knots (including
+ * subnormals), exact byte length, kernel identity and an FNV-1a checksum.
+ * Source options, grid, controls and sampled validation metadata are retained.
+ * Import requires the current kernel identity, validates structure/options and
+ * per-knot particle/energy balance, and publishes only a complete table.
+ * It does NOT repeat direct quadratures or certify unsampled interpolation;
+ * the caller must retain trusted cache provenance and convergence evidence.
+ * At most256MiB and the existing node/entry resource bounds are accepted.
+ * required/written clear to0 on failure; unpack clears*out first. Short pack
+ * buffers are untouched. Caller owns buffer/file I/O; arrays must not overlap.
+ * See docs/BEAM_TABLE_BYTES.md for the format and compatibility contract. */
+int fusion_c_beam_birth_table_pack_size(const fusion_beam_birth_table_v1 *table,
+ size_t *required);
+int fusion_c_beam_birth_table_pack(const fusion_beam_birth_table_v1 *table,
+ void *buffer,size_t capacity,size_t *written);
+int fusion_c_beam_birth_table_unpack(const void *buffer,size_t length,
+ fusion_beam_birth_table_v1 **out);
 #ifdef __cplusplus
 }
 #endif

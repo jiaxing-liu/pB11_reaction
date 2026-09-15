@@ -1,3 +1,7 @@
+#include <cstring>
+#include <cstddef>
+#include <type_traits>
+#include "fusion_cache_identity_internal.h"
 #include "fusion_beam_birth_table_internal.h"
 #include "fusion_nuclear_data.h"
 #include <algorithm>
@@ -170,4 +174,112 @@ bool beam_birth_table_matches(const fusion_beam_birth_table_v1*t,int channel,
     a.angular_order!=s.angular_order||a.nq!=s.nq||a.ncos!=s.ncos)return false;
  return std::equal(t->edges.begin(),t->edges.end(),edges);
 }
+}
+
+// Canonical, bounded byte representation of an immutable sampled source table.
+namespace {
+constexpr uint64_t beam_magic=0x3142544e4f495346ULL,beam_format=1;
+constexpr size_t beam_byte_cap=256ULL*1024*1024;
+constexpr uint64_t beam_entry_cap=12500000;
+static_assert(sizeof(double)==8&&std::numeric_limits<double>::is_iec559,"binary64 required");
+template<class I,class F,class G>void table_fields(I&i,F real,G integer){
+ real(i.projectile_energy_J);real(i.lower_kT_J);real(i.upper_kT_J);
+ real(i.max_validated_rate_error);real(i.max_validated_debit_error);
+ real(i.max_validated_number_L1);real(i.max_validated_energy_L1);
+ real(i.max_sampled_direct_rate_discrepancy);real(i.max_sampled_direct_debit_discrepancy);
+ integer(i.channel);integer(i.projectile_slot);integer(i.cells);integer(i.knots);integer(i.direct_evaluations);
+ integer(i.spectral_entries_evaluated);integer(i.stored_spectral_entries);
+ auto&s=i.source;
+ real(s.relative_max_J);real(s.angular_max_exponent);real(s.ground_state_q_J);real(s.cutoff_J);
+ real(s.l1_fraction);real(s.relative_phase);real(s.narrow_peak_fraction);real(s.continuum_peak_scale);
+ integer(s.continuation);integer(s.pb_low);integer(s.remainder_policy);integer(s.broad_mode);integer(s.fsci_policy);
+ integer(s.relative_order);integer(s.angular_order);integer(s.nq);integer(s.ncos);
+ auto&c=i.control;real(c.max_rate_error);real(c.max_debit_error);real(c.max_number_L1);real(c.max_energy_L1);
+ real(c.max_direct_rate_discrepancy);real(c.max_direct_debit_discrepancy);
+ integer(c.max_knots);integer(c.max_evaluations);integer(c.max_depth);
+}
+uint64_t beam_checksum(const unsigned char*p,size_t n){uint64_t h=14695981039346656037ULL;for(size_t i=0;i<n;++i){h^=p[i];h*=1099511628211ULL;}return h;}
+struct BeamWriter{
+ unsigned char*p;size_t n,pos=0;
+ void bytes(const void*src,size_t count){require(count<=n-pos,BAD);std::memcpy(p+pos,src,count);pos+=count;}
+ void integer(uint64_t v){unsigned char b[8];for(int i=0;i<8;++i)b[i]=static_cast<unsigned char>(v>>(8*i));bytes(b,8);}
+ void real(double v){uint64_t b;std::memcpy(&b,&v,8);integer(b);}
+};
+struct BeamReader{
+ const unsigned char*p;size_t n,pos=0;
+ void bytes(void*dst,size_t count){require(count<=n-pos,BAD);std::memcpy(dst,p+pos,count);pos+=count;}
+ uint64_t integer(){unsigned char b[8];bytes(b,8);uint64_t v=0;for(int i=0;i<8;++i)v|=uint64_t(b[i])<<(8*i);return v;}
+ double real(){uint64_t b=integer();double v;std::memcpy(&v,&b,8);return v;}
+};
+size_t beam_packed_size(const fusion_beam_birth_table_v1&t){
+ size_t size=24+64+8;auto field=[&](auto){size+=8;};table_fields(t.info,field,field);
+ auto add=[&](size_t count,size_t unit){require(count<=(beam_byte_cap-size)/unit,BAD);size+=count*unit;};
+ add(t.edges.size(),8);for(const auto&node:t.knots){add(33,8);add(node->grid.size(),16);}return size;
+}
+void validate_table_metadata(const fusion_beam_birth_table_info_v1&i){
+ bool finite=true;table_fields(i,[&](double x){finite=finite&&std::isfinite(x);},[](auto){});require(finite,BAD);
+ require(i.channel>=0&&i.channel<=4&&i.projectile_slot>=0&&i.projectile_slot<=1,BAD);
+ require(i.cells>=1&&i.cells<=100000&&i.knots>=2&&i.knots<=100000,BAD);
+ require(i.projectile_energy_J>=0&&i.lower_kT_J>0&&i.upper_kT_J>i.lower_kT_J,BAD);
+ const auto&q=i.control;
+ for(double v:{q.max_rate_error,q.max_debit_error,q.max_number_L1,q.max_energy_L1,q.max_direct_rate_discrepancy,q.max_direct_debit_discrepancy})require(v>=0&&v<=1,BAD);
+ require(q.max_knots>=2&&q.max_knots<=100000&&q.max_evaluations>=5&&q.max_evaluations<=1000000&&q.max_depth>=0&&q.max_depth<=24,BAD);
+ require(i.knots<=q.max_knots&&i.direct_evaluations>=std::max(5,i.knots)&&i.direct_evaluations<=q.max_evaluations,BAD);
+ require(i.spectral_entries_evaluated<=beam_entry_cap&&i.stored_spectral_entries<=i.spectral_entries_evaluated,BAD);
+ const double errors[]={i.max_validated_rate_error,i.max_validated_debit_error,i.max_validated_number_L1,i.max_validated_energy_L1,i.max_sampled_direct_rate_discrepancy,i.max_sampled_direct_debit_discrepancy};
+ const double gates[]={q.max_rate_error,q.max_debit_error,q.max_number_L1,q.max_energy_L1,q.max_direct_rate_discrepancy,q.max_direct_debit_discrepancy};
+ for(int k=0;k<6;++k)require(errors[k]>=0&&errors[k]<=gates[k],BAD);
+ const auto&s=i.source;constexpr double mev=1.602176634e-13;
+ require(s.relative_max_J>0&&s.angular_max_exponent>=8&&s.angular_max_exponent<=80&&s.ground_state_q_J>=0&&s.cutoff_J>=.001*mev&&s.cutoff_J<=.01*mev,BAD);
+ require(s.l1_fraction>=0&&s.l1_fraction<=1&&s.narrow_peak_fraction>=0&&s.narrow_peak_fraction<=1&&s.continuum_peak_scale>=0&&s.continuum_peak_scale<=2,BAD);
+ require(s.continuation>=1&&s.continuation<=2&&s.pb_low>=0&&s.pb_low<=3&&(i.channel==0||s.pb_low==0),BAD);
+ require(s.remainder_policy>=0&&s.remainder_policy<=2&&(s.broad_mode==1||s.broad_mode==3||s.broad_mode==13)&&s.fsci_policy>=0&&s.fsci_policy<=1,BAD);
+ require(s.relative_order>=4&&s.relative_order<=64&&s.angular_order>=4&&s.angular_order<=32&&s.nq>=4&&s.nq<=1024&&s.ncos>=4&&s.ncos<=1024,BAD);
+}
+void validate_sparse_node(const fusion_beam_birth_table_v1&t,const Node&node){
+ const auto&c=node.c;bool valid=true;fields(c,[&](double v){valid=valid&&std::isfinite(v)&&v>=0;});require(valid,BAD);
+ std::array<R,7>number{},energy{};
+ for(int i=0;i<7;++i){number[i]=R(c.below_number_m3_s[i])+c.above_number_m3_s[i];energy[i]=R(c.below_energy_J_m3_s[i])+c.above_energy_J_m3_s[i];}
+ for(const auto&e:node.grid){int species=e.index/t.info.cells,j=e.index%t.info.cells;number[species]+=e.value;energy[species]+=R(e.value)*(R(t.edges[j])+t.edges[j+1])/2;}
+ R total=0;for(int i=0;i<7;++i){int multiplicity=0;for(int j=0;j<t.channel.product_count;++j){int id=t.channel.product_ids[j];if(id==FUSION_MASS_NEUTRON)id=6;if(id==i)++multiplicity;}require(balanced(number[i],R(multiplicity)*c.reactivity_m3_s),BAD);total+=energy[i];}
+ require(balanced(total,R(t.channel.q_J)*c.reactivity_m3_s+c.reactant_energy_moment_J_m3_s[0]+c.reactant_energy_moment_J_m3_s[1]),BAD);
+}
+}
+extern "C" const char*fusion_c_beam_birth_table_kernel_identity(void){return fusion_detail::beam_cache_kernel_identity;}
+extern "C" int fusion_c_beam_birth_table_pack_size(const fusion_beam_birth_table_v1*t,size_t*required){
+ if(!required)return PB11_STATUS_NULL_OUTPUT;
+ *required=0;if(!t)return BAD;
+ try{*required=beam_packed_size(*t);return PB11_STATUS_OK;}catch(const Failure&f){return f.status;}catch(...){return PB11_STATUS_EXCEPTION;}
+}
+extern "C" int fusion_c_beam_birth_table_pack(const fusion_beam_birth_table_v1*t,void*buffer,size_t capacity,size_t*written){
+ if(!written)return PB11_STATUS_NULL_OUTPUT;
+ *written=0;if(!t||!buffer)return BAD;
+ try{const size_t size=beam_packed_size(*t);require(capacity>=size,BAD);BeamWriter w{static_cast<unsigned char*>(buffer),size};
+ w.integer(beam_magic);w.integer(beam_format);w.integer(size);w.bytes(fusion_detail::beam_cache_kernel_identity,64);
+ table_fields(t->info,[&](double v){w.real(v);},[&](auto v){w.integer(uint64_t(v));});
+ for(double v:t->edges)w.real(v);
+ for(const auto&node:t->knots){w.real(node->T);fields(node->c,[&](double v){w.real(v);});w.integer(node->grid.size());for(const auto&e:node->grid){w.integer(e.index);w.real(e.value);}}
+ require(w.pos==size-8,BAD);const auto check=beam_checksum(w.p,w.pos);w.integer(check);*written=size;return PB11_STATUS_OK;
+ }catch(const Failure&f){return f.status;}catch(...){return PB11_STATUS_EXCEPTION;}
+}
+extern "C" int fusion_c_beam_birth_table_unpack(const void*buffer,size_t length,fusion_beam_birth_table_v1**out){
+ if(!out)return PB11_STATUS_NULL_OUTPUT;
+ *out=nullptr;if(!buffer||length<96||length>beam_byte_cap)return BAD;
+ try{const auto*data=static_cast<const unsigned char*>(buffer);BeamReader footer{data+length-8,8};require(footer.integer()==beam_checksum(data,length-8),BAD);
+ BeamReader r{data,length-8};require(r.integer()==beam_magic&&r.integer()==beam_format&&r.integer()==length,BAD);
+ char identity[64];r.bytes(identity,64);require(std::memcmp(identity,fusion_detail::beam_cache_kernel_identity,64)==0,BAD);
+ auto t=std::make_unique<fusion_beam_birth_table_v1>();table_fields(t->info,[&](double&v){v=r.real();},[&](auto&v){uint64_t x=r.integer();using V=std::decay_t<decltype(v)>;require(x<=uint64_t(std::numeric_limits<V>::max()),BAD);v=static_cast<V>(x);});validate_table_metadata(t->info);
+ require(fusion_c_nuclear_channel(t->info.channel,&t->channel)==PB11_STATUS_OK,BAD);
+ require(t->info.channel!=0||t->info.source.ground_state_q_J<=t->channel.q_J,BAD);
+ require(size_t(t->info.cells+1)<=(r.n-r.pos)/8,BAD);t->edges.resize(t->info.cells+1);
+ for(size_t i=0;i<t->edges.size();++i){double v=r.real();require(std::isfinite(v)&&v>=0&&(!i||v>t->edges[i-1]),BAD);t->edges[i]=v;}
+ require(size_t(t->info.knots)<=(r.n-r.pos)/(33*8),BAD);t->knots.reserve(t->info.knots);uint64_t entries=0;
+ for(int i=0;i<t->info.knots;++i){auto node=std::make_shared<Node>();node->T=r.real();require(std::isfinite(node->T)&&node->T>=t->info.lower_kT_J&&node->T<=t->info.upper_kT_J&&(!i||node->T>t->knots.back()->T),BAD);
+ fields(node->c,[&](double&v){v=r.real();});uint64_t count=r.integer();require(count<=uint64_t(7*t->info.cells)&&count<=beam_entry_cap-entries&&count<=(r.n-r.pos)/16,BAD);entries+=count;node->grid.reserve(size_t(count));
+ for(uint64_t j=0;j<count;++j){uint64_t index=r.integer();double value=r.real();require(index<uint64_t(7*t->info.cells)&&(!j||index>uint64_t(node->grid.back().index))&&std::isfinite(value)&&value>0,BAD);node->grid.push_back({int(index),value});}
+ validate_sparse_node(*t,*node);t->knots.push_back(node);
+ }
+ require(r.pos==r.n&&entries==t->info.stored_spectral_entries&&t->knots.front()->T==t->info.lower_kT_J&&t->knots.back()->T==t->info.upper_kT_J,BAD);
+ *out=t.release();return PB11_STATUS_OK;
+ }catch(const Failure&f){return f.status;}catch(...){return PB11_STATUS_EXCEPTION;}
 }

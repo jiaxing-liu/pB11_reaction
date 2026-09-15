@@ -39,6 +39,8 @@ add_library(pb11 src/pb11.cpp src/pb11_c.cpp src/pb11_source.cpp
                    src/fusion_transfer_rate.cpp src/fusion_two_component.cpp
                    src/fusion_birth_floor.cpp src/fusion_handoff.cpp src/fusion_thermal_burn.cpp src/fusion_nuclear_data.cpp src/fusion_source_state.cpp src/fusion_fast_moments.cpp)
 add_library(pb11::pb11 ALIAS pb11)
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/BeamCacheIdentity.cmake")
+pb11_add_beam_cache_kernel_identity(pb11 "${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_compile_features(pb11 PUBLIC cxx_std_17)
 target_include_directories(
@@ -574,6 +576,10 @@ if(BUILD_TESTING)
     add_executable(test_fusion_coupled_thermal tests/test_fusion_coupled_thermal.cpp)
     target_link_libraries(test_fusion_coupled_thermal PRIVATE pb11::pb11)
     add_test(NAME fusion_coupled_thermal_tests COMMAND test_fusion_coupled_thermal)
+    add_executable(test_fusion_beam_birth_table_bytes tests/test_fusion_beam_birth_table_bytes.cpp)
+    target_link_libraries(test_fusion_beam_birth_table_bytes PRIVATE pb11::pb11)
+    add_test(NAME fusion_beam_birth_table_bytes_tests COMMAND test_fusion_beam_birth_table_bytes)
+
     add_executable(test_fusion_beam_birth_table tests/test_fusion_beam_birth_table.cpp)
     target_link_libraries(test_fusion_beam_birth_table PRIVATE pb11::pb11)
     add_test(NAME fusion_beam_birth_table_tests COMMAND test_fusion_beam_birth_table)
@@ -779,6 +785,13 @@ if(BUILD_TESTING)
             Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod")
         target_link_libraries(test_fusion_birth_floor_fortran PRIVATE pb11::fusion_birth_floor_fortran)
         add_test(NAME fusion_birth_floor_fortran_binding_tests COMMAND test_fusion_birth_floor_fortran)
+
+        add_executable(test_fusion_beam_birth_table_bytes_fortran tests/test_fusion_beam_birth_table_bytes.f90)
+        set_target_properties(test_fusion_beam_birth_table_bytes_fortran PROPERTIES
+            LINKER_LANGUAGE Fortran
+            Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fortran-mod-tests")
+        target_link_libraries(test_fusion_beam_birth_table_bytes_fortran PRIVATE pb11::fusion_beam_birth_table_fortran)
+        add_test(NAME fusion_beam_birth_table_bytes_fortran_tests COMMAND test_fusion_beam_birth_table_bytes_fortran)
 
         add_executable(test_fusion_beam_birth_table_fortran tests/test_fusion_beam_birth_table_fortran.f90)
         set_target_properties(test_fusion_beam_birth_table_fortran PROPERTIES

@@ -1,0 +1,8 @@
+#pragma once
+
+namespace fusion_detail {
+
+inline constexpr char beam_cache_kernel_identity[] =
+    "@PB11_BEAM_CACHE_KERNEL_IDENTITY@";
+
+}  // namespace fusion_detail

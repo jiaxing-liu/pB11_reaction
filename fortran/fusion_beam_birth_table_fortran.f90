@@ -7,7 +7,7 @@ module fusion_beam_birth_table_fortran
   !! use shape (cells,7), whose column-major storage is the C species-major
   !! layout [species][cell].
   use, intrinsic :: iso_c_binding, only : c_associated, c_double, c_int, &
-       c_int64_t, c_null_ptr, c_ptr, c_size_t, c_loc
+       c_int8_t, c_int64_t, c_null_ptr, c_ptr, c_size_t, c_loc
   use fusion_beam_birth_fortran, only : &
        fusion_beam_birth_options_v1, &
        beam_status_ok => PB11_STATUS_OK, &
@@ -110,6 +110,9 @@ module fusion_beam_birth_table_fortran
   public :: fusion_beam_birth_table_destroy
   public :: fusion_beam_birth_table_info
   public :: fusion_beam_birth_table_evaluate
+  public :: fusion_beam_birth_table_pack_size
+  public :: fusion_beam_birth_table_pack
+  public :: fusion_beam_birth_table_unpack
 
   interface
      function c_fusion_beam_birth_table_create(channel, projectile_slot, &
@@ -155,6 +158,33 @@ module fusion_beam_birth_table_fortran
        type(c_ptr), value :: out
        integer(c_int) :: status
      end function c_fusion_beam_birth_table_evaluate
+
+     function c_fusion_beam_birth_table_pack_size(table, required) bind(C, &
+          name="fusion_c_beam_birth_table_pack_size") result(status)
+       import :: c_int, c_ptr, c_size_t
+       type(c_ptr), value :: table
+       type(c_ptr), value :: required
+       integer(c_int) :: status
+     end function c_fusion_beam_birth_table_pack_size
+
+     function c_fusion_beam_birth_table_pack(table, buffer, capacity, written) &
+          bind(C, name="fusion_c_beam_birth_table_pack") result(status)
+       import :: c_int, c_ptr, c_size_t
+       type(c_ptr), value :: table
+       type(c_ptr), value :: buffer
+       integer(c_size_t), value :: capacity
+       type(c_ptr), value :: written
+       integer(c_int) :: status
+     end function c_fusion_beam_birth_table_pack
+
+     function c_fusion_beam_birth_table_unpack(buffer, length, out) bind(C, &
+          name="fusion_c_beam_birth_table_unpack") result(status)
+       import :: c_int, c_ptr, c_size_t
+       type(c_ptr), value :: buffer
+       integer(c_size_t), value :: length
+       type(c_ptr), value :: out
+       integer(c_int) :: status
+     end function c_fusion_beam_birth_table_unpack
   end interface
 
 contains
@@ -307,5 +337,66 @@ contains
        call clear_birth_coefficients(out)
     end if
   end subroutine fusion_beam_birth_table_evaluate
+
+  subroutine fusion_beam_birth_table_pack_size(table, required, status)
+    type(c_ptr), intent(in) :: table
+    integer(c_size_t), intent(out), target :: required
+    integer(c_int), intent(out) :: status
+
+    required = 0_c_size_t
+    status = PB11_STATUS_INVALID_ARGUMENT
+    if (.not. c_associated(table)) return
+
+    status = c_fusion_beam_birth_table_pack_size(table, c_loc(required))
+    if (status /= PB11_STATUS_OK) required = 0_c_size_t
+  end subroutine fusion_beam_birth_table_pack_size
+
+  subroutine fusion_beam_birth_table_pack(table, buffer, capacity, &
+       bytes_written, status)
+    type(c_ptr), intent(in) :: table
+    integer(c_int8_t), intent(inout), target, contiguous :: buffer(:)
+    integer(c_size_t), intent(in) :: capacity
+    integer(c_size_t), intent(out), target :: bytes_written
+    integer(c_int), intent(out) :: status
+
+    bytes_written = 0_c_size_t
+    status = PB11_STATUS_INVALID_ARGUMENT
+    if (.not. c_associated(table)) return
+    ! C requires a nonnull buffer even when capacity is zero.  Avoid C_LOC for
+    ! zero-length Fortran actuals and reject a capacity beyond the actual
+    ! caller-owned extent before entering the ABI.
+    if (capacity <= 0_c_size_t) return
+    if (size(buffer, kind=c_size_t) < capacity) return
+
+    status = c_fusion_beam_birth_table_pack(table, c_loc(buffer(1)), &
+         capacity, c_loc(bytes_written))
+    if (status /= PB11_STATUS_OK) bytes_written = 0_c_size_t
+  end subroutine fusion_beam_birth_table_pack
+
+  subroutine fusion_beam_birth_table_unpack(buffer, length, table, status)
+    integer(c_int8_t), intent(in), target, contiguous :: buffer(:)
+    integer(c_size_t), intent(in) :: length
+    type(c_ptr), intent(out), target :: table
+    integer(c_int), intent(out) :: status
+
+    type(c_ptr), target :: unpacked
+
+    table = c_null_ptr
+    unpacked = c_null_ptr
+    status = PB11_STATUS_INVALID_ARGUMENT
+    ! Do not form C_LOC for a zero-length actual or for a requested length
+    ! beyond the actual buffer.  The C ABI receives exactly the requested
+    ! prefix when a larger Fortran buffer is supplied.
+    if (length <= 0_c_size_t) return
+    if (size(buffer, kind=c_size_t) < length) return
+
+    status = c_fusion_beam_birth_table_unpack(c_loc(buffer(1)), length, &
+         c_loc(unpacked))
+    if (status /= PB11_STATUS_OK) then
+       table = c_null_ptr
+       return
+    end if
+    table = unpacked
+  end subroutine fusion_beam_birth_table_unpack
 
 end module fusion_beam_birth_table_fortran
