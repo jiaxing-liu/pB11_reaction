@@ -48,8 +48,9 @@ struct Mapper {
    birth[id*n+j]+=z*f;birth[id*n+j-1]+=z*(1-f);
   }
  }
- void isotropic(int id,R mass,R K,R beta,R w){
-  R root=std::sqrt(1-beta*beta),gamma=1/root,d=beta*beta/(root*(1+root)),rest=mass*c2;
+ struct Boost {R beta,gamma,d;explicit Boost(R b):beta(b){R root=std::sqrt(1-beta*beta);gamma=1/root;d=beta*beta/(root*(1+root));}};
+ void isotropic(int id,R mass,R K,const Boost&boost,R w){
+  const R beta=boost.beta,gamma=boost.gamma,d=boost.d,rest=mass*c2;
   R mid=gamma*K+d*rest,half=gamma*beta*std::sqrt(K*(K+2*rest));
   R hi=mid+half;
   // (mid-half)*(mid+half)=(K-(gamma-1)*mc^2)^2 avoids
@@ -125,20 +126,21 @@ int prepare_weights(int ch,R E,const fusion_thermal_birth_options_v1&o,
 int emit_products(int ch,R A,R beta,R w,const fusion_thermal_birth_options_v1&o,
  const fusion_nuclear_channel_v1&reaction,const fusion_nuclear_mass_v1*products,
  const std::vector<fusion_detail::QuadNode>&angular,const SourceWeights&weights,Mapper&map,R&shell_shift){
+ const Mapper::Boost boost(beta);
  int st=0;
      if(ch!=0){fusion_particle_four_vector_v1 pair[2]{};double direction[3]={0,0,1};
       st=fusion_c_two_body_cm(products[0].mass_kg,products[1].mass_kg,double(A),direction,pair);if(st)return st;
-      for(int j=0;j<2;++j)map.isotropic(reaction.product_ids[j],products[j].mass_kg,pair[j].kinetic_energy_J,beta,w);
+      for(int j=0;j<2;++j)map.isotropic(reaction.product_ids[j],products[j].mass_kg,pair[j].kinetic_energy_J,boost,w);
      }else{
       if(weights.f0>0)for(auto angle:angular){fusion_three_body_cm_v1 event{};
        st=fusion_c_three_equal_sequential_cm(products[0].mass_kg,double(A),o.ground_state_q_J,angle.x,&event);if(st)return st;
-       for(double K:event.kinetic_energy_J)map.isotropic(4,products[0].mass_kg,K,beta,w*weights.f0*angle.w/2);
+       for(double K:event.kinetic_energy_J)map.isotropic(4,products[0].mass_kg,K,boost,w*weights.f0*angle.w/2);
       }
       auto alpha1=[&](const fusion_detail::AlphaEvents&events,R fraction){
        if(fraction==0)return;
        for(const auto&event:events.events){if(event.weight==0)continue;
         auto K=on_shell(event,A,R(products[0].mass_kg)*c2,shell_shift);
-        for(R k:K)map.isotropic(4,products[0].mass_kg,k,beta,w*fraction*event.weight);
+        for(R k:K)map.isotropic(4,products[0].mass_kg,k,boost,w*fraction*event.weight);
        }
       };
       alpha1(weights.low,weights.flow);alpha1(weights.broad,weights.fbroad);
