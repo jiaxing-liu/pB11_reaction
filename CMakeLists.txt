@@ -587,6 +587,9 @@ if(BUILD_TESTING)
     add_executable(test_fusion_birth_table tests/test_fusion_birth_table.cpp)
     target_link_libraries(test_fusion_birth_table PRIVATE pb11::pb11)
     add_test(NAME fusion_birth_table_tests COMMAND test_fusion_birth_table)
+    add_executable(test_fusion_birth_table_bytes tests/test_fusion_birth_table_bytes.cpp)
+    target_link_libraries(test_fusion_birth_table_bytes PRIVATE pb11::pb11)
+    add_test(NAME fusion_birth_table_bytes_tests COMMAND test_fusion_birth_table_bytes)
     add_executable(test_fusion_thermal_increment tests/test_fusion_thermal_increment.cpp)
     target_link_libraries(test_fusion_thermal_increment PRIVATE pb11::pb11)
     add_test(NAME fusion_thermal_increment_tests COMMAND test_fusion_thermal_increment)
@@ -806,6 +809,12 @@ if(BUILD_TESTING)
             Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod")
         target_link_libraries(test_fusion_birth_table_fortran PRIVATE pb11::fusion_birth_table_fortran)
         add_test(NAME fusion_birth_table_fortran_binding_tests COMMAND test_fusion_birth_table_fortran)
+        add_executable(test_fusion_birth_table_bytes_fortran tests/test_fusion_birth_table_bytes.f90)
+        set_target_properties(test_fusion_birth_table_bytes_fortran PROPERTIES
+            LINKER_LANGUAGE Fortran
+            Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod")
+        target_link_libraries(test_fusion_birth_table_bytes_fortran PRIVATE pb11::fusion_birth_table_fortran)
+        add_test(NAME fusion_birth_table_bytes_fortran_tests COMMAND test_fusion_birth_table_bytes_fortran)
         add_executable(test_fusion_coupled_thermal_fortran tests/test_fusion_coupled_thermal_fortran.f90)
         set_target_properties(test_fusion_coupled_thermal_fortran PROPERTIES
             LINKER_LANGUAGE Fortran

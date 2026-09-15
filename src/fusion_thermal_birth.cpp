@@ -1,4 +1,5 @@
 #include "fusion_thermal_birth.h"
+#include "fusion_thermal_parent_internal.h"
 #include "fusion_beam_birth.h"
 #include "fusion_alpha_events.h"
 #include "fusion_rate_model.h"
@@ -196,6 +197,16 @@ int parent(int ch,R E,R C,double ma,double mb,fusion_reaction_parent_v1&out){
  return fusion_c_reaction_parent(ch,FUSION_REACTANT_CLASSICAL_BUDGET,pa,pb,&out);
 }
 }
+namespace fusion_detail {
+int thermal_parent_preflight(int ch,long double E,long double C,double ma,double mb,
+ double reaction_q,double ground_q){
+ fusion_reaction_parent_v1 maximum{};
+ int st=parent(ch,E,C,ma,mb,maximum);if(st)return st;
+ if(ch==0&&(maximum.available_cm_energy_J>12*mev||ground_q>reaction_q))
+  return PB11_STATUS_OUT_OF_RANGE;
+ return PB11_STATUS_OK;
+}
+}
 static int pair_birth_impl(int ch,double Ta,double Tb,int correlation_order,const fusion_thermal_birth_options_v1*op,
  int n,const double*edges,double*birth,fusion_thermal_birth_v1*out){
  double T=Ta;
@@ -234,15 +245,14 @@ static int pair_birth_impl(int ch,double Ta,double Tb,int correlation_order,cons
   }
   fusion_rate_model_v1 reference{};
   st=fusion_c_thermal_pair_maxwellian_model(ch,o.continuation,o.pb_low,ma.mass_kg,mb.mass_kg,Ta,Tb,&reference);if(st)return st;
-  fusion_reaction_parent_v1 maximum{};
   R max_cm=R(T)*o.cm_max_kT;
   if(correlated){
    R speed=std::abs(drift)*std::sqrt(2*R(o.relative_max_J)/reduced)+
      std::sqrt(2*R(cm_temperature)*o.cm_max_kT/mass_sum);
    max_cm=mass_sum*speed*speed/2;
   }
-  st=parent(ch,o.relative_max_J,max_cm,ma.mass_kg,mb.mass_kg,maximum);if(st)return st;
-  if(ch==0&&(maximum.available_cm_energy_J>12*mev||o.ground_state_q_J>reaction.q_J))return PB11_STATUS_OUT_OF_RANGE;
+  st=fusion_detail::thermal_parent_preflight(ch,o.relative_max_J,max_cm,ma.mass_kg,mb.mass_kg,
+    reaction.q_J,o.ground_state_q_J);if(st)return st;
   auto cm=cm_nodes(cm_temperature,o);auto nodes=fusion_detail::gauss_legendre(o.relative_order);
   auto angular=fusion_detail::gauss_legendre(o.ncos);auto knots=relative_knots(T,o.relative_max_J,ch);
   auto directions=correlated?fusion_detail::gauss_legendre(correlation_order):

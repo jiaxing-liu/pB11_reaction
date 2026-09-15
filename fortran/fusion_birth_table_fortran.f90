@@ -6,8 +6,9 @@ module fusion_birth_table_fortran
   !! exactly once by fusion_birth_table_destroy.  Fortran birth arrays use
   !! shape (cells,7), whose column-major storage is the C species-major
   !! layout [species][cell].
-  use, intrinsic :: iso_c_binding, only : c_associated, c_double, c_int, &
-       c_null_ptr, c_ptr, c_size_t, c_loc
+  use, intrinsic :: iso_c_binding, only : c_associated, c_char, c_double, &
+       c_f_pointer, c_int, c_int8_t, c_null_char, c_null_ptr, c_ptr, &
+       c_size_t, c_loc
   use fusion_thermal_birth_fortran, only : &
        fusion_thermal_birth_options_v1, &
        thermal_status_ok => PB11_STATUS_OK, &
@@ -101,6 +102,14 @@ module fusion_birth_table_fortran
   public :: fusion_birth_table_destroy
   public :: fusion_birth_table_info
   public :: fusion_birth_table_evaluate
+  public :: fusion_birth_table_kernel_identity
+  public :: fusion_birth_table_matches_request
+  public :: fusion_birth_table_pack_size
+  public :: fusion_birth_table_pack
+  public :: fusion_birth_table_unpack
+
+  integer(c_int), parameter, public :: &
+       FUSION_BIRTH_TABLE_KERNEL_IDENTITY_LENGTH = 64_c_int
 
   interface
      function c_fusion_birth_table_create(channel, lower_kT_J, upper_kT_J, &
@@ -142,6 +151,55 @@ module fusion_birth_table_fortran
        type(c_ptr), value :: out
        integer(c_int) :: status
      end function c_fusion_birth_table_evaluate
+
+     function c_fusion_birth_table_kernel_identity() bind(C, &
+          name="fusion_c_birth_table_kernel_identity") result(identity)
+       import :: c_ptr
+       type(c_ptr) :: identity
+     end function c_fusion_birth_table_kernel_identity
+
+     function c_fusion_birth_table_matches_request(table, channel, lower_kT_J, &
+          upper_kT_J, source, control, cells, edges, matches) bind(C, &
+          name="fusion_c_birth_table_matches_request") result(status)
+       import :: c_double, c_int, c_ptr
+       type(c_ptr), value :: table
+       integer(c_int), value :: channel
+       real(c_double), value :: lower_kT_J
+       real(c_double), value :: upper_kT_J
+       type(c_ptr), value :: source
+       type(c_ptr), value :: control
+       integer(c_int), value :: cells
+       type(c_ptr), value :: edges
+       type(c_ptr), value :: matches
+       integer(c_int) :: status
+     end function c_fusion_birth_table_matches_request
+
+     function c_fusion_birth_table_pack_size(table, required) bind(C, &
+          name="fusion_c_birth_table_pack_size") result(status)
+       import :: c_int, c_ptr
+       type(c_ptr), value :: table
+       type(c_ptr), value :: required
+       integer(c_int) :: status
+     end function c_fusion_birth_table_pack_size
+
+     function c_fusion_birth_table_pack(table, buffer, capacity, written) &
+          bind(C, name="fusion_c_birth_table_pack") result(status)
+       import :: c_int, c_ptr, c_size_t
+       type(c_ptr), value :: table
+       type(c_ptr), value :: buffer
+       integer(c_size_t), value :: capacity
+       type(c_ptr), value :: written
+       integer(c_int) :: status
+     end function c_fusion_birth_table_pack
+
+     function c_fusion_birth_table_unpack(buffer, length, out) bind(C, &
+          name="fusion_c_birth_table_unpack") result(status)
+       import :: c_int, c_ptr, c_size_t
+       type(c_ptr), value :: buffer
+       integer(c_size_t), value :: length
+       type(c_ptr), value :: out
+       integer(c_int) :: status
+     end function c_fusion_birth_table_unpack
   end interface
 
 contains
@@ -289,5 +347,110 @@ contains
        call clear_birth_coefficients(out)
     end if
   end subroutine fusion_birth_table_evaluate
+
+  function fusion_birth_table_kernel_identity() result(identity)
+    !! Return the process-lifetime 64-character thermal-table kernel identity.
+    character(len=FUSION_BIRTH_TABLE_KERNEL_IDENTITY_LENGTH) :: identity
+
+    type(c_ptr) :: pointer
+    character(kind=c_char), pointer :: bytes(:)
+    integer :: i
+
+    identity = ' '
+    pointer = c_fusion_birth_table_kernel_identity()
+    if (.not. c_associated(pointer)) return
+    call c_f_pointer(pointer, bytes, [FUSION_BIRTH_TABLE_KERNEL_IDENTITY_LENGTH + 1])
+    do i = 1, FUSION_BIRTH_TABLE_KERNEL_IDENTITY_LENGTH
+       if (bytes(i) == c_null_char) exit
+       identity(i:i) = bytes(i)
+    end do
+  end function fusion_birth_table_kernel_identity
+
+  subroutine fusion_birth_table_matches_request(table, channel, lower_kT_J, &
+       upper_kT_J, source, control, edges_J, matches, status)
+    type(c_ptr), intent(in) :: table
+    integer(c_int), intent(in) :: channel
+    real(c_double), intent(in) :: lower_kT_J, upper_kT_J
+    type(fusion_thermal_birth_options_v1), intent(in), target :: source
+    type(fusion_birth_table_control_v1), intent(in), target :: control
+    real(c_double), intent(in), target, contiguous :: edges_J(:)
+    logical, intent(out) :: matches
+    integer(c_int), intent(out) :: status
+
+    integer(c_int) :: cells
+    integer(c_int), target :: answer
+    integer(c_size_t) :: edge_count
+
+    matches = .false.
+    status = PB11_STATUS_INVALID_ARGUMENT
+    edge_count = size(edges_J, kind=c_size_t)
+    if (edge_count < 2_c_size_t .or. edge_count > 100001_c_size_t) return
+    cells = int(edge_count - 1_c_size_t, c_int)
+    answer = 0_c_int
+    status = c_fusion_birth_table_matches_request(table, channel, lower_kT_J, &
+         upper_kT_J, c_loc(source), c_loc(control), cells, c_loc(edges_J(1)), &
+         c_loc(answer))
+    if (status == PB11_STATUS_OK) matches = answer == 1_c_int
+  end subroutine fusion_birth_table_matches_request
+
+  subroutine fusion_birth_table_pack_size(table, required, status)
+    type(c_ptr), intent(in) :: table
+    integer(c_size_t), intent(out), target :: required
+    integer(c_int), intent(out) :: status
+
+    required = 0_c_size_t
+    status = PB11_STATUS_INVALID_ARGUMENT
+    if (.not. c_associated(table)) return
+
+    status = c_fusion_birth_table_pack_size(table, c_loc(required))
+    if (status /= PB11_STATUS_OK) required = 0_c_size_t
+  end subroutine fusion_birth_table_pack_size
+
+  subroutine fusion_birth_table_pack(table, buffer, capacity, bytes_written, &
+       status)
+    type(c_ptr), intent(in) :: table
+    integer(c_int8_t), intent(inout), target, contiguous :: buffer(:)
+    integer(c_size_t), intent(in) :: capacity
+    integer(c_size_t), intent(out), target :: bytes_written
+    integer(c_int), intent(out) :: status
+
+    bytes_written = 0_c_size_t
+    status = PB11_STATUS_INVALID_ARGUMENT
+    if (.not. c_associated(table)) return
+    ! The C contract requires a nonnull buffer for every positive capacity.
+    ! Check the Fortran extent before forming C_LOC, and leave caller bytes
+    ! untouched when the request is invalid or too small.
+    if (capacity <= 0_c_size_t) return
+    if (size(buffer, kind=c_size_t) < capacity) return
+
+    status = c_fusion_birth_table_pack(table, c_loc(buffer(1)), capacity, &
+         c_loc(bytes_written))
+    if (status /= PB11_STATUS_OK) bytes_written = 0_c_size_t
+  end subroutine fusion_birth_table_pack
+
+  subroutine fusion_birth_table_unpack(buffer, length, table, status)
+    integer(c_int8_t), intent(in), target, contiguous :: buffer(:)
+    integer(c_size_t), intent(in) :: length
+    type(c_ptr), intent(out), target :: table
+    integer(c_int), intent(out) :: status
+
+    type(c_ptr), target :: unpacked
+
+    table = c_null_ptr
+    unpacked = c_null_ptr
+    status = PB11_STATUS_INVALID_ARGUMENT
+    ! Do not form C_LOC for an empty array or pass a requested prefix beyond
+    ! the actual Fortran buffer extent.
+    if (length <= 0_c_size_t) return
+    if (size(buffer, kind=c_size_t) < length) return
+
+    status = c_fusion_birth_table_unpack(c_loc(buffer(1)), length, &
+         c_loc(unpacked))
+    if (status /= PB11_STATUS_OK) then
+       table = c_null_ptr
+       return
+    end if
+    table = unpacked
+  end subroutine fusion_birth_table_unpack
 
 end module fusion_birth_table_fortran
