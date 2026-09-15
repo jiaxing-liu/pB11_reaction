@@ -73,6 +73,13 @@ int fusion_c_source_state_create(int cells,const double *edges_J,
 void fusion_c_source_state_destroy(fusion_source_state_v1 *state);
 /* Immutable layout query, including after unpack. cells is zero on errors. */
 int fusion_c_source_state_cells(const fusion_source_state_v1 *state,int *cells);
+/* Compare caller grid to the context's immutable grid (including restored
+ * contexts). Exact numeric equality, no tolerance/interpolation. Valid unequal
+ * grids return OK with matches=0. Invalid input clears matches and returns an
+ * error. Does not change accepted or pending state. */
+int fusion_c_source_state_grid_matches(const fusion_source_state_v1 *state,
+ int cells,const double *edges_J,int *matches);
+
 /* Snapshot accepted state only; arrays each6*cells, ledger cumulative amounts.
  * Outputs required; caller knows cells from its configuration. Returns epoch.
  */

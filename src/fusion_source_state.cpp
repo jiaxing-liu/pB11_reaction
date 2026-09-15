@@ -199,6 +199,17 @@ extern "C" int fusion_c_source_state_cells(const fusion_source_state_v1* p,int* 
  *cells=0;if(!p)return BAD;
  *cells=static_cast<int>(p->edges.size()-1);return OK;
 }
+extern "C" int fusion_c_source_state_grid_matches(const fusion_source_state_v1* p,
+ int cells,const double* edges,int* matches){
+ if(!matches)return PB11_STATUS_NULL_OUTPUT;
+ *matches=0;
+ if(!p||!edges||cells<1||cells>1000000)return BAD;
+ for(int i=0;i<=cells;++i)
+  if(!std::isfinite(edges[i])||edges[i]<0||(i&&edges[i]<=edges[i-1]))return BAD;
+ if(p->edges.size()!=size_t(cells)+1)return OK;
+ *matches=std::equal(p->edges.begin(),p->edges.end(),edges)?1:0;
+ return OK;
+}
 namespace {
 int snapshot(const fusion_source_state_v1* p,double* s,double* t,
  fusion_source_ledger_v1* ledger,double* inert,double* time,uint64_t* epoch,

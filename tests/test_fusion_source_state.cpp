@@ -741,8 +741,38 @@ void test_two_independent_contexts() {
 
 }  // namespace
 
+static void test_grid_identity() {
+    const double edges[]={0.,1.,2.}; double populations[12]={};
+    fusion_source_state_v1* state=nullptr; int matches=17;
+    check_status(fusion_c_source_state_create(2,edges,populations,populations,0.,42,&state),"grid fixture");
+    check_status(fusion_c_source_state_grid_matches(state,2,edges,&matches),"exact grid");
+    check(matches==1,"exact immutable grid matches");
+    const double different[]={0.,1.,3.};
+    check_status(fusion_c_source_state_grid_matches(state,2,different,&matches),"different valid grid");
+    check(matches==0,"same dimension is insufficient grid identity");
+    const double fewer[]={0.,2.};
+    check_status(fusion_c_source_state_grid_matches(state,1,fewer,&matches),"different dimension");
+    check(matches==0,"unequal cells mismatch");
+    const double invalid[]={0.,2.,1.};
+    matches=17;check_rejected(fusion_c_source_state_grid_matches(state,2,invalid,&matches),"unordered grid");
+    check(matches==0,"error clears match output");
+    check_rejected(fusion_c_source_state_grid_matches(nullptr,2,edges,&matches),"null context");
+    check_rejected(fusion_c_source_state_grid_matches(state,2,nullptr,&matches),"null grid");
+    check_rejected(fusion_c_source_state_grid_matches(state,2,edges,nullptr),"null output");
+    size_t size=0,written=0;check_status(fusion_c_source_state_pack_size(state,&size),"grid pack size");
+    std::vector<unsigned char> bytes(size);check_status(fusion_c_source_state_pack(state,bytes.data(),size,&written),"grid pack");
+    fusion_source_state_v1* restored=nullptr;
+    check_status(fusion_c_source_state_unpack(bytes.data(),written,42,&restored),"grid restored context");
+    check_status(fusion_c_source_state_grid_matches(restored,2,edges,&matches),"restored grid identity");
+    check(matches==1,"imported grid matches original caller grid");
+    check_status(fusion_c_source_state_grid_matches(restored,2,different,&matches),"restored false grid");
+    check(matches==0,"imported grid rejects conflicting envelope");
+    fusion_c_source_state_destroy(restored);fusion_c_source_state_destroy(state);
+}
+
 int main() {
     try {
+        test_grid_identity();
         test_unrepresentable_restart_anchor();
         test_create_and_snapshot();
         test_begin_stage_commit_once();

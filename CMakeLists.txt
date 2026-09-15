@@ -927,6 +927,12 @@ if(BUILD_TESTING)
             Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod")
         target_link_libraries(test_fusion_source_state_fortran PRIVATE pb11::fusion_source_state_fortran)
         add_test(NAME fusion_source_state_fortran_binding_tests COMMAND test_fusion_source_state_fortran)
+        add_executable(test_source_grid_fortran tests/test_source_grid_fortran.f90)
+        set_target_properties(test_source_grid_fortran PROPERTIES LINKER_LANGUAGE Fortran
+            Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-grid-fortran-mod")
+        target_link_libraries(test_source_grid_fortran PRIVATE pb11::fusion_source_state_fortran)
+        add_test(NAME source_grid_fortran_binding_tests COMMAND test_source_grid_fortran)
+
 
         add_executable(test_fusion_nuclear_data_fortran tests/test_fusion_nuclear_data_fortran.f90)
         set_target_properties(test_fusion_nuclear_data_fortran PROPERTIES

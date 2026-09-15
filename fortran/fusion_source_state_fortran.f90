@@ -56,6 +56,7 @@ module fusion_source_state_fortran
 
   public :: fusion_source_state_create
   public :: fusion_source_state_destroy
+  public :: fusion_source_state_grid_matches
   public :: fusion_source_state_cells
   public :: fusion_source_state_snapshot
   public :: fusion_source_state_snapshot_inert
@@ -89,6 +90,14 @@ module fusion_source_state_fortran
        import :: c_ptr
        type(c_ptr), value :: state
      end subroutine c_fusion_source_state_destroy
+
+     function c_fusion_source_state_grid_matches(state,cells,edges,matches) &
+          bind(C,name="fusion_c_source_state_grid_matches") result(status)
+       import :: c_ptr,c_int
+       type(c_ptr),value :: state,edges,matches
+       integer(c_int),value :: cells
+       integer(c_int) :: status
+     end function
 
      function c_fusion_source_state_cells(state, cells) bind(C, &
           name="fusion_c_source_state_cells") result(status)
@@ -214,6 +223,20 @@ module fusion_source_state_fortran
   end interface
 
 contains
+  subroutine fusion_source_state_grid_matches(state,edges,matches,status)
+    type(c_ptr),intent(in) :: state
+    real(c_double),intent(in),target,contiguous :: edges(:)
+    logical,intent(out) :: matches
+    integer(c_int),intent(out) :: status
+    integer(c_int),target :: result
+    matches=.false.;status=PB11_STATUS_INVALID_ARGUMENT
+    if(.not.c_associated(state))return
+    if(size(edges)<2.or.size(edges)>FUSION_SOURCE_STATE_MAX_CELLS+1)return
+    result=0
+    status=c_fusion_source_state_grid_matches(state,int(size(edges)-1,c_int),c_loc(edges(1)),c_loc(result))
+    if(status==PB11_STATUS_OK)matches=result==1
+  end subroutine
+
 
   subroutine clear_ledger(ledger)
     type(fusion_source_ledger_v1), intent(out) :: ledger
