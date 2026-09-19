@@ -8,7 +8,11 @@ chosen by the caller; this API has no material-wall information.
 
 The implementation uses long double and an equally spaced polygon. Define
 P=sum max(abs(Rj),abs(Zj)), M=sum j*j*max(abs(Rj),abs(Zj)), h=2*pi/N.
-P bounds the distance from (R0,0); M bounds the second theta derivative norm.
+For each harmonic, ||(Rj*cos(j*theta),Zj*sin(j*theta))||^2 is at most
+max(Rj^2,Zj^2), since cos^2+sin^2=1. The triangle inequality therefore gives
+P as a vector-norm bound without an extra sqrt(2). Multiplying each harmonic
+by j^2 gives the same argument for M. Thus P bounds the distance from (R0,0);
+M bounds the second theta derivative norm.
 The maximum curve-to-corresponding-chord deviation is bounded by M*h*h/8 in
 exact arithmetic. W=(R-R0)*Ztheta-Z*Rtheta and abs(Wprime)<=P*M.
 Only geometry passing all the following checks is supported:
