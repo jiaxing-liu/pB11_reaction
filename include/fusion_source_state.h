@@ -30,6 +30,10 @@ typedef struct fusion_source_ledger_v1 {
  * Spatial fields are signed net inward exchange; work is signed onto particles.
  * Lower/upper fields are nonnegative numerical energy-domain outflow carrying
  * the immutable grid-edge energy. These are NOT physical escape or fluid ash.
+ * For exact N*edge below DBL_MIN, N remains authoritative and U is the unique
+ * binary64 round-to-nearest-even representation of N*edge (possibly +0).
+ * Geometry and cumulative ledgers canonicalize U AFTER extensive conversion.
+ * This is not an absolute conservation tolerance or a loss of particle count.
  */
 typedef struct fusion_transport_ledger_v1 {
  double spatial_number[6],spatial_energy_J[6],work_J[6];

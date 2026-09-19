@@ -1,5 +1,6 @@
 #include "fusion_source_state.h"
 #include "fusion_nuclear_data.h"
+#include "fusion_boundary_energy.hpp"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -105,22 +106,32 @@ bool inventory(const std::vector<double>& edges,const double* s,const double* t,
  for(int j=0;j<6;++j)if(!representable(n[j])||!representable(u[j]))return false;
  return true;
 }
+bool boundary_matches(double n,double edge,double u){
+ double rounded;
+ if(fusion_boundary_energy::subnormal_product(n,edge,rounded))
+  return u==rounded && !std::signbit(u);
+ return balance({u,-static_cast<long double>(n)*edge});
+}
 bool transport_valid(const fusion_transport_ledger_v1& x,const std::vector<double>& edges){
  bool valid=true;size_t k=0;
  transport_fields(x,[&](double v){if(!std::isfinite(v)||(k>=18&&v<0))valid=false;++k;});
  if(!valid)return false;
  for(int j=0;j<6;++j)
-  if(!balance({x.lower_energy_J[j],-static_cast<long double>(x.lower_number[j])*edges.front()})||
-     !balance({x.upper_energy_J[j],-static_cast<long double>(x.upper_number[j])*edges.back()}))return false;
+  if(!boundary_matches(x.lower_number[j],edges.front(),x.lower_energy_J[j])||
+     !boundary_matches(x.upper_number[j],edges.back(),x.upper_energy_J[j]))return false;
  return true;
 }
 bool add_transport(const fusion_transport_ledger_v1& a,const fusion_transport_ledger_v1& b,
- fusion_transport_ledger_v1& out){
+ fusion_transport_ledger_v1& out,const std::vector<double>& edges){
  std::array<double,42> av{},bv{};size_t k=0;
  transport_fields(a,[&](double v){av[k++]=v;});k=0;
  transport_fields(b,[&](double v){bv[k++]=v;});k=0;bool valid=true;
  transport_fields(out,[&](double& v){long double sum=static_cast<long double>(av[k])+bv[k];++k;
   if(!representable(sum)){valid=false;v=0;}else v=static_cast<double>(sum);});
+ for(int j=0;j<6;++j){
+  fusion_boundary_energy::canonicalize(out.lower_number[j],edges.front(),out.lower_energy_J[j]);
+  fusion_boundary_energy::canonicalize(out.upper_number[j],edges.back(),out.upper_energy_J[j]);
+ }
  return valid;
 }
 bool rescale_inventory(Moments& n,Moments& u,double volume,double reference){
@@ -130,7 +141,7 @@ bool rescale_inventory(Moments& n,Moments& u,double volume,double reference){
 }
 bool inventory_balance(const Moments& old_n,const Moments& old_u,
  const Moments& n,const Moments& u,const fusion_source_ledger_v1& x,
- const std::array<double,6>& inert,const fusion_transport_ledger_v1* transport=nullptr,double reference=1,const double* numerical=nullptr){
+ const std::array<double,6>& inert,const fusion_transport_ledger_v1* transport=nullptr,double reference=1,const double* numerical=nullptr,const std::vector<double>* edges=nullptr){
  const fusion_transport_ledger_v1 empty{};const auto& m=transport?*transport:empty;
  for(int s=0;s<6;++s){long double heat=inert[s],heat_scale=std::abs(inert[s]);
   for(int b=0;b<7;++b){heat+=x.heat_to_bath_J_m3[7*s+b];heat_scale+=std::abs(x.heat_to_bath_J_m3[7*s+b]);}
@@ -144,7 +155,8 @@ bool inventory_balance(const Moments& old_n,const Moments& old_u,
     -static_cast<long double>(x.external_born_energy_J_m3[s]),x.fast_consumed_energy_J_m3[s],
     x.escaped_energy_J_m3[s],x.handed_off_energy_J_m3[s],numerical?numerical[s]:0.,(heat_scale+heat)/2,-(heat_scale-heat)/2,
     -static_cast<long double>(m.spatial_energy_J[s])/reference,-static_cast<long double>(m.work_J[s])/reference,
-    static_cast<long double>(m.lower_energy_J[s])/reference,static_cast<long double>(m.upper_energy_J[s])/reference}))return false;
+    (edges?fusion_boundary_energy::accounting(m.lower_number[s],edges->front(),m.lower_energy_J[s]):m.lower_energy_J[s])/reference,
+    (edges?fusion_boundary_energy::accounting(m.upper_number[s],edges->back(),m.upper_energy_J[s]):m.upper_energy_J[s])/reference}))return false;
  }
  return true;
 }
@@ -275,7 +287,7 @@ int stage(fusion_source_state_v1* p,uint64_t ticket,
   fusion_transport_ledger_v1 cumulative_transport{};
   if(movement){
    if(!std::isfinite(trial_volume)||trial_volume<=0||!transport_valid(*movement,p->edges)||
-      !add_transport(p->transport,*movement,cumulative_transport)||!transport_valid(cumulative_transport,p->edges))return BAD;
+      !add_transport(p->transport,*movement,cumulative_transport,p->edges)||!transport_valid(cumulative_transport,p->edges))return BAD;
   }
   std::array<double,6> step_inert{},cumulative_inert{},step_numerical{},cumulative_numerical{};
   for(int i=0;i<6;++i){
@@ -296,11 +308,11 @@ int stage(fusion_source_state_v1* p,uint64_t ticket,
   if(!inventory(p->edges,s,t,n,u)||!inventory(p->edges,p->s.data(),p->t.data(),old_n,old_u))return BAD;
   if(p->moving&&(!rescale_inventory(old_n,old_u,p->volume,p->reference_volume)||
      !rescale_inventory(n,u,trial_volume,p->reference_volume)))return NUM;
-  if(!inventory_balance(old_n,old_u,n,u,*step,step_inert,movement,p->reference_volume,step_numerical.data()))return NUM;
+  if(!inventory_balance(old_n,old_u,n,u,*step,step_inert,movement,p->reference_volume,step_numerical.data(),movement?&p->edges:nullptr))return NUM;
   fusion_source_ledger_v1 cumulative{};
   if(!add_ledger(p->cumulative,*step,cumulative)||
      !inventory_balance(p->initial_n,p->initial_u,n,u,cumulative,cumulative_inert,
-       movement?&cumulative_transport:nullptr,p->reference_volume,cumulative_numerical.data()))return NUM;
+       movement?&cumulative_transport:nullptr,p->reference_volume,cumulative_numerical.data(),movement?&p->edges:nullptr))return NUM;
   // Allocations complete before the valid-stage flag changes.
   std::vector<double> ts(s,s+p->s.size()),tt(t,t+p->t.size());
   p->trial_s.swap(ts);p->trial_t.swap(tt);p->staged_cumulative=cumulative;
@@ -476,7 +488,7 @@ extern "C" int fusion_c_source_state_unpack(const unsigned char* buffer,size_t l
   if(!inventory(p->edges,p->s.data(),p->t.data(),n,u))return BAD;
   if(p->moving&&(!transport_valid(p->transport,p->edges)||!rescale_inventory(n,u,p->volume,p->reference_volume)))return BAD;
   if(!inventory_balance(p->initial_n,p->initial_u,n,u,p->cumulative,p->inert,
-      p->moving?&p->transport:nullptr,p->reference_volume,p->numerical.data()))return BAD;
+      p->moving?&p->transport:nullptr,p->reference_volume,p->numerical.data(),p->moving?&p->edges:nullptr))return BAD;
   *out=p.release();return OK;
  }catch(...){return EXC;}
 }

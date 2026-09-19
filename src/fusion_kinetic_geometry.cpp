@@ -1,6 +1,7 @@
 #include "fusion_kinetic_geometry.h"
 #include "fusion_radial_transport.h"
 #include "fusion_energy_work.h"
+#include "fusion_boundary_energy.hpp"
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -73,6 +74,10 @@ extern "C" int fusion_c_kinetic_geometry_trial(int zones,int cells,double dt,
    if(!store(spatial_n,r.spatial_number[sp])||!store(spatial_u,r.spatial_energy_J[sp])||
       !store(work,r.work_J[sp])||!store(lower_n,r.lower_number[sp])||!store(lower_u,r.lower_energy_J[sp])||
       !store(upper_n,r.upper_number[sp])||!store(upper_u,r.upper_energy_J[sp]))return num;
+   // Domain outflow is monoenergetic at the immutable edge, not a spectral mean.
+   // Reconstruct after BOTH component summation and extensive-volume conversion.
+   fusion_boundary_energy::canonicalize(r.lower_number[sp],edges[0],r.lower_energy_J[sp]);
+   fusion_boundary_energy::canonicalize(r.upper_number[sp],edges[cells],r.upper_energy_J[sp]);
   }
   std::copy(candidates_s.begin(),candidates_s.end(),ts);std::copy(candidates_t.begin(),candidates_t.end(),tt);
   std::copy(result.begin(),result.end(),ledger);return PB11_STATUS_OK;
