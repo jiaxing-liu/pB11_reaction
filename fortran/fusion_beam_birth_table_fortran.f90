@@ -111,6 +111,7 @@ module fusion_beam_birth_table_fortran
   public :: fusion_beam_birth_table_destroy
   public :: fusion_beam_birth_table_info
   public :: fusion_beam_birth_table_evaluate
+  public :: fusion_beam_birth_table_content_digest
   public :: fusion_beam_birth_table_pack_size
   public :: fusion_beam_birth_table_pack
   public :: fusion_beam_birth_table_unpack
@@ -167,6 +168,13 @@ module fusion_beam_birth_table_fortran
        type(c_ptr), value :: out
        integer(c_int) :: status
      end function c_fusion_beam_birth_table_evaluate
+
+     function c_fusion_beam_birth_table_content_digest(table, digest, length) &
+          bind(C, name="fusion_c_beam_birth_table_content_digest") result(status)
+       import :: c_ptr, c_int
+       type(c_ptr), value :: table, digest, length
+       integer(c_int) :: status
+     end function c_fusion_beam_birth_table_content_digest
 
      function c_fusion_beam_birth_table_pack_size(table, required) bind(C, &
           name="fusion_c_beam_birth_table_pack_size") result(status)
@@ -369,6 +377,16 @@ contains
        call clear_birth_coefficients(out)
     end if
   end subroutine fusion_beam_birth_table_evaluate
+
+  subroutine fusion_beam_birth_table_content_digest(table, digest, length, status)
+    type(c_ptr), intent(in) :: table
+    integer(c_int8_t), intent(out), target :: digest(32)
+    integer(c_size_t), intent(out), target :: length
+    integer(c_int), intent(out) :: status
+    digest = 0_c_int8_t
+    length = 0_c_size_t
+    status = c_fusion_beam_birth_table_content_digest(table, c_loc(digest), c_loc(length))
+  end subroutine fusion_beam_birth_table_content_digest
 
   subroutine fusion_beam_birth_table_pack_size(table, required, status)
     type(c_ptr), intent(in) :: table

@@ -27,7 +27,7 @@ if(POLICY CMP0167)
 endif()
 find_package(Boost 1.70 REQUIRED)
 
-add_library(pb11 src/pb11.cpp src/pb11_c.cpp src/pb11_source.cpp
+add_library(pb11 src/fusion_table_digest.cpp src/pb11.cpp src/pb11_c.cpp src/pb11_source.cpp
                    src/fusion_network.cpp src/fusion_rates.cpp
                    src/fusion_cross_sections.cpp src/fusion_kinetics.cpp src/fusion_radial_transport.cpp src/fusion_energy_work.cpp src/fusion_kinetic_geometry.cpp
                    src/fusion_coulomb.cpp src/fusion_beam.cpp src/fusion_rate_model.cpp
@@ -474,6 +474,17 @@ endif()
 
 include(CTest)
 if(BUILD_TESTING)
+    add_executable(test_fusion_table_digest tests/test_fusion_table_digest.cpp)
+    target_link_libraries(test_fusion_table_digest PRIVATE pb11::pb11)
+    add_test(NAME fusion_table_digest_tests COMMAND test_fusion_table_digest)
+    set_tests_properties(fusion_table_digest_tests PROPERTIES FIXTURES_SETUP table_digest_bytes)
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    if(Python3_Interpreter_FOUND)
+        add_test(NAME fusion_table_digest_hashlib_tests COMMAND ${Python3_EXECUTABLE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/tests/check_table_digest.py
+            $<TARGET_FILE:test_fusion_table_digest> ${CMAKE_CURRENT_BINARY_DIR}/digest-oracle)
+    endif()
+
     add_executable(test_pb11 tests/test_pb11.cpp)
     target_link_libraries(test_pb11 PRIVATE pb11::pb11)
     add_test(NAME pb11_unit_tests COMMAND test_pb11)
@@ -788,6 +799,15 @@ if(BUILD_TESTING)
             Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod")
         target_link_libraries(test_fusion_birth_floor_fortran PRIVATE pb11::fusion_birth_floor_fortran)
         add_test(NAME fusion_birth_floor_fortran_binding_tests COMMAND test_fusion_birth_floor_fortran)
+
+        add_executable(test_fusion_table_digest_fortran tests/test_fusion_table_digest.f90)
+        set_target_properties(test_fusion_table_digest_fortran PROPERTIES
+            LINKER_LANGUAGE Fortran
+            Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fortran-mod-tests")
+        target_link_libraries(test_fusion_table_digest_fortran PRIVATE pb11::fusion_beam_birth_table_fortran)
+        add_test(NAME fusion_table_digest_fortran_tests COMMAND test_fusion_table_digest_fortran
+            ${CMAKE_CURRENT_BINARY_DIR}/thermal-digest.bin ${CMAKE_CURRENT_BINARY_DIR}/beam-digest.bin)
+        set_tests_properties(fusion_table_digest_fortran_tests PROPERTIES FIXTURES_REQUIRED table_digest_bytes)
 
         add_executable(test_fusion_beam_birth_table_bytes_fortran tests/test_fusion_beam_birth_table_bytes.f90)
         set_target_properties(test_fusion_beam_birth_table_bytes_fortran PROPERTIES

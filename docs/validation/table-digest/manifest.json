@@ -1,0 +1,98 @@
+[
+  {
+    "source": "build.log",
+    "payload": "000-build.log.gz",
+    "bytes": 4293,
+    "sha256": "d73f9613525ef75e09bc92a542357e358932b9d01d2727a1fe4d70f073281ab9"
+  },
+  {
+    "source": "configure.log",
+    "payload": "001-configure.log.gz",
+    "bytes": 440,
+    "sha256": "bff3db1a391176cbc4399f317961ffd8045d6ba31399825bc85c689ad8a068b7"
+  },
+  {
+    "source": "gnu-build.log",
+    "payload": "002-gnu-build.log.gz",
+    "bytes": 5657,
+    "sha256": "8fd09b8ee0c2016f8e759898b68ac960ff8ad97dca6940a1793afd1daa2e1eb7"
+  },
+  {
+    "source": "gnu-configure.log",
+    "payload": "003-gnu-configure.log.gz",
+    "bytes": 643,
+    "sha256": "e68e3eab21951bc757fba032301c3b2044f92509c08f3736a3a528d3aef4408b"
+  },
+  {
+    "source": "gnu-test.log",
+    "payload": "004-gnu-test.log.gz",
+    "bytes": 538,
+    "sha256": "5a2378ef92ae906506b58b8890b7b21169858cab220805848dc7bce252b2a2b9"
+  },
+  {
+    "source": "host-build.log",
+    "payload": "005-host-build.log.gz",
+    "bytes": 29199,
+    "sha256": "0534d443d82c707fe83af44087c215bae269a110d6658ba26a8114d6e3e573c0"
+  },
+  {
+    "source": "run.log",
+    "payload": "006-run.log.gz",
+    "bytes": 171,
+    "sha256": "b27d653847d989829ea0c9817a06a380b071f147ab05ae6202de63329dbfa855"
+  },
+  {
+    "source": "oracle/hashlib-results.json",
+    "payload": "007-hashlib-results.json.gz",
+    "bytes": 1974,
+    "sha256": "18a1497240f7962112093da4f4af692d05ae1c792e2dbfe704dae9ca8e10b253"
+  },
+  {
+    "source": "thermal-digest.bin",
+    "payload": "008-thermal-digest.bin.gz",
+    "bytes": 6808,
+    "sha256": "86ad1658d54e9e86659c1c9e54e7c7f15b3dfa608a9d01694b8fe57a840bd67c"
+  },
+  {
+    "source": "beam-digest.bin",
+    "payload": "009-beam-digest.bin.gz",
+    "bytes": 2248,
+    "sha256": "2d9211c7619fb7a2802b2e2804e6fe9038bf383829e2c9c34d2e354ec63e7a7f"
+  },
+  {
+    "source": "ifx/compile.log",
+    "payload": "010-compile.log.gz",
+    "bytes": 155,
+    "sha256": "c6e52e5ea5b017231706b716b65e611a5122890cfd30da0092d8ffe95411d364"
+  },
+  {
+    "source": "ifx/run.log",
+    "payload": "011-run.log.gz",
+    "bytes": 171,
+    "sha256": "3395e3cee704e9fe6b8104963d8b3feaaecfa6ab5ed054eedce69bba0d8b69c3"
+  },
+  {
+    "source": "ifx/command.json",
+    "payload": "012-command.json.gz",
+    "bytes": 865,
+    "sha256": "388ece47b2408c29a0142e3429c9577d1622b6c2d2971ad0b8ca1183899149f3"
+  },
+  {
+    "source": "ifx-r8/compile.log",
+    "payload": "013-compile.log.gz",
+    "bytes": 155,
+    "sha256": "c6e52e5ea5b017231706b716b65e611a5122890cfd30da0092d8ffe95411d364"
+  },
+  {
+    "source": "ifx-r8/run.log",
+    "payload": "014-run.log.gz",
+    "bytes": 171,
+    "sha256": "3395e3cee704e9fe6b8104963d8b3feaaecfa6ab5ed054eedce69bba0d8b69c3"
+  },
+  {
+    "source": "ifx-r8/command.json",
+    "payload": "015-command.json.gz",
+    "bytes": 883,
+    "sha256": "685131a6ff6f19f3b7779f155844063228a5f17dfcaa637ad7d8f8c2cba59fb9"
+  }
+]

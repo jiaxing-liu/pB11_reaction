@@ -104,6 +104,7 @@ module fusion_birth_table_fortran
   public :: fusion_birth_table_evaluate
   public :: fusion_birth_table_kernel_identity
   public :: fusion_birth_table_matches_request
+  public :: fusion_birth_table_content_digest
   public :: fusion_birth_table_pack_size
   public :: fusion_birth_table_pack
   public :: fusion_birth_table_unpack
@@ -173,6 +174,13 @@ module fusion_birth_table_fortran
        type(c_ptr), value :: matches
        integer(c_int) :: status
      end function c_fusion_birth_table_matches_request
+
+     function c_fusion_birth_table_content_digest(table, digest, length) &
+          bind(C, name="fusion_c_birth_table_content_digest") result(status)
+       import :: c_ptr, c_int
+       type(c_ptr), value :: table, digest, length
+       integer(c_int) :: status
+     end function c_fusion_birth_table_content_digest
 
      function c_fusion_birth_table_pack_size(table, required) bind(C, &
           name="fusion_c_birth_table_pack_size") result(status)
@@ -392,6 +400,16 @@ contains
          c_loc(answer))
     if (status == PB11_STATUS_OK) matches = answer == 1_c_int
   end subroutine fusion_birth_table_matches_request
+
+  subroutine fusion_birth_table_content_digest(table, digest, length, status)
+    type(c_ptr), intent(in) :: table
+    integer(c_int8_t), intent(out), target :: digest(32)
+    integer(c_size_t), intent(out), target :: length
+    integer(c_int), intent(out) :: status
+    digest = 0_c_int8_t
+    length = 0_c_size_t
+    status = c_fusion_birth_table_content_digest(table, c_loc(digest), c_loc(length))
+  end subroutine fusion_birth_table_content_digest
 
   subroutine fusion_birth_table_pack_size(table, required, status)
     type(c_ptr), intent(in) :: table

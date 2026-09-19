@@ -97,6 +97,15 @@ const char *fusion_c_birth_table_kernel_identity(void);
  * resource bounds are accepted. required/written clear to0 on failure;
  * unpack clears*out first. Short pack buffers are untouched. Caller owns
  * buffer/file I/O; arrays must not overlap. */
+/* SHA256 of all canonical pack bytes (including format/kernel/checksum).
+ * digest must point to32 bytes; packed_size receives the exact byte length.
+ * Both nonnull outputs are zeroed before validation, including null-output
+ * failures. No file I/O or mutation. One temporary packed buffer is allocated,
+ * bounded by the existing pack limit (thermal512MiB, beam256MiB).
+ * This is content identity, not authentication or physical validation.
+ * Buffers/outputs must not overlap each other or the table. */
+int fusion_c_birth_table_content_digest(const fusion_birth_table_v1 *table,
+ unsigned char *digest, size_t *packed_size);
 int fusion_c_birth_table_pack_size(const fusion_birth_table_v1 *table,
  size_t *required);
 int fusion_c_birth_table_pack(const fusion_birth_table_v1 *table,
