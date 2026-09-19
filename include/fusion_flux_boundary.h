@@ -29,6 +29,22 @@ typedef struct fusion_flux_boundary_value_v1 {
 int fusion_c_flux_boundary(int harmonics,const double*coeff_m,int segments,
  double R_m,double Z_m,double geometry_allowance_m,double angular_allowance_m2,
  fusion_flux_boundary_value_v1*out);
+/* Immutable prepared geometry. Additive API; legacy point queries retain their
+ * allocation-free implementation. Owns all derived data, never retains coeff.
+ * Storage <=65536 vertices of four long doubles (platform-dependent, about4MiB
+ * on x86-64). Query arithmetic/allowances are the legacy algorithm. No relaxed
+ * geometry gate or spatial index. Queries are read-only and thread-safe; caller
+ * must not destroy while any query runs. NULL destroy is safe; other handles
+ * must be live handles returned by prepare (no arbitrary/freed-pointer probe).
+ * Prepare sets *out=NULL before validation and publishes only on success.
+ * Queries clear output on error. Allocation failure returns EXCEPTION.
+ */
+typedef struct fusion_flux_boundary_prepared fusion_flux_boundary_prepared;
+int fusion_c_flux_boundary_prepare(int harmonics,const double*coeff_m,int segments,
+ double geometry_allowance_m,double angular_allowance_m2,fusion_flux_boundary_prepared**out);
+int fusion_c_flux_boundary_prepared_point(const fusion_flux_boundary_prepared*context,
+ double R_m,double Z_m,fusion_flux_boundary_value_v1*out);
+void fusion_c_flux_boundary_destroy(fusion_flux_boundary_prepared*context);
 #ifdef __cplusplus
 }
 #endif

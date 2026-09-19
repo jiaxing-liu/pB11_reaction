@@ -6,8 +6,9 @@ namespace {
 struct Point {double fraction,x[3];fusion_flux_boundary_value_v1 boundary;};
 struct Node {Point a,b;int depth;};
 }
-extern "C" int fusion_c_boundary_segment(int m,const double*coeff,int segments,
- const double*start,const double*end,double geom,double angular,double tolerance,
+namespace fusion_detail { double boundary_geometry_allowance(const fusion_flux_boundary_prepared*); }
+template<class Query> int segment_impl(Query query,double geom,
+ const double*start,const double*end,double tolerance,
  int budget,fusion_boundary_segment_value_v1*out){
  if(!out)return PB11_STATUS_NULL_OUTPUT;
  *out={};
@@ -21,7 +22,7 @@ extern "C" int fusion_c_boundary_segment(int m,const double*coeff,int segments,
   }
   double R=std::hypot(p.x[0],p.x[1]);
   if(!std::isfinite(R))return int(PB11_STATUS_NUMERICAL_FAILURE);
-  return fusion_c_flux_boundary(m,coeff,segments,R,p.x[2],geom,angular,&p.boundary);
+  return query(R,p.x[2],&p.boundary);
  };
  Point first{},last{};int rc=point(0,first);if(rc)return rc;rc=point(1,last);if(rc)return rc;
  if(first.boundary.classification==FUSION_BOUNDARY_OUTSIDE)return PB11_STATUS_OUT_OF_RANGE;
@@ -71,4 +72,18 @@ extern "C" int fusion_c_boundary_segment(int m,const double*coeff,int segments,
   stack[size++]={middle,b,node.depth+1};stack[size++]={a,middle,node.depth+1};
  }
  *out={1,1,first.boundary.uncertainty_m,FUSION_SEGMENT_CLEAR,1,FUSION_SEGMENT_FINISHED,visited};return 0;
+}
+
+extern "C" int fusion_c_boundary_segment(int m,const double*coeff,int segments,
+ const double*start,const double*end,double geom,double angular,double tolerance,
+ int budget,fusion_boundary_segment_value_v1*out){
+ auto query=[&](double R,double Z,fusion_flux_boundary_value_v1*b){return fusion_c_flux_boundary(m,coeff,segments,R,Z,geom,angular,b);};
+ return segment_impl(query,geom,start,end,tolerance,budget,out);
+}
+extern "C" int fusion_c_boundary_prepared_segment(const fusion_flux_boundary_prepared*context,
+ const double*start,const double*end,double tolerance,int budget,fusion_boundary_segment_value_v1*out){
+ if(!out)return PB11_STATUS_NULL_OUTPUT;
+ *out={};if(!context)return PB11_STATUS_INVALID_ARGUMENT;
+ auto query=[&](double R,double Z,fusion_flux_boundary_value_v1*b){return fusion_c_flux_boundary_prepared_point(context,R,Z,b);};
+ return segment_impl(query,fusion_detail::boundary_geometry_allowance(context),start,end,tolerance,budget,out);
 }

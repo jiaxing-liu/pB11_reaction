@@ -37,6 +37,11 @@ int fusion_c_boundary_segment(int harmonics,const double*coeff_m,int segments,
  const double*start_m,const double*end_m,double geometry_allowance_m,
  double angular_allowance_m2,double fraction_tolerance,int max_intervals,
  fusion_boundary_segment_value_v1*out);
+/* Same traversal/gates as legacy segment; immutable prepared point kernel.
+ * Context must remain alive for the call. No query allocation or mutation. */
+int fusion_c_boundary_prepared_segment(const fusion_flux_boundary_prepared*context,
+ const double*start_m,const double*end_m,double fraction_tolerance,int max_intervals,
+ fusion_boundary_segment_value_v1*out);
 #ifdef __cplusplus
 }
 #endif

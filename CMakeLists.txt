@@ -706,6 +706,11 @@ if(BUILD_TESTING)
     target_link_libraries(test_fusion_prompt_orbit PRIVATE pb11::pb11)
     add_test(NAME fusion_prompt_orbit_tests COMMAND test_fusion_prompt_orbit)
 
+    find_package(Threads REQUIRED)
+    add_executable(test_fusion_boundary_prepared tests/test_fusion_boundary_prepared.cpp)
+    target_link_libraries(test_fusion_boundary_prepared PRIVATE pb11::pb11 Threads::Threads)
+    add_test(NAME fusion_boundary_prepared_tests COMMAND test_fusion_boundary_prepared)
+
     add_executable(test_fusion_boundary_segment tests/test_fusion_boundary_segment.cpp)
     target_link_libraries(test_fusion_boundary_segment PRIVATE pb11::pb11)
     add_test(NAME fusion_boundary_segment_tests COMMAND test_fusion_boundary_segment)
