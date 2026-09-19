@@ -37,7 +37,7 @@ add_library(pb11 src/fusion_table_digest.cpp src/pb11.cpp src/pb11_c.cpp src/pb1
                    src/fusion_alpha_spectrum.cpp src/fusion_alpha_events.cpp src/fusion_thermal_birth.cpp src/fusion_birth_table.cpp src/fusion_beam_birth_table.cpp src/fusion_coupled_thermal.cpp src/fusion_pb_birth.cpp src/fusion_pb_population.cpp src/fusion_reaction_event.cpp
                    src/fusion_target_burn.cpp src/fusion_target_network.cpp
                    src/fusion_transfer_rate.cpp src/fusion_two_component.cpp
-                   src/fusion_birth_floor.cpp src/fusion_handoff.cpp src/fusion_thermal_burn.cpp src/fusion_nuclear_data.cpp src/fusion_source_state.cpp src/fusion_fast_moments.cpp src/fusion_flux_field.cpp src/fusion_flux_core.cpp src/fusion_flux_inverse.cpp)
+                   src/fusion_birth_floor.cpp src/fusion_handoff.cpp src/fusion_thermal_burn.cpp src/fusion_nuclear_data.cpp src/fusion_source_state.cpp src/fusion_fast_moments.cpp src/fusion_flux_field.cpp src/fusion_flux_core.cpp src/fusion_flux_inverse.cpp src/fusion_flux_boundary.cpp)
 add_library(pb11::pb11 ALIAS pb11)
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/BeamCacheIdentity.cmake")
 pb11_add_beam_cache_kernel_identity(pb11 "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -682,6 +682,10 @@ if(BUILD_TESTING)
     add_test(NAME fusion_coupled_restart_tests COMMAND test_fusion_coupled_restart)
 
 
+    add_executable(test_fusion_flux_boundary tests/test_fusion_flux_boundary.cpp)
+    target_link_libraries(test_fusion_flux_boundary PRIVATE pb11::pb11)
+    add_test(NAME fusion_flux_boundary_tests COMMAND test_fusion_flux_boundary)
+
     add_executable(test_fusion_flux_inverse tests/test_fusion_flux_inverse.cpp)
     target_link_libraries(test_fusion_flux_inverse PRIVATE pb11::pb11)
     add_test(NAME fusion_flux_inverse_tests COMMAND test_fusion_flux_inverse)
@@ -1066,7 +1070,7 @@ install(
           include/fusion_cross_sections.h include/fusion_kinetics.h include/fusion_radial_transport.h include/fusion_energy_work.h
           include/fusion_coulomb.h include/fusion_beam.h include/fusion_rate_model.h
           include/fusion_target_burn.h include/fusion_target_network.h include/fusion_two_component.h include/fusion_handoff.h include/fusion_birth_floor.h
-          include/fusion_thermal_burn.h include/fusion_nuclear_data.h include/fusion_source_state.h include/fusion_kinetic_geometry.h include/fusion_fast_moments.h include/fusion_flux_field.h include/fusion_flux_core.h include/fusion_flux_inverse.h
+          include/fusion_thermal_burn.h include/fusion_nuclear_data.h include/fusion_source_state.h include/fusion_kinetic_geometry.h include/fusion_fast_moments.h include/fusion_flux_field.h include/fusion_flux_core.h include/fusion_flux_inverse.h include/fusion_flux_boundary.h
           include/fusion_products.h include/fusion_laboratory.h
           include/fusion_nuclear_coulomb.h include/fusion_alpha_amplitudes.h
           include/fusion_alpha_spectrum.h include/fusion_beam_birth_table.h include/fusion_birth_table.h include/fusion_coupled_thermal.h include/fusion_coupled_fast.h include/fusion_coupled_sources.h include/fusion_thermal_birth.h include/fusion_beam_birth.h include/fusion_pb_birth.h include/fusion_pb_population.h include/fusion_reaction_event.h
