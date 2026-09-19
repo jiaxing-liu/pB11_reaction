@@ -686,6 +686,10 @@ if(BUILD_TESTING)
     target_link_libraries(test_fusion_birth_packets PRIVATE pb11::pb11)
     add_test(NAME fusion_birth_packets_tests COMMAND test_fusion_birth_packets)
 
+    add_executable(test_fusion_uniform_ensemble tests/test_fusion_uniform_ensemble.cpp)
+    target_link_libraries(test_fusion_uniform_ensemble PRIVATE pb11::pb11)
+    add_test(NAME fusion_uniform_ensemble_tests COMMAND test_fusion_uniform_ensemble)
+
     add_executable(test_fusion_thermal_sphere tests/test_fusion_thermal_sphere.cpp)
     target_link_libraries(test_fusion_thermal_sphere PRIVATE pb11::pb11)
     add_test(NAME fusion_thermal_sphere_tests COMMAND test_fusion_thermal_sphere)
