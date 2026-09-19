@@ -113,6 +113,48 @@ int fusion_c_coupled_sources_covered_trial(double dt_s,
  const fusion_coupled_floor_limits_v1 *floor_limits,
  fusion_birth_floor_ledger_v1 *floor_ledger,
  int table_domain_policy, uint64_t *outside_domain_direct_evaluations);
+/* Additive source-only TRIAL packet, not an accepted snapshot or new owner.
+ * source0=thermal, source1=fast-target; channel0..4, species0..6(neutron).
+ * mapped array layout [2][5][7][cells], AMOUNTS in m^-3, arithmetic centers.
+ * Below/above retain ORIGINAL physical N/E before optional floor remapping.
+ * No external birth, FP evolution, handoff or numerical floor correction is
+ * folded into this packet. Fast angles/pitch are NOT recovered by this API.
+ * Events[2][5] distinguish thermal from fast-target reaction amounts.
+ * Packet is derived from the exact quadratures/tables and accepted thermal/
+ * target-network subsolves already used by this trial; no second source solve.
+ * Caller must publish ONLY when its enclosing host attempt is accepted, discard
+ * on rejection, and multiply by the explicit source volume exactly once.
+ * No callback or persistent side effect. All outputs clear on failure; mapped
+ * clears only for valid cells1..100000. Nonoverlapping output arrays required.
+ * Opt-in extraction may reject unrepresentable positive per-packet values even
+ * when legacy summed quantities are representable. No tiny packet clipping.
+ * Existing entry points/ABI/arithmetic remain unchanged. Extra workspace is
+ * O(70*cells) long doubles plus O(70*cells) doubles, allocated only on opt-in.
+ */
+typedef struct fusion_birth_packets_v1 {
+ double events_m3[2][5];
+ double below_number_m3[2][5][7],below_energy_J_m3[2][5][7];
+ double above_number_m3[2][5][7],above_energy_J_m3[2][5][7];
+} fusion_birth_packets_v1;
+int fusion_c_coupled_sources_packets_trial(double dt_s,
+ const fusion_coupled_thermal_options_v1 *options,
+ const fusion_fast_target_options_v1 *fast_options,
+ const fusion_birth_table_v1 *const *thermal_tables,
+ int beam_table_count, const fusion_beam_table_entry_v1 *beam_tables,
+ int effective_charge, int cells, const double *edges_J,
+ const double thermal_number_m3[6], double electron_energy_J_m3,
+ double ion_energy_J_m3, double electron_density_m3,
+ const double thermal_charge_squared[6], int inert_count,
+ const fusion_inert_ion_v1 *inert, const double *coulomb_logs,
+ const double *old_s_m3, const double *old_t_m3,
+ const double *external_birth_m3_s, const double *escape_s_inv,
+ double new_thermal_m3[6], double *new_s_m3, double *new_t_m3,
+ fusion_coupled_thermal_v1 *out, fusion_handoff_diagnostics_v1 *diagnostics,
+ fusion_beam_table_usage_v1 *usage,
+ const fusion_coupled_floor_limits_v1 *floor_limits,
+ fusion_birth_floor_ledger_v1 *floor_ledger,
+ int table_domain_policy, uint64_t *outside_domain_direct_evaluations,
+ double *mapped_packets_m3, fusion_birth_packets_v1 *packets);
 #ifdef __cplusplus
 }
 #endif

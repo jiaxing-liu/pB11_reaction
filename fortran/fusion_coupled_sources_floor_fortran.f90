@@ -30,6 +30,15 @@ module fusion_coupled_sources_floor_fortran
      real(c_double) :: max_ion_energy_fraction
   end type fusion_coupled_floor_limits_v1
 
+  ! C [source][channel][species] becomes Fortran (species,channel,source).
+  ! Trial-only; bind to the host ticket before any accepted publication.
+  type, bind(C), public :: fusion_birth_packets_v1
+     real(c_double) :: events_m3(5,2)
+     real(c_double) :: below_number_m3(7,5,2), below_energy_J_m3(7,5,2)
+     real(c_double) :: above_number_m3(7,5,2), above_energy_J_m3(7,5,2)
+  end type fusion_birth_packets_v1
+  public :: c_fusion_c_coupled_sources_packets_trial
+
   ! Re-export the ABI types used by the direct call so a fixture can obtain all
   ! declarations from this one module while their layouts remain owned by the
   ! existing external bindings.
@@ -131,6 +140,50 @@ module fusion_coupled_sources_floor_fortran
        type(c_ptr), value :: outside_count
        integer(c_int) :: status
      end function c_fusion_c_coupled_sources_covered_trial
+     function c_fusion_c_coupled_sources_packets_trial( &
+          dt_s, options, fast_options, thermal_tables, beam_table_count, &
+          beam_tables, effective_charge, cells, edges, thermal_number, &
+          electron_energy, ion_energy, electron_density, &
+          thermal_charge_squared, inert_count, inert, coulomb_logs, old_s, &
+          old_t, external_birth, escape, new_thermal_number, new_s, new_t, &
+          out, diagnostics, usage, floor_limits, floor_ledger, table_domain_policy, outside_count, &
+          mapped_packets, packets) &
+          bind(C, name="fusion_c_coupled_sources_packets_trial") result(status)
+       import :: c_double, c_int, c_ptr
+       real(c_double), value :: dt_s
+       type(c_ptr), value :: options
+       type(c_ptr), value :: fast_options
+       type(c_ptr), value :: thermal_tables
+       integer(c_int), value :: beam_table_count
+       type(c_ptr), value :: beam_tables
+       integer(c_int), value :: effective_charge
+       integer(c_int), value :: cells
+       type(c_ptr), value :: edges
+       type(c_ptr), value :: thermal_number
+       real(c_double), value :: electron_energy
+       real(c_double), value :: ion_energy
+       real(c_double), value :: electron_density
+       type(c_ptr), value :: thermal_charge_squared
+       integer(c_int), value :: inert_count
+       type(c_ptr), value :: inert
+       type(c_ptr), value :: coulomb_logs
+       type(c_ptr), value :: old_s
+       type(c_ptr), value :: old_t
+       type(c_ptr), value :: external_birth
+       type(c_ptr), value :: escape
+       type(c_ptr), value :: new_thermal_number
+       type(c_ptr), value :: new_s
+       type(c_ptr), value :: new_t
+       type(c_ptr), value :: out
+       type(c_ptr), value :: diagnostics
+       type(c_ptr), value :: usage
+       type(c_ptr), value :: floor_limits
+       type(c_ptr), value :: floor_ledger
+       integer(c_int), value :: table_domain_policy
+       type(c_ptr), value :: outside_count
+       type(c_ptr), value :: mapped_packets, packets
+       integer(c_int) :: status
+     end function c_fusion_c_coupled_sources_packets_trial
   end interface
 
 end module fusion_coupled_sources_floor_fortran

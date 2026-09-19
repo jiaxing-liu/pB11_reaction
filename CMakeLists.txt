@@ -682,6 +682,10 @@ if(BUILD_TESTING)
     add_test(NAME fusion_coupled_restart_tests COMMAND test_fusion_coupled_restart)
 
 
+    add_executable(test_fusion_birth_packets tests/test_fusion_birth_packets.cpp)
+    target_link_libraries(test_fusion_birth_packets PRIVATE pb11::pb11)
+    add_test(NAME fusion_birth_packets_tests COMMAND test_fusion_birth_packets)
+
     add_executable(test_fusion_prompt_reduce tests/test_fusion_prompt_reduce.cpp)
     target_link_libraries(test_fusion_prompt_reduce PRIVATE pb11::pb11)
     add_test(NAME fusion_prompt_reduce_tests COMMAND test_fusion_prompt_reduce)
@@ -876,6 +880,10 @@ if(BUILD_TESTING)
             Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod")
         target_link_libraries(test_fusion_coupled_thermal_fortran PRIVATE pb11::fusion_coupled_thermal_fortran)
         add_test(NAME fusion_coupled_thermal_fortran_binding_tests COMMAND test_fusion_coupled_thermal_fortran)
+
+        add_executable(test_fusion_birth_packets_fortran tests/test_fusion_birth_packets_fortran.f90 tests/fusion_birth_packets_layout.cpp)
+        target_link_libraries(test_fusion_birth_packets_fortran PRIVATE fusion_coupled_sources_floor_fortran)
+        add_test(NAME fusion_birth_packets_fortran_tests COMMAND test_fusion_birth_packets_fortran)
 
         add_executable(test_fusion_coupled_sources_floor_fortran tests/test_fusion_coupled_sources_floor_fortran.f90)
         set_target_properties(test_fusion_coupled_sources_floor_fortran PROPERTIES

@@ -7,6 +7,13 @@ int floor_call(const Inputs& a,double dt,Trial& b,fusion_coupled_floor_limits_v1
  fusion_handoff_diagnostics_v1 d{};fusion_beam_table_usage_v1 u{};
  return fusion_c_coupled_sources_floor_trial(dt,&a.options,&a.fast_options,nullptr,0,nullptr,0,a.grid.cells(),a.grid.edges.data(),a.thermal_number.data(),a.electron_energy_J_m3,a.ion_energy_J_m3,a.electron_density_m3,a.thermal_charge_squared.data(),0,nullptr,a.coulomb_logs.data(),a.old_s.data(),a.old_t.data(),a.external_birth.data(),a.escape.data(),b.thermal_number.data(),b.s.data(),b.t.data(),&b.result,&d,&u,limits,&ledger);
 }
+std::vector<double> captured_packets;
+fusion_birth_packets_v1 captured_meta{};
+int floor_packet_call(const Inputs&a,double dt,Trial&b,fusion_coupled_floor_limits_v1*limits,fusion_birth_floor_ledger_v1&ledger){
+ fusion_handoff_diagnostics_v1 d{};fusion_beam_table_usage_v1 u{};uint64_t outside=0;
+ captured_packets.assign(70*a.grid.cells(),-7);
+ return fusion_c_coupled_sources_packets_trial(dt,&a.options,&a.fast_options,nullptr,0,nullptr,0,a.grid.cells(),a.grid.edges.data(),a.thermal_number.data(),a.electron_energy_J_m3,a.ion_energy_J_m3,a.electron_density_m3,a.thermal_charge_squared.data(),0,nullptr,a.coulomb_logs.data(),a.old_s.data(),a.old_t.data(),a.external_birth.data(),a.escape.data(),b.thermal_number.data(),b.s.data(),b.t.data(),&b.result,&d,&u,limits,&ledger,FUSION_BEAM_TABLE_STRICT,&outside,captured_packets.data(),&captured_meta);
+}
 int main(){try{
  Inputs a(true);a.fast_options=make_fast_options({{0,0,0,1,0}});
  Trial b=make_trial(a),c=make_trial(a);fusion_coupled_floor_limits_v1 limits{.02,.001};fusion_birth_floor_ledger_v1 ledger{};
@@ -27,9 +34,12 @@ int main(){try{
  a.options.birth.relative_max_J=2500*kKeVJ;a.options.birth.cutoff_J=.001*1.602176634e-13;
  a.options.birth.relative_order=16;a.fast_options.angular_order=16;
  limits.max_center_over_ion_kT=.2;
- b=make_trial(a);c=make_trial(a);old=call_fast(a,1e-3,b);now=floor_call(a,1e-3,c,&limits,ledger);
+ b=make_trial(a);c=make_trial(a);old=call_fast(a,1e-3,b);now=floor_packet_call(a,1e-3,c,&limits,ledger);
  std::cout<<std::setprecision(17)<<"pB legacy="<<old<<" floor="<<now<<" lowN="<<ledger.born_number_m3[4]<<" lowU="<<ledger.born_energy_J_m3[4]<<" correction="<<ledger.ion_energy_correction_J_m3[4]<<std::endl;
  require(old==PB11_STATUS_OUT_OF_RANGE,"legacy rejects real low pB");require(now==0,"floor pB passes");require(ledger.born_number_m3[4]>0,"real low source");
+ require(captured_meta.events_m3[0][0]==0&&captured_meta.events_m3[1][0]>0,"pB fast-only event packet");
+ require(close_scaled(captured_meta.below_number_m3[1][0][4],ledger.born_number_m3[4],1e-12)&&close_scaled(captured_meta.below_energy_J_m3[1][0][4],ledger.born_energy_J_m3[4],1e-12),"physical below packet matches original ledger");
+ require(captured_meta.below_energy_J_m3[1][0][4]!=ledger.mapped_energy_J_m3[4],"packet does not replace physical below energy by floor energy");
  long double expected=a.ion_energy_J_m3,delta=0;
  for(int i=0;i<6;++i){expected-=c.result.ledger.thermal_consumed_energy_J_m3[i];
  expected+=c.result.inert_ion_heat_J_m3[i]+c.result.ledger.handed_off_energy_J_m3[i];
@@ -40,8 +50,10 @@ int main(){try{
  require(std::abs((long double)c.result.ion_energy_J_m3-(expected+delta))<=2*std::numeric_limits<double>::epsilon()*std::abs(expected+delta),"separate ion ledger reconstruction");
  Trial accepted=c;
  limits.max_center_over_ion_kT=0;
- require(floor_call(a,1e-3,c,&limits,ledger)==PB11_STATUS_OUT_OF_RANGE,"real source rejected by explicit zero displacement gate");
+ require(floor_packet_call(a,1e-3,c,&limits,ledger)==PB11_STATUS_OUT_OF_RANGE,"real source rejected by explicit zero displacement gate");
  for(double x:c.s)require(x==0,"late reject clears source");
+ for(double x:captured_packets)require(x==0,"late reject clears packets");
+ require(captured_meta.events_m3[1][0]==0&&captured_meta.below_number_m3[1][0][4]==0,"late reject clears packet metadata");
  for(double x:ledger.born_number_m3)require(x==0,"late reject clears ledger");
  limits.max_center_over_ion_kT=.2;
  require(floor_call(a,1e-3,c,&limits,ledger)==0,"retry succeeds");

@@ -937,6 +937,18 @@ void test_explicit_full_source_tables() {
         tabulated.result.electron_energy_J_m3==direct.result.electron_energy_J_m3&&
         tabulated.result.ion_energy_J_m3==direct.result.ion_energy_J_m3,"endpoint complete physical-state equality");
     require(usage.table_evaluations==3&&usage.direct_evaluations==0,"table calls counted");
+    {
+        Trial packet_trial=make_trial(in);std::vector<double> packet(70*n);fusion_birth_packets_v1 pm{};uint64_t outside=0;
+        int ps=fusion_c_coupled_sources_packets_trial(1e-4,&in.options,&in.fast_options,nullptr,
+            int(entries.size()),entries.data(),0,n,in.grid.edges.data(),in.thermal_number.data(),
+            in.electron_energy_J_m3,in.ion_energy_J_m3,in.electron_density_m3,in.thermal_charge_squared.data(),
+            0,nullptr,in.coulomb_logs.data(),in.old_s.data(),in.old_t.data(),in.external_birth.data(),in.escape.data(),
+            packet_trial.thermal_number.data(),packet_trial.s.data(),packet_trial.t.data(),&packet_trial.result,
+            &diagnostic,&usage,nullptr,nullptr,FUSION_BEAM_TABLE_STRICT,&outside,packet.data(),&pm);
+        require(ps==0&&packet_trial.s==tabulated.s&&packet_trial.t==tabulated.t&&same_result(packet_trial.result,tabulated.result),"table packet physics parity");
+        require(usage.table_evaluations==3&&usage.direct_evaluations==0&&pm.events_m3[1][3]>0,"packet reuses actual beam tables");
+    }
+
     require(usage.max_validated_rate_error<=control.max_rate_error&&
         usage.max_validated_debit_error<=control.max_debit_error&&
         usage.max_validated_number_L1<=control.max_number_L1&&
@@ -1164,10 +1176,60 @@ void test_explicit_full_source_tables() {
     require(in.old_s==original.old_s&&in.old_t==original.old_t,"table trials retain caller inventory");
 }
 
+void test_source_packets() {
+    Inputs in(true);in.fast_options=make_fast_options({{0,0,0,1,0}});
+    const int n=in.grid.cells();std::vector<double> packets(70*n,-7);
+    fusion_birth_packets_v1 meta{};fusion_handoff_diagnostics_v1 diag{};
+    fusion_beam_table_usage_v1 usage{};uint64_t outside=0;
+    auto evaluate=[&](double dt,Trial& trial){
+        return fusion_c_coupled_sources_packets_trial(dt,&in.options,&in.fast_options,nullptr,
+            0,nullptr,0,n,in.grid.edges.data(),in.thermal_number.data(),in.electron_energy_J_m3,
+            in.ion_energy_J_m3,in.electron_density_m3,in.thermal_charge_squared.data(),0,nullptr,
+            in.coulomb_logs.data(),in.old_s.data(),in.old_t.data(),in.external_birth.data(),in.escape.data(),
+            trial.thermal_number.data(),trial.s.data(),trial.t.data(),&trial.result,&diag,&usage,
+            nullptr,nullptr,FUSION_BEAM_TABLE_STRICT,&outside,packets.data(),&meta);
+    };
+    Trial legacy=make_trial(in),trial=make_trial(in);
+    require(call_fast(in,1e-4,legacy)==0,"packet baseline");
+    int rc=evaluate(1e-4,trial);require(rc==0,"packet trial status="+std::to_string(rc));
+    require(legacy.s==trial.s&&legacy.t==trial.t&&legacy.thermal_number==trial.thermal_number&&same_result(legacy.result,trial.result),"packet exact physics parity");
+    require(meta.events_m3[0][3]>0&&meta.events_m3[1][3]>0,"thermal and fast separated");
+    for(int src=0;src<2;++src)for(int ch=0;ch<5;++ch)for(int sp=0;sp<7;++sp){
+        long double N=meta.below_number_m3[src][ch][sp]+meta.above_number_m3[src][ch][sp];
+        for(int j=0;j<n;++j)N+=packets[((src*5+ch)*7+sp)*n+j];
+        double expected=(ch==3&&(sp==4||sp==6))?meta.events_m3[src][ch]:0;
+        require(close_scaled(double(N),expected,1e-10),"per-source per-channel stoichiometry");
+    }
+    std::vector<double> reference(7*n);fusion_thermal_birth_v1 spectrum{};
+    require(fusion_c_thermal_birth_grid(3,10*kKeVJ,&in.options.birth,n,in.grid.edges.data(),reference.data(),&spectrum)==0,"independent thermal spectrum");
+    for(int k=0;k<7*n;++k){
+        long double expected=static_cast<long double>(reference[k])/spectrum.reactivity_m3_s*meta.events_m3[0][3];
+        require(close_scaled(packets[3*7*n+k],double(expected),3e-13),"actual thermal shape not mixed normalization");
+    }
+    for(int sp=0;sp<7;++sp){long double N=0,E=0;
+        for(int src=0;src<2;++src)for(int ch=0;ch<5;++ch){
+            N+=meta.below_number_m3[src][ch][sp]+meta.above_number_m3[src][ch][sp];
+            E+=meta.below_energy_J_m3[src][ch][sp]+meta.above_energy_J_m3[src][ch][sp];
+            for(int j=0;j<n;++j){double v=packets[((src*5+ch)*7+sp)*n+j];N+=v;E+=static_cast<long double>(v)*cell_center(in.grid,j);}
+        }
+        auto&l=trial.result.ledger;
+        require(close_scaled(double(N),sp<6?l.nuclear_born_number_m3[sp]:l.neutron_number_m3,1e-10),"packet number ledger");
+        require(close_scaled(double(E),sp<6?l.nuclear_born_energy_J_m3[sp]:l.neutron_energy_J_m3,1e-10),"packet energy ledger");
+    }
+    auto saved=packets;auto saved_meta=meta;auto old_s=in.old_s;
+    require(evaluate(1e-4,trial)==0&&packets==saved,"packet deterministic retry");
+    for(int src=0;src<2;++src)for(int ch=0;ch<5;++ch)require(meta.events_m3[src][ch]==saved_meta.events_m3[src][ch],"packet event determinism");
+    require(evaluate(-1,trial)!=0,"packet failure");
+    require(std::all_of(packets.begin(),packets.end(),[](double x){return x==0;}),"packet array failure clears");
+    for(int src=0;src<2;++src)for(int ch=0;ch<5;++ch){require(meta.events_m3[src][ch]==0,"packet metadata failure clears");for(int sp=0;sp<7;++sp)require(meta.below_number_m3[src][ch][sp]==0&&meta.below_energy_J_m3[src][ch][sp]==0&&meta.above_number_m3[src][ch][sp]==0&&meta.above_energy_J_m3[src][ch][sp]==0,"spill metadata failure clears");}
+    require(in.old_s==old_s,"packet initial inventory unchanged");
+}
+
 }  // namespace
 
 int main() {
     try {
+        test_source_packets();
         test_explicit_full_source_tables();
         test_diagnosed_fast_interfaces();
         test_fast_dt_accounting_and_shared_components();
