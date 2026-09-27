@@ -219,6 +219,13 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
      r.relative_rate_discrepancy=info.max_sampled_direct_rate_discrepancy;
      r.relative_reactant_energy_discrepancy=info.max_sampled_direct_debit_discrepancy;
     }else{
+     // Direct fallback must cover the full relative-energy support of a fast
+     // projectile.  The historical 2.5 MeV cap is sufficient for the initial
+     // bins but truncates high-energy reaction-born He3/D bins and trips the
+     // 1e-5 discrepancy gate.  Keep cached-table identity unchanged and only
+     // widen the uncached direct evaluation conservatively.
+     const double projectile_support = fast_energy[k];
+     beam.relative_max_J = std::max(beam.relative_max_J, projectile_support);
      int code=fusion_c_beam_birth_grid(ch,slot,fast_energy[k],fastTi,&beam,n,edges,spectrum.data(),&value);if(code)return code;
      ++source_usage.direct_evaluations;
     }
