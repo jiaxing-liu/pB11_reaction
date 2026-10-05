@@ -14,7 +14,6 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
-#include <chrono>
 #include <limits>
 #include <new>
 #include <vector>
@@ -31,12 +30,6 @@ bool trial_timing_enabled(){
 }
 void trial_stage(const char*name){
  if(trial_timing_enabled()){std::fprintf(stdout,"FUSION_CXX_STAGE %s\n",name);std::fflush(stdout);}
-}
-void trial_stage_elapsed(const char*name,std::chrono::steady_clock::time_point start){
- if(trial_timing_enabled()){
-  const double seconds=std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count();
-  std::fprintf(stdout,"FUSION_CXX_STAGE %s elapsed_s=%.9g\n",name,seconds);std::fflush(stdout);
- }
 }
 bool put(R x,double& d){if(!std::isfinite(x)||std::abs(x)>std::numeric_limits<double>::max())return false;d=double(x);return true;}
 using fusion_detail::source_rounding::floor_source_rate;
@@ -199,7 +192,6 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
   }
   if(fast_enabled){
    trial_stage("fast_begin");
-   const auto fast_start=std::chrono::steady_clock::now();
    struct EdgeMeta{int channel,slot,index,cached;};
    struct CachedBeam{fusion_beam_birth_v1 value;std::vector<double> spectrum;};
    std::vector<CachedBeam> cache;
@@ -281,7 +273,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
      links.push_back({k,target,value.spectrum.reactivity_m3_s,value.spectrum.reactant_energy_moment_J_m3_s[1-slot]});meta.push_back({ch,slot,k,cached});
     }
    }
-   trial_stage_elapsed("fast_links_done",fast_start);
+   trial_stage("fast_links_done");
    // Permit only spill whose conservative full-consumption bounds, including
    // step-equivalent source rates, cannot be represented by the public double
    // state. Factor two keeps margin for positive long-double arithmetic.
@@ -297,7 +289,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
     for(int i=0;i<6;++i)if(!put(1.5L*fastTi*trialNi[i],targetU[i]))return NUM;
     std::vector<double> afterFast(6*n),loss(links.size());fusion_target_network_v1 debit{};
     st=fusion_c_target_network_trial(6*n,6,int(links.size()),dt,fast_energy.data(),fast_initial.data(),trialNi,targetU,links.data(),afterFast.data(),afterN,afterU,loss.data(),&debit);if(st)return st;
-    trial_stage_elapsed("fast_network_done",fast_start);
+    trial_stage("fast_network_done");
     // Use the same hazard denominator for S and T, avoiding loss of a small
     // component when a summed inventory rounds or the other component dominates.
     std::vector<R> hazard(6*n,0);for(size_t e=0;e<links.size();++e)hazard[links[e].fast_index]+=R(dt)*links[e].reactivity_m3_s*afterN[links[e].target_index];
@@ -328,14 +320,14 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
      for(int j=0;j<n;++j){neutronNumber+=spectrum[6*n+j];neutronEnergy+=R(spectrum[6*n+j])*centers[j];}
      fast_neutronN+=scale*neutronNumber;fast_neutronE+=scale*neutronEnergy;
     }
-    trial_stage_elapsed("fast_losses_done",fast_start);
+    trial_stage("fast_losses_done");
     Npool=Ninert;
     for(int i=0;i<6;++i){trialNi[i]=afterN[i];Npool+=trialNi[i];ionU-=targetEremoved[i];
      if(!put(fastNremoved[i],l.fast_consumed_number_m3[i])||!put(fastEremoved[i],l.fast_consumed_energy_J_m3[i])||!put(R(l.thermal_consumed_number_m3[i])+targetNremoved[i],l.thermal_consumed_number_m3[i])||!put(R(l.thermal_consumed_energy_J_m3[i])+targetEremoved[i],l.thermal_consumed_energy_J_m3[i]))return NUM;
     }
     if(ionU<=0||Npool<=0||!put(ionU/(1.5L*Npool),Ti)||Ti<=0)return NUM;
    }
-   trial_stage_elapsed("fast_done",fast_start);
+   trial_stage("fast_done");
   }
   if(floor_limits){
    for(int ch=0;ch<5;++ch)if(burn.events_m3[ch]>0){
