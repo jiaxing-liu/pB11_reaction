@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstdio>
+#include <cstdlib>
 #include <limits>
 #include <new>
 #include <vector>
@@ -21,6 +23,14 @@ constexpr int BAD=PB11_STATUS_INVALID_ARGUMENT,NUM=PB11_STATUS_NUMERICAL_FAILURE
 constexpr double MeV=1.602176634e-13;
 bool finite_value(double x){return std::isfinite(x);}
 bool nonnegative(double x){return finite_value(x)&&x>=0;}
+bool trial_timing_enabled(){
+ static int enabled=-1;
+ if(enabled<0){const char*v=std::getenv("BALDUR_FUSION_TRIAL_TIMING");enabled=(v&&*v)?1:0;}
+ return enabled==1;
+}
+void trial_stage(const char*name){
+ if(trial_timing_enabled()){std::fprintf(stdout,"FUSION_CXX_STAGE %s\n",name);std::fflush(stdout);}
+}
 bool put(R x,double& d){if(!std::isfinite(x)||std::abs(x)>std::numeric_limits<double>::max())return false;d=double(x);return true;}
 using fusion_detail::source_rounding::floor_source_rate;
 using fusion_detail::source_rounding::source_roundoff_accumulate;
@@ -78,6 +88,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
  fusion_birth_floor_ledger_v1*floor_ledger=nullptr,bool require_floor=false,
  int table_policy=0,uint64_t*outside_direct=nullptr,bool require_policy=false,
  double*packet_output=nullptr,fusion_birth_packets_v1*packet_meta=nullptr,bool require_packets=false){
+ trial_stage("begin");
  if(packet_meta)*packet_meta={};
  if(packet_output&&n>0&&n<=100000)std::fill(packet_output,packet_output+70*n,0.);
  if(outside_direct)*outside_direct=0;
@@ -153,6 +164,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
    rates[ch]=r.reactivity_m3_s;
    if(rates[ch]>0){mean_a[ch]=r.reactant_energy_moment_J_m3_s[0]/rates[ch];mean_b[ch]=r.reactant_energy_moment_J_m3_s[1]/rates[ch];}
   }
+  trial_stage("thermal_sources_done");
   fusion_thermal_burn_v1 burn{};st=fusion_c_thermal_burn_trial(dt,thermal,oldUi,rates,mean_a,mean_b,trialNi,trialUi,&burn);if(st)return st;
   R ionU=Ui,electronU=Ue;Npool=Ninert;for(int i=0;i<6;++i){l.thermal_consumed_number_m3[i]=burn.reactant_removed_m3[i];l.thermal_consumed_energy_J_m3[i]=burn.reactant_removed_energy_J_m3[i];ionU-=burn.reactant_removed_energy_J_m3[i];Npool+=trialNi[i];}
   if(ionU<=0||Npool<=0||!put(ionU/(1.5L*Npool),Ti)||Ti<=0)return NUM;
@@ -179,6 +191,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
    }
   }
   if(fast_enabled){
+   trial_stage("fast_begin");
    struct EdgeMeta{int channel,slot,index,cached;};
    struct CachedBeam{fusion_beam_birth_v1 value;std::vector<double> spectrum;};
    std::vector<CachedBeam> cache;
@@ -260,6 +273,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
      links.push_back({k,target,value.spectrum.reactivity_m3_s,value.spectrum.reactant_energy_moment_J_m3_s[1-slot]});meta.push_back({ch,slot,k,cached});
     }
    }
+   trial_stage("fast_links_done");
    // Permit only spill whose conservative full-consumption bounds, including
    // step-equivalent source rates, cannot be represented by the public double
    // state. Factor two keeps margin for positive long-double arithmetic.
@@ -275,6 +289,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
     for(int i=0;i<6;++i)if(!put(1.5L*fastTi*trialNi[i],targetU[i]))return NUM;
     std::vector<double> afterFast(6*n),loss(links.size());fusion_target_network_v1 debit{};
     st=fusion_c_target_network_trial(6*n,6,int(links.size()),dt,fast_energy.data(),fast_initial.data(),trialNi,targetU,links.data(),afterFast.data(),afterN,afterU,loss.data(),&debit);if(st)return st;
+    trial_stage("fast_network_done");
     // Use the same hazard denominator for S and T, avoiding loss of a small
     // component when a summed inventory rounds or the other component dominates.
     std::vector<R> hazard(6*n,0);for(size_t e=0;e<links.size();++e)hazard[links[e].fast_index]+=R(dt)*links[e].reactivity_m3_s*afterN[links[e].target_index];
@@ -305,12 +320,14 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
      for(int j=0;j<n;++j){neutronNumber+=spectrum[6*n+j];neutronEnergy+=R(spectrum[6*n+j])*centers[j];}
      fast_neutronN+=scale*neutronNumber;fast_neutronE+=scale*neutronEnergy;
     }
+    trial_stage("fast_losses_done");
     Npool=Ninert;
     for(int i=0;i<6;++i){trialNi[i]=afterN[i];Npool+=trialNi[i];ionU-=targetEremoved[i];
      if(!put(fastNremoved[i],l.fast_consumed_number_m3[i])||!put(fastEremoved[i],l.fast_consumed_energy_J_m3[i])||!put(R(l.thermal_consumed_number_m3[i])+targetNremoved[i],l.thermal_consumed_number_m3[i])||!put(R(l.thermal_consumed_energy_J_m3[i])+targetEremoved[i],l.thermal_consumed_energy_J_m3[i]))return NUM;
     }
     if(ionU<=0||Npool<=0||!put(ionU/(1.5L*Npool),Ti)||Ti<=0)return NUM;
    }
+   trial_stage("fast_done");
   }
   if(floor_limits){
    for(int ch=0;ch<5;++ch)if(burn.events_m3[ch]>0){
@@ -342,6 +359,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
    }
    bool active=false;for(int i=0;i<6;++i){active=active||N[i]>0;ionU+=floor_result.ion_energy_correction_J_m3[i];}
    if(active&&(!put(ionU/(1.5L*Npool),Ti)||Ti<=0))return NUM;
+   trial_stage("floor_done");
   }
   std::vector<double> birth(6*n),s(6*n),t(6*n);R unrepresentedN=0,unrepresentedE=0;R Q=0,neutronN=fast_neutronN,neutronE=fast_neutronE;
   for(int ch=0;ch<5;++ch){if(!put(R(burn.events_m3[ch])+fast_events[ch],l.events_m3[ch]))return NUM;Q+=R(l.events_m3[ch])*reactions[ch].q_J;}
@@ -388,6 +406,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
    electronU+=heat[0];R extra=0;for(int b=0;b<nb;++b){if(b<7)l.heat_to_bath_J_m3[i*7+b]=heat[b];else extra+=heat[b];if(b>0)ionU+=heat[b];}
    if(!put(extra,result.inert_ion_heat_J_m3[i]))return NUM;
   }
+  trial_stage("two_component_done");
   if(electronU<=0||ionU<=0)return NUM;
   if(op->handoff_enabled)for(int i=0;i<6;++i){R N=0,E=0;for(int j=0;j<n;++j){N+=t[i*n+j];E+=R(t[i*n+j])*centers[j];}if(N==0)continue;
    double mixedTi=0;if(!put((ionU+E)/(1.5L*(Npool+N)),mixedTi)||mixedTi<=0)return NUM;
@@ -401,6 +420,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
     std::copy(after.begin(),after.end(),t.begin()+i*n);
    }
   }
+  trial_stage("handoff_done");
   if(!put(electronU,result.electron_energy_J_m3)||!put(ionU,result.ion_energy_J_m3))return NUM;
   // Independent accounting of reaction, kinetic, and complete local inventories.
   R nuclearE=neutronE,removedE=0,totalOld=R(Ue)+Ui,totalNew=R(result.electron_energy_J_m3)+result.ion_energy_J_m3;
@@ -451,6 +471,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
    }
    std::copy(packet_rounded.begin(),packet_rounded.end(),packet_output);*packet_meta=packet_result;
   }
+  trial_stage("complete");
   std::copy(trialNi,trialNi+6,new_thermal);std::copy(s.begin(),s.end(),new_s);std::copy(t.begin(),t.end(),new_t);*out=result;if(diagnostics)*diagnostics=observation;if(usage)*usage=source_usage;if(floor_ledger)*floor_ledger=floor_result;if(outside_direct)*outside_direct=outside_count;return PB11_STATUS_OK;
  }catch(...){return PB11_STATUS_EXCEPTION;}
 }
