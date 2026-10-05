@@ -33,6 +33,17 @@ double value_at(const Node&node,int index){
 std::vector<double> dense(const Node&node,int n){
  std::vector<double> grid(7*n,0.);for(const auto&e:node.grid)grid[e.index]=e.value;return grid;
 }
+void interpolate_sparse(const Node&a,const Node&b,R w,int n,std::vector<double>&out){
+ out.assign(7*n,0.);
+ size_t ia=0,ib=0;
+ for(int k=0;k<7*n;++k){
+  while(ia<a.grid.size()&&a.grid[ia].index<k)++ia;
+  while(ib<b.grid.size()&&b.grid[ib].index<k)++ib;
+  const double av=ia<a.grid.size()&&a.grid[ia].index==k?a.grid[ia].value:0.;
+  const double bv=ib<b.grid.size()&&b.grid[ib].index==k?b.grid[ib].value:0.;
+  out[k]=stored((1-w)*R(av)+w*R(bv));
+ }
+}
 using Ptr=std::shared_ptr<Node>;
 using Errors=std::array<double,4>;
 R weight(double T,double a,double b){
@@ -154,7 +165,7 @@ extern "C" int fusion_c_beam_birth_table_evaluate(const fusion_beam_birth_table_
  try{auto it=std::lower_bound(t->knots.begin(),t->knots.end(),T,[](const Ptr&p,double x){return p->T<x;});require(it!=t->knots.end());
   std::vector<double> values;fusion_birth_coefficients_v1 c{};
   if((*it)->T==T){values=dense(**it,n);c=(*it)->c;}
-  else{require(it!=t->knots.begin());const auto&a=**(it-1);const auto&b=**it;R w=weight(T,a.T,b.T);c=mix(a,b,w);values.resize(7*n);for(int j=0;j<7*n;++j)values[j]=stored((1-w)*value_at(a,j)+w*value_at(b,j));}
+  else{require(it!=t->knots.begin());const auto&a=**(it-1);const auto&b=**it;R w=weight(T,a.T,b.T);c=mix(a,b,w);interpolate_sparse(a,b,w,n,values);}
   conservative(*t,values.data(),c);std::copy(values.begin(),values.end(),grid);*out=c;return PB11_STATUS_OK;
  }catch(const Failure&f){return f.status;}catch(...){return PB11_STATUS_EXCEPTION;}
 }
