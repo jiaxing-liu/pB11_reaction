@@ -16,6 +16,16 @@ typedef struct fusion_beam_birth_v1 {
  double retained_pair_probability;
  double angular_omitted_pair_probability;
 } fusion_beam_birth_v1;
+/* Explicit per-projectile support builder for coupled/cache callers.
+ * Copy base unchanged except relative_max_J=max(base.relative_max_J,E[J]).
+ * Validates only finite E>=0 and finite base.relative_max_J>0; remaining
+ * source controls and retained-domain accuracy are checked by grid/table APIs.
+ * It does not extend the pB event domain or certify any discrepancy gate.
+ * BASE==OUT is allowed. Non-null OUT clears on failure; no hidden state.
+ * Existing grid/table APIs continue to honor their explicit source cutoff.
+ */
+int fusion_c_beam_birth_resolve_support(double projectile_energy_J,
+ const fusion_beam_birth_options_v1 *base,fusion_beam_birth_options_v1 *out);
 /* Monoenergetic projectile with E[J]>=0 against a stationary Maxwellian
  * target kT[J]>=0; projectile_slot0/1 refers to canonical channel reactants.
  * Nuclear models, isotropic outgoing CM-event closure, product mapping,

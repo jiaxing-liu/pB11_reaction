@@ -183,7 +183,9 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
        entry.energy_cell<0||entry.energy_cell>=n||!fastop->channels[entry.channel])return BAD;
     const auto&reaction=reactions[entry.channel];
     if(entry.projectile_slot==1&&reaction.reactant_ids[0]==reaction.reactant_ids[1])return BAD;
-    const auto expected=beam_options_for(op->birth,*fastop,entry.channel);
+    auto expected=beam_options_for(op->birth,*fastop,entry.channel);
+    st=fusion_c_beam_birth_resolve_support(double(centers[entry.energy_cell]),&expected,&expected);
+    if(st)return st;
     if(!fusion_detail::beam_birth_table_matches(entry.table,entry.channel,entry.projectile_slot,
        double(centers[entry.energy_cell]),expected,n,edges))return BAD;
     auto&destination=beam_lookup[(entry.channel*2+entry.projectile_slot)*n+entry.energy_cell];
@@ -204,11 +206,13 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
    std::vector<fusion_target_network_edge_v1> links;std::vector<EdgeMeta> meta;
    std::vector<double> fast_initial(6*n),fast_energy(6*n),spectrum(7*n);
    for(int i=0;i<6;++i)for(int j=0;j<n;++j){int k=i*n+j;if(!put(R(old_s[k])+old_t[k],fast_initial[k]))return NUM;fast_energy[k]=double(centers[j]);}
-   auto beam=beam_options_for(op->birth,*fastop,0);
    const double fastTi=Ti;
    std::array<R,6> spill_number_bound{},spill_energy_bound{};
    auto sample=[&](int ch,int slot,int k,fusion_beam_birth_v1&value,bool bound_spill)->int{
-    beam.pb_low=ch==0?op->birth.pb_low:FUSION_PB_LOW_TB;
+    auto base=beam_options_for(op->birth,*fastop,ch);
+    fusion_beam_birth_options_v1 beam{};
+    int support_status=fusion_c_beam_birth_resolve_support(fast_energy[k],&base,&beam);
+    if(support_status)return support_status;
     const auto*table=beam_lookup.empty()?nullptr:beam_lookup[(ch*2+slot)*n+k%n];
     fusion_beam_birth_table_info_v1 info{};
     if(table){
@@ -232,13 +236,8 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
      r.relative_rate_discrepancy=info.max_sampled_direct_rate_discrepancy;
      r.relative_reactant_energy_discrepancy=info.max_sampled_direct_debit_discrepancy;
     }else{
-     // Direct fallback must cover the full relative-energy support of a fast
-     // projectile.  The historical 2.5 MeV cap is sufficient for the initial
-     // bins but truncates high-energy reaction-born He3/D bins and trips the
-     // 1e-5 discrepancy gate.  Keep cached-table identity unchanged and only
-     // widen the uncached direct evaluation conservatively.
-     const double projectile_support = fast_energy[k];
-     beam.relative_max_J = std::max(beam.relative_max_J, projectile_support);
+     // The same per-projectile support is used by table matching and direct
+     // fallback; it cannot accumulate across unrelated samples or channels.
      int code=fusion_c_beam_birth_grid(ch,slot,fast_energy[k],fastTi,&beam,n,edges,spectrum.data(),&value);if(code)return code;
      ++source_usage.direct_evaluations;
     }

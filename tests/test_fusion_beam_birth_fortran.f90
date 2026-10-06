@@ -1,5 +1,6 @@
 program beam_birth_binding_test
   use, intrinsic :: iso_c_binding, only : c_double, c_int, c_size_t, c_sizeof
+  use, intrinsic :: ieee_arithmetic, only : ieee_value, ieee_quiet_nan
   use fusion_beam_birth_fortran
   implicit none
 
@@ -11,6 +12,7 @@ program beam_birth_binding_test
   real(c_double), target :: birth_slot1(cells, FUSION_BEAM_BIRTH_SPECIES)
   real(c_double), allocatable, target :: zero_birth(:,:), zero_edges(:)
   type(fusion_beam_birth_options_v1), target :: options
+  type(fusion_beam_birth_options_v1), target :: base_support, resolved_support
   type(fusion_beam_birth_v1), target :: out_slot0, out_slot1, bad_out
   integer(c_int) :: status_slot0, status_slot1, bad_status
   integer :: i
@@ -57,9 +59,57 @@ program beam_birth_binding_test
   call require(bad_status == PB11_STATUS_INVALID_ARGUMENT .and. &
        result_is_zero(bad_out), 'zero-cell extent is rejected and result cleared')
 
+  ! The resolver builds only relative-energy support. It does not validate
+  ! the remaining controls or certify a physical grid/table evaluation.
+  base_support = options
+  base_support%relative_max_J = 10.0_c_double * mev
+  call fusion_beam_birth_resolve_support(30.0_c_double * mev, base_support, &
+       resolved_support, bad_status)
+  call require(bad_status == PB11_STATUS_OK .and. &
+       resolved_support%relative_max_J == 30.0_c_double * mev .and. &
+       base_support%relative_max_J == 10.0_c_double * mev .and. &
+       resolved_support%angular_order == base_support%angular_order, &
+       'support wrapper widens only the output cap and preserves base')
+  call fusion_beam_birth_resolve_support(5.0_c_double * mev, base_support, &
+       resolved_support, bad_status)
+  call require(bad_status == PB11_STATUS_OK .and. &
+       resolved_support%relative_max_J == 10.0_c_double * mev, &
+       'support wrapper starts again from base, not prior resolved cap')
+
+  resolved_support = base_support
+  call fusion_beam_birth_resolve_support(-1.0_c_double * mev, base_support, &
+       resolved_support, bad_status)
+  call require(bad_status == PB11_STATUS_OUT_OF_RANGE .and. &
+       options_is_zero(resolved_support), &
+       'negative projectile energy rejects and clears output')
+  resolved_support = base_support
+  call fusion_beam_birth_resolve_support(ieee_value(0.0_c_double, &
+       ieee_quiet_nan), base_support, resolved_support, bad_status)
+  call require(bad_status == PB11_STATUS_INVALID_ARGUMENT .and. &
+       options_is_zero(resolved_support), &
+       'NaN projectile energy rejects and clears output')
+
   write(*, '(A)') 'beam birth Fortran binding smoke test passed'
 
 contains
+
+  logical function options_is_zero(o)
+    type(fusion_beam_birth_options_v1), intent(in) :: o
+
+    options_is_zero = o%relative_max_J == 0.0_c_double .and. &
+         o%angular_max_exponent == 0.0_c_double .and. &
+         o%ground_state_q_J == 0.0_c_double .and. &
+         o%cutoff_J == 0.0_c_double .and. &
+         o%l1_fraction == 0.0_c_double .and. &
+         o%relative_phase == 0.0_c_double .and. &
+         o%narrow_peak_fraction == 0.0_c_double .and. &
+         o%continuum_peak_scale == 0.0_c_double .and. &
+         o%continuation == 0_c_int .and. o%pb_low == 0_c_int .and. &
+         o%remainder_policy == 0_c_int .and. o%broad_mode == 0_c_int .and. &
+         o%fsci_policy == 0_c_int .and. o%relative_order == 0_c_int .and. &
+         o%angular_order == 0_c_int .and. o%nq == 0_c_int .and. &
+         o%ncos == 0_c_int
+  end function options_is_zero
 
   subroutine require(ok, message)
     logical, intent(in) :: ok

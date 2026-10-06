@@ -318,6 +318,19 @@ extern "C" int fusion_c_thermal_pair_birth_grid(int ch,double Ta,double Tb,int c
  return pair_birth_impl(ch,Ta,Tb,correlation_order,op,n,edges,birth,out);
 }
 
+extern "C" int fusion_c_beam_birth_resolve_support(double energy,
+ const fusion_beam_birth_options_v1*base,fusion_beam_birth_options_v1*out){
+ if(!out)return PB11_STATUS_NULL_OUTPUT;
+ if(!base){*out={};return PB11_STATUS_INVALID_ARGUMENT;}
+ const auto input=*base; // Preserve aliasing before clearing the output.
+ *out={};
+ if(!finite_value(energy)||!finite_value(input.relative_max_J))
+  return PB11_STATUS_INVALID_ARGUMENT;
+ if(energy<0||input.relative_max_J<=0)return PB11_STATUS_OUT_OF_RANGE;
+ auto result=input;result.relative_max_J=std::max(input.relative_max_J,energy);
+ *out=result;return PB11_STATUS_OK;
+}
+
 extern "C" int fusion_c_beam_birth_grid(int ch,int slot,double projectile_E,double target_T,
  const fusion_beam_birth_options_v1*op,int n,const double*edges,double*birth,fusion_beam_birth_v1*out){
  if(out)*out={};

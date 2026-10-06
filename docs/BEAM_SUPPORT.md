@@ -1,0 +1,7 @@
+# Beam relative-energy support
+
+`fusion_c_beam_birth_resolve_support(projectile_energy_J, base, out)` copies every beam source option from `base` and sets `out->relative_max_J` to `max(base->relative_max_J, projectile_energy_J)`. Use the resolved options consistently for a beam table's constructor, exact request matcher, and coupled source trial. In Fortran, `fusion_beam_birth_resolve_support` supplies the same operation with separate `base` and `out` variables. The C function permits `base == out`; the Fortran wrapper requires distinct actual arguments because of its `intent(in)` and `intent(out)` declarations.
+
+The helper checks only the projectile energy and support cap. It clears a nonnull output on error, rejects nonfinite inputs, and rejects a negative projectile energy or nonpositive base cap. It does not validate the other source fields, alter the existing grid or table APIs, or certify accuracy. Callers still provide the resolved options explicitly and retain the usual direct discrepancy, interpolation, offsample, conservation, and resource checks.
+
+For example, a 29.99 MeV beam with a 10 MeV base relative-energy cap produces a 29.99 MeV resolved cap. The raw exact table matcher rejects a request that passes the unresolved 10 MeV options against a table built with the resolved cap. The host and new coupled entry points resolve per-projectile options internally from the supplied base options before constructing, loading, or matching the table, so that widened table matches their 10 MeV base request.

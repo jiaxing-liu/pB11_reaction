@@ -56,6 +56,106 @@ fusion_beam_birth_options_v1 options_for(double relative_max_MeV) {
     return options;
 }
 
+bool same_options(const fusion_beam_birth_options_v1 &a,
+                  const fusion_beam_birth_options_v1 &b) {
+    return a.relative_max_J == b.relative_max_J &&
+           a.angular_max_exponent == b.angular_max_exponent &&
+           a.ground_state_q_J == b.ground_state_q_J &&
+           a.cutoff_J == b.cutoff_J && a.l1_fraction == b.l1_fraction &&
+           a.relative_phase == b.relative_phase &&
+           a.narrow_peak_fraction == b.narrow_peak_fraction &&
+           a.continuum_peak_scale == b.continuum_peak_scale &&
+           a.continuation == b.continuation && a.pb_low == b.pb_low &&
+           a.remainder_policy == b.remainder_policy &&
+           a.broad_mode == b.broad_mode && a.fsci_policy == b.fsci_policy &&
+           a.relative_order == b.relative_order &&
+           a.angular_order == b.angular_order && a.nq == b.nq &&
+           a.ncos == b.ncos;
+}
+
+void check_support_resolver() {
+    const fusion_beam_birth_options_v1 base = options_for(10.0);
+    fusion_beam_birth_options_v1 out{};
+    const double energy = 30.0 * MeV;
+
+    require(fusion_c_beam_birth_resolve_support(energy, &base, &out) ==
+                PB11_STATUS_OK,
+            "support resolver accepts a finite high beam energy");
+    fusion_beam_birth_options_v1 expected = base;
+    expected.relative_max_J = energy;
+    require(same_options(out, expected),
+            "support resolver raises only the relative-energy cap");
+    require(base.relative_max_J == 10.0 * MeV,
+            "support resolver does not mutate the base request");
+
+    require(fusion_c_beam_birth_resolve_support(5.0 * MeV, &base, &out) ==
+                PB11_STATUS_OK && same_options(out, base),
+            "support resolver retains an already sufficient cap");
+    require(fusion_c_beam_birth_resolve_support(0.0, &base, &out) ==
+                PB11_STATUS_OK && same_options(out, base),
+            "zero projectile energy retains a positive base cap");
+
+    fusion_beam_birth_options_v1 alias = base;
+    require(fusion_c_beam_birth_resolve_support(energy, &alias, &alias) ==
+                PB11_STATUS_OK && same_options(alias, expected),
+            "support resolver accepts base/output aliasing");
+
+    // This helper checks only support inputs; unrelated source controls are
+    // validated later by the grid/table constructor.
+    fusion_beam_birth_options_v1 unrelated = base;
+    unrelated.angular_order = 3;
+    expected = unrelated;
+    expected.relative_max_J = energy;
+    require(fusion_c_beam_birth_resolve_support(energy, &unrelated, &out) ==
+                PB11_STATUS_OK && same_options(out, expected),
+            "support resolver leaves unrelated options for downstream validation");
+
+    auto rejected = [&](double projectile_energy_J,
+                        const fusion_beam_birth_options_v1 *request,
+                        int expected_status, const char *label) {
+        out = base;
+        require(fusion_c_beam_birth_resolve_support(projectile_energy_J,
+                                                    request, &out) ==
+                    expected_status &&
+                    same_options(out, fusion_beam_birth_options_v1{}),
+                label);
+    };
+    rejected(-MeV, &base, PB11_STATUS_OUT_OF_RANGE,
+             "negative projectile energy rejects and clears output");
+    rejected(std::numeric_limits<double>::quiet_NaN(), &base,
+             PB11_STATUS_INVALID_ARGUMENT,
+             "NaN projectile energy rejects and clears output");
+    rejected(std::numeric_limits<double>::infinity(), &base,
+             PB11_STATUS_INVALID_ARGUMENT,
+             "infinite projectile energy rejects and clears output");
+    rejected(energy, nullptr, PB11_STATUS_INVALID_ARGUMENT,
+             "null base rejects and clears output");
+
+    fusion_beam_birth_options_v1 invalid = base;
+    invalid.relative_max_J = 0.0;
+    rejected(energy, &invalid, PB11_STATUS_OUT_OF_RANGE,
+             "zero base cap rejects and clears output");
+    invalid.relative_max_J = -MeV;
+    rejected(energy, &invalid, PB11_STATUS_OUT_OF_RANGE,
+             "negative base cap rejects and clears output");
+    invalid.relative_max_J = std::numeric_limits<double>::quiet_NaN();
+    rejected(energy, &invalid, PB11_STATUS_INVALID_ARGUMENT,
+             "NaN base cap rejects and clears output");
+    invalid.relative_max_J = std::numeric_limits<double>::infinity();
+    rejected(energy, &invalid, PB11_STATUS_INVALID_ARGUMENT,
+             "infinite base cap rejects and clears output");
+
+    require(fusion_c_beam_birth_resolve_support(energy, &base, nullptr) ==
+                PB11_STATUS_NULL_OUTPUT,
+            "null output returns NULL_OUTPUT");
+    alias = base;
+    alias.relative_max_J = -MeV;
+    require(fusion_c_beam_birth_resolve_support(energy, &alias, &alias) ==
+                PB11_STATUS_OUT_OF_RANGE &&
+                same_options(alias, fusion_beam_birth_options_v1{}),
+            "invalid aliased base rejects and clears output");
+}
+
 std::vector<double> source_edges() {
     // The four-MeV center grid retains the ordinary charged products while
     // forcing the DT neutron, and any high alpha tail, into explicit spills.
@@ -620,6 +720,7 @@ void check_invalid_inputs_clear_all_outputs() {
 
 int main() {
     try {
+        check_support_resolver();
         const fusion_beam_birth_options_v1 dt_options = options_for(5.0);
         const fusion_beam_birth_options_v1 pb_options = options_for(2.5);
         check_cold_rate_and_canonical_debits(FUSION_DT_ALPHAN, 0, 1.0 * MeV,

@@ -113,6 +113,7 @@ module fusion_beam_birth_fortran
 
   public :: fusion_thermal_birth_v1
   public :: fusion_beam_birth_grid
+  public :: fusion_beam_birth_resolve_support
 
   interface
      function c_fusion_beam_birth_grid(channel, projectile_slot, &
@@ -130,9 +131,31 @@ module fusion_beam_birth_fortran
        type(c_ptr), value :: out
        integer(c_int) :: status
      end function c_fusion_beam_birth_grid
+     function c_fusion_beam_birth_resolve_support(projectile_energy_J, &
+          base, out) bind(C, name="fusion_c_beam_birth_resolve_support") &
+          result(status)
+       import :: c_double, c_int, c_ptr
+       real(c_double), value :: projectile_energy_J
+       type(c_ptr), value :: base, out
+       integer(c_int) :: status
+     end function c_fusion_beam_birth_resolve_support
   end interface
 
 contains
+
+  subroutine fusion_beam_birth_resolve_support(projectile_energy_J, base, &
+       out, status)
+    !! Resolve the beam relative-energy support through the C library.
+    !! BASE and OUT are distinct Fortran actual arguments; the C API also
+    !! supports aliasing, but Fortran INTENT(IN)/INTENT(OUT) arguments do not.
+    real(c_double), intent(in) :: projectile_energy_J
+    type(fusion_beam_birth_options_v1), intent(in), target :: base
+    type(fusion_beam_birth_options_v1), intent(out), target :: out
+    integer(c_int), intent(out) :: status
+
+    status = c_fusion_beam_birth_resolve_support(projectile_energy_J, &
+         c_loc(base), c_loc(out))
+  end subroutine fusion_beam_birth_resolve_support
 
   subroutine clear_thermal_birth_fields(out)
     type(fusion_thermal_birth_v1), intent(out) :: out
