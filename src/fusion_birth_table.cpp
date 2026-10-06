@@ -100,9 +100,9 @@ Errors discrepancy(const fusion_birth_table_v1&t,const Node&a,const Node&b,const
  }
  return e;
 }
-void refine(fusion_birth_table_v1&t,const Ptr&a,const Ptr&b,int depth){
- const auto&q=t.info.control;Errors worst{};Ptr midpoint;
- for(int j=1;j<=3;++j){auto ref=direct(t,geometric(a->T,b->T,R(j)/4));const auto e=discrepancy(t,*a,*b,*ref);for(int i=0;i<4;++i)worst[i]=std::max(worst[i],e[i]);if(j==2)midpoint=ref;}
+void refine(fusion_birth_table_v1&t,const Ptr&a,const Ptr&b,int depth,Ptr midpoint_hint={}){
+ const auto&q=t.info.control;Errors worst{};Ptr midpoint,quarter1,quarter3;
+ for(int j=1;j<=3;++j){const double T=geometric(a->T,b->T,R(j)/4);auto ref=(j==2&&midpoint_hint&&T==midpoint_hint->T)?midpoint_hint:direct(t,T);const auto e=discrepancy(t,*a,*b,*ref);for(int i=0;i<4;++i)worst[i]=std::max(worst[i],e[i]);if(j==1)quarter1=ref;else if(j==2)midpoint=ref;else quarter3=ref;}
  const bool pass=worst[0]<=q.max_rate_error&&worst[1]<=q.max_debit_error&&worst[2]<=q.max_number_L1&&worst[3]<=q.max_energy_L1;
  if(pass){require(t.knots.size()+2<=size_t(q.max_knots));t.knots.push_back(a);
   t.info.max_validated_rate_error=std::max(t.info.max_validated_rate_error,worst[0]);
@@ -110,7 +110,7 @@ void refine(fusion_birth_table_v1&t,const Ptr&a,const Ptr&b,int depth){
   t.info.max_validated_number_L1=std::max(t.info.max_validated_number_L1,worst[2]);
   t.info.max_validated_energy_L1=std::max(t.info.max_validated_energy_L1,worst[3]);return;
  }
- require(depth<q.max_depth);refine(t,a,midpoint,depth+1);refine(t,midpoint,b,depth+1);
+ require(depth<q.max_depth);refine(t,a,midpoint,depth+1,quarter1);refine(t,midpoint,b,depth+1,quarter3);
 }
 }
 extern "C" int fusion_c_birth_table_create(int channel,double lower,double upper,
