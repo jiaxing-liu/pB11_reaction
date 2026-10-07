@@ -2,11 +2,24 @@
 
 Current approved work is coordinated by /home/cloud/research/pB-baldur/baldur-code/docs/exl50u-program/PLAN.md and STATUS.md. Read these and the relevant API_CONTRACT.md before continuing; check actual git state after resuming.
 
-Work on feature/exl50u-fusion-library. Preserve the existing scalar C++/C/Fortran interfaces; use explicit units and model/domain contracts. Keep BALDUR-specific state, indexing and I/O out of this library. Root agent owns physics and architecture; Luna may implement bounded agreed interfaces/tests. Never silently add empirical physics or turn failed calculations into zero-valued success.
+Work on feature/exl50u-fusion-library. Preserve the existing scalar C++/C/Fortran interfaces; use explicit units and model/domain contracts. Keep BALDUR-specific state, indexing and I/O out of this library. Root agent owns physics and architecture; bounded agreed tasks may be delegated to gpt-6.1-sol. Never silently add empirical physics or turn failed calculations into zero-valued success.
 
 Commit and push reviewed, validated milestones to this same branch; do not merge main. Record paired host/library commits in the coordinator STATUS.md. Do not overwrite concurrent agents' owned files.
 
-## Chat-first analysis routing — confirmed 2026-09-20
+## Current model rule — confirmed 2026-10-07
+
+The latest user instruction requires `gpt-6.1-sol` for every task, including
+analysis, implementation, execution, documentation and review. Explicitly select
+`gpt-6.1-sol` for all new subagents. Do not assign or resume work on existing
+`gpt-6-sol` or `gpt-6-luna` agents. The user selects the root model in the client;
+tools cannot change it. This rule supersedes all historical Chat/Pro/Luna/sol
+routing below and in older program records. Follow the current coordinating
+BALDUR AGENTS.md and preserve its case-concurrency and memory limits.
+
+## Historical Chat-first routing — superseded 2026-10-07
+
+The following destination and authorization are retained as historical records;
+they are not the current task-routing policy.
 
 Follow the coordinating BALDUR AGENTS.md cost preference across sessions.
 Route physics reasoning, design review, diagnosis, test planning and result
