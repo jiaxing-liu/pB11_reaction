@@ -899,6 +899,8 @@ if(BUILD_TESTING)
         add_test(NAME fusion_coupled_thermal_fortran_binding_tests COMMAND test_fusion_coupled_thermal_fortran)
 
         add_executable(test_fusion_birth_packets_fortran tests/test_fusion_birth_packets_fortran.f90 tests/fusion_birth_packets_layout.cpp)
+        set_target_properties(test_fusion_birth_packets_fortran PROPERTIES
+            LINKER_LANGUAGE Fortran)
         target_link_libraries(test_fusion_birth_packets_fortran PRIVATE fusion_coupled_sources_floor_fortran)
         add_test(NAME fusion_birth_packets_fortran_tests COMMAND test_fusion_birth_packets_fortran)
 
