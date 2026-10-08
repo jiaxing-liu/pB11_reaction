@@ -90,3 +90,41 @@ ledger plus the separate correction. It is not an EXL actuator prescription.
 The direct `fusion_coupled_sources_floor_fortran` ISO_C_BINDING module uses
 explicit `c_ptr,value` pointers and interoperable types imported from existing
 modules. Null optional arrays and failure clearing are tested with GNU/Intel.
+
+
+## Rate-aware subnormal floor amounts
+
+The opt-in coupled floor path retains below-grid amounts in private extended
+precision when their per-step binary64 representation vanishes. It converts
+the combined nuclear, floor and external source once, on the rate scale. A
+rate that is representable is not discarded because amount = dt*rate rounds
+to zero. Kinetic state, source, heat and ledger conversions use only measured
+IEEE subnormal rounding allowances, propagated through the same operator;
+the existing relative conservation gates remain. Allowance sums round outward;
+this is not an interval proof for every intermediate floating-point product.
+No long-double value crosses the C/Fortran ABI. These regressions are qualified
+on Linux x86-64 with binary64 double and extended-precision long double.
+
+Normal species retain the existing projector. Mixed-species borrowing checks
+also include physical N*first_center-U when returned mapped energy/correction
+round to zero. A representable particle amount can have unrepresentable energy;
+the difference between actual mapped energy, returned correction and physical
+birth energy is explicitly included in the subnormal conversion account.
+Temperature, shared ion borrowing and positive reservoir gates stay active.
+Source up-quantization is included in the joint borrowing bound. No empirical
+tail cutoff, new default limit or relaxed nuclear/FP relative tolerance is used.
+
+Public v1 amount ledgers still round to binary64. Optional per-channel birth
+packet extraction continues to reject an unrepresentable positive amount,
+even if the ordinary source trial succeeds using a representable aggregate
+rate. This is an explicit representability error with zeroed outputs, not
+clipping or a zero-valued successful packet. The amount-only standalone floor
+utility is unchanged; it cannot receive amounts outside its binary64 domain.
+
+Tests cover true failed-trial replay, ordinary-kernel parity, visible rates with
+invisible amounts, aggregate missing-amount bounds, and the actual coupled
+mixed-species borrowing gate with complete failure clearing. The latter uses
+a deliberately synthetic birth provider and does not certify nuclear spectra
+or full physical closure. Full host windows and numerical convergence remain
+separate acceptance work. Cache kernel identity must be regenerated after this
+source change; old identity overrides are diagnostic evidence only.

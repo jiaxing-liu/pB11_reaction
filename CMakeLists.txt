@@ -583,6 +583,28 @@ if(BUILD_TESTING)
     target_link_libraries(test_fusion_coupled_floor PRIVATE pb11::pb11)
     add_test(NAME fusion_coupled_floor_tests COMMAND test_fusion_coupled_floor)
 
+    # Internal measured-rounding regressions; assertions remain active in Release.
+    foreach(rounding_case floor_rate_edges floor_precise kinetic_rounding)
+        add_executable(test_fusion_${rounding_case} tests/test_fusion_${rounding_case}.cpp)
+        target_include_directories(test_fusion_${rounding_case} PRIVATE src)
+        target_link_libraries(test_fusion_${rounding_case} PRIVATE pb11::pb11)
+        if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+            target_compile_options(test_fusion_${rounding_case} PRIVATE -UNDEBUG)
+        elseif(MSVC)
+            target_compile_options(test_fusion_${rounding_case} PRIVATE /UNDEBUG)
+        endif()
+        add_test(NAME fusion_${rounding_case}_tests COMMAND test_fusion_${rounding_case})
+    endforeach()
+    # A synthetic source provider exercises the real coupled entry point.
+    # ELF linker wrapping is test-only; the installed library is unchanged.
+    if(UNIX AND NOT APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        add_executable(test_fusion_mixed_floor_boundary tests/test_fusion_mixed_floor_boundary.cpp)
+        target_link_libraries(test_fusion_mixed_floor_boundary PRIVATE pb11::pb11)
+        target_link_options(test_fusion_mixed_floor_boundary PRIVATE "-Wl,--wrap=fusion_c_thermal_birth_grid")
+        add_test(NAME fusion_mixed_floor_boundary_tests COMMAND test_fusion_mixed_floor_boundary strict)
+        add_test(NAME fusion_mixed_floor_boundary_high_tests COMMAND test_fusion_mixed_floor_boundary high)
+    endif()
+
     add_executable(test_fusion_birth_floor tests/test_fusion_birth_floor.cpp)
     target_link_libraries(test_fusion_birth_floor PRIVATE pb11::pb11)
     add_test(NAME fusion_birth_floor_tests COMMAND test_fusion_birth_floor)

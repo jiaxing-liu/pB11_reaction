@@ -1,4 +1,5 @@
 #include "fusion_two_component.h"
+#include "fusion_kinetic_rounding_internal.h"
 
 #include <algorithm>
 #include <cmath>
@@ -47,13 +48,15 @@ void clear_outputs(int cells, int baths, double* trial_s, double* trial_t,
 
 }  // namespace
 
-extern "C" int fusion_c_two_component_trial(
+int fusion_detail::two_component_trial_precise(
     int cells, int baths, double dt_s, const double* edges_J,
     const double* old_s_m3, const double* old_t_m3, const double* bath_kT_J,
     const double* diffusion_J2_s, const double* birth_s_m3_s,
     const double* birth_t_m3_s, const double* escape_s_inv,
     const double* transfer_s_inv, double* trial_s_m3, double* trial_t_m3,
-    double* heat_to_bath_J_m3, fusion_two_component_ledger_v1* ledger) {
+    double* heat_to_bath_J_m3, fusion_two_component_ledger_v1* ledger,
+    kinetic_rounding_budget* budget) {
+    if (budget) *budget = {};
     if (ledger != nullptr) {
         *ledger = {};
     }
@@ -141,6 +144,8 @@ extern "C" int fusion_c_two_component_trial(
         std::vector<double> t_heat(b);
         fusion_kinetic_ledger_v1 s_ledger{};
         fusion_kinetic_ledger_v1 t_ledger{};
+        kinetic_rounding_budget s_budget{}, t_budget{}, measured{};
+        std::vector<Real> escape_round(n, 0.0L);
 
         for (std::size_t i = 0; i < n; ++i) {
             const Real sum = static_cast<Real>(escape_s_inv[i]) +
@@ -148,12 +153,14 @@ extern "C" int fusion_c_two_component_trial(
             if (!put_double(sum, effective_escape[i])) {
                 return PB11_STATUS_NUMERICAL_FAILURE;
             }
+            if (sum < std::numeric_limits<double>::min())
+                escape_round[i] = std::abs(sum - static_cast<Real>(effective_escape[i]));
         }
 
-        const int s_status = fusion_c_energy_fp_trial(
+        const int s_status = energy_fp_trial_precise(
             cells, baths, dt_s, edges_J, old_s_m3, bath_kT_J, diffusion_J2_s,
             birth_s_m3_s, effective_escape.data(), 0.0, s_trial.data(),
-            baths > 0 ? s_heat.data() : nullptr, &s_ledger);
+            baths > 0 ? s_heat.data() : nullptr, &s_ledger, &s_budget);
         if (s_status != PB11_STATUS_OK) {
             return s_status;
         }
@@ -184,12 +191,20 @@ extern "C" int fusion_c_two_component_trial(
             // the recomputed TOTAL N/U residuals below still bound the loss.
             // This is IEEE underflow, not a population floor or negative clip.
             effective_birth_t[i] = static_cast<double>(sum);
+            if (sum < std::numeric_limits<double>::min()) {
+                const Real error = static_cast<Real>(dt_s) *
+                    std::abs(sum - static_cast<Real>(effective_birth_t[i]));
+                const Real energy = (static_cast<Real>(edges_J[i]) + edges_J[i+1]) / 2;
+                if (!accumulate_rounding(error, measured.number) ||
+                    !accumulate_rounding(energy * error, measured.energy))
+                    return PB11_STATUS_NUMERICAL_FAILURE;
+            }
         }
 
-        const int t_status = fusion_c_energy_fp_trial(
+        const int t_status = energy_fp_trial_precise(
             cells, baths, dt_s, edges_J, old_t_m3, bath_kT_J, diffusion_J2_s,
             effective_birth_t.data(), escape_s_inv, 0.0, t_trial.data(),
-            baths > 0 ? t_heat.data() : nullptr, &t_ledger);
+            baths > 0 ? t_heat.data() : nullptr, &t_ledger, &t_budget);
         if (t_status != PB11_STATUS_OK) {
             return t_status;
         }
@@ -204,6 +219,11 @@ extern "C" int fusion_c_two_component_trial(
             }
         }
 
+        if (!accumulate_rounding(s_budget.number, measured.number) ||
+            !accumulate_rounding(t_budget.number, measured.number) ||
+            !accumulate_rounding(s_budget.energy, measured.energy) ||
+            !accumulate_rounding(t_budget.energy, measured.energy))
+            return PB11_STATUS_NUMERICAL_FAILURE;
         fusion_two_component_ledger_v1 result{};
         Real initial_number = 0.0L;
         Real final_number = 0.0L;
@@ -224,6 +244,9 @@ extern "C" int fusion_c_two_component_trial(
             if (!put_double(sum, heat_total[j])) {
                 return PB11_STATUS_NUMERICAL_FAILURE;
             }
+            if (std::abs(sum) < std::numeric_limits<double>::min() &&
+                !accumulate_rounding(std::abs(sum - static_cast<Real>(heat_total[j])), measured.energy))
+                return PB11_STATUS_NUMERICAL_FAILURE;
             net_heat += static_cast<Real>(heat_total[j]);
         }
 
@@ -245,6 +268,10 @@ extern "C" int fusion_c_two_component_trial(
                                   static_cast<Real>(transfer_s_inv[i]) *
                                   trial_s;
 
+            const Real coefficient_error = static_cast<Real>(dt_s) * trial_s * escape_round[i];
+            if (!accumulate_rounding(coefficient_error, measured.number) ||
+                !accumulate_rounding(energy * coefficient_error, measured.energy))
+                return PB11_STATUS_NUMERICAL_FAILURE;
             initial_number += old_s + old_t;
             final_number += trial_s + trial_t;
             initial_energy += energy * (old_s + old_t);
@@ -273,8 +300,9 @@ extern "C" int fusion_c_two_component_trial(
             !std::isfinite(energy_error) ||
             !std::isfinite(particle_scale) ||
             !std::isfinite(energy_scale) ||
-            std::abs(particle_error) > 1.0e-10L * particle_scale ||
-            std::abs(energy_error) > 1.0e-10L * energy_scale) {
+            !std::isfinite(measured.number) || !std::isfinite(measured.energy) ||
+            std::abs(particle_error) > 1.0e-10L * particle_scale + measured.number ||
+            std::abs(energy_error) > 1.0e-10L * energy_scale + measured.energy) {
             return PB11_STATUS_NUMERICAL_FAILURE;
         }
 
@@ -305,10 +333,24 @@ extern "C" int fusion_c_two_component_trial(
                       heat_to_bath_J_m3);
         }
         *ledger = result;
+        if (budget) *budget = measured;
         return PB11_STATUS_OK;
     } catch (...) {
         clear_outputs(cells, baths, trial_s_m3, trial_t_m3,
                       heat_to_bath_J_m3, ledger);
         return PB11_STATUS_EXCEPTION;
     }
+}
+
+extern "C" int fusion_c_two_component_trial(
+    int cells, int baths, double dt_s, const double* edges_J,
+    const double* old_s_m3, const double* old_t_m3, const double* bath_kT_J,
+    const double* diffusion_J2_s, const double* birth_s_m3_s,
+    const double* birth_t_m3_s, const double* escape_s_inv,
+    const double* transfer_s_inv, double* trial_s_m3, double* trial_t_m3,
+    double* heat_to_bath_J_m3, fusion_two_component_ledger_v1* ledger) {
+    return fusion_detail::two_component_trial_precise(cells,baths,dt_s,
+        edges_J,old_s_m3,old_t_m3,bath_kT_J,diffusion_J2_s,birth_s_m3_s,
+        birth_t_m3_s,escape_s_inv,transfer_s_inv,trial_s_m3,trial_t_m3,
+        heat_to_bath_J_m3,ledger,nullptr);
 }

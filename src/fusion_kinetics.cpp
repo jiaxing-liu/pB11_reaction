@@ -1,4 +1,5 @@
 #include "fusion_kinetics.h"
+#include "fusion_kinetic_rounding_internal.h"
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -32,11 +33,12 @@ void bernoulli_pair(Real w,Real &positive,Real &negative) {
 bool nonnegative(double value) {return std::isfinite(value) && value>=0;}
 }
 
-extern "C" int fusion_c_energy_fp_trial(int n,int nb,double dt,
+int fusion_detail::energy_fp_trial_precise(int n,int nb,double dt,
     const double *edges,const double *old,const double *temperatures,
     const double *diffusion,const double *birth,const double *escape,
     double thermalization,double *trial,double *heat,
-    fusion_kinetic_ledger_v1 *ledger) {
+    fusion_kinetic_ledger_v1 *ledger, kinetic_rounding_budget *budget) {
+    if (budget) *budget={};
     if (ledger) *ledger={};
     if (n<1 || nb<0) return PB11_STATUS_INVALID_ARGUMENT;
     if (trial) std::fill(trial,trial+n,0.);
@@ -107,8 +109,9 @@ extern "C" int fusion_c_energy_fp_trial(int n,int nb,double dt,
             if (state[i]<std::numeric_limits<double>::min())
                 underflow_error[i]=std::abs(state[i]-static_cast<Real>(output[i]));
             const Real loss=static_cast<Real>(escape[i])+(i==0?thermalization:0.);
-            number_round+=underflow_error[i]*(1+static_cast<Real>(dt)*loss);
-            energy_round+=energy[i]*underflow_error[i]*(1+static_cast<Real>(dt)*loss);
+            if (!accumulate_rounding(underflow_error[i]*(1+static_cast<Real>(dt)*loss), number_round) ||
+                !accumulate_rounding(energy[i]*underflow_error[i]*(1+static_cast<Real>(dt)*loss), energy_round))
+                return PB11_STATUS_NUMERICAL_FAILURE;
             state[i]=output[i]; // Ledger describes the actual returned precision.
         }
         Real net_heat=0,heat_scale=0;
@@ -118,8 +121,9 @@ extern "C" int fusion_c_energy_fp_trial(int n,int nb,double dt,
                 const auto index=static_cast<std::size_t>(b)*nf+f;
                 const Real flux=left[index]*state[f]-right[index]*state[f+1];
                 bath_heat-=dt*(energy[f+1]-energy[f])*flux;
-                energy_round+=dt*(energy[f+1]-energy[f])*
-                    (left[index]*underflow_error[f]+right[index]*underflow_error[f+1]);
+                if (!accumulate_rounding(dt*(energy[f+1]-energy[f])*
+                    (left[index]*underflow_error[f]+right[index]*underflow_error[f+1]), energy_round))
+                    return PB11_STATUS_NUMERICAL_FAILURE;
             }
             // Match positive-tail state rounding: a finite bath exchange below
             // double range may round to zero. Keep overflow/nonfinite rejection;
@@ -127,8 +131,9 @@ extern "C" int fusion_c_energy_fp_trial(int n,int nb,double dt,
             if (!finite(bath_heat) || std::abs(bath_heat)>std::numeric_limits<double>::max())
                 return PB11_STATUS_NUMERICAL_FAILURE;
             heat_output[b]=static_cast<double>(bath_heat);
-            if (std::abs(bath_heat)<std::numeric_limits<double>::min())
-                energy_round+=std::abs(bath_heat-static_cast<Real>(heat_output[b]));
+            if (std::abs(bath_heat)<std::numeric_limits<double>::min() &&
+                !accumulate_rounding(std::abs(bath_heat-static_cast<Real>(heat_output[b])), energy_round))
+                return PB11_STATUS_NUMERICAL_FAILURE;
             net_heat+=heat_output[b]; heat_scale+=std::abs(heat_output[b]);
         }
         Real n0=0,n1=0,e0=0,e1=0,nborn=0,eborn=0,nesc=0,eesc=0;
@@ -164,8 +169,18 @@ extern "C" int fusion_c_energy_fp_trial(int n,int nb,double dt,
         std::copy(output.begin(),output.end(),trial);
         if (nb) std::copy(heat_output.begin(),heat_output.end(),heat);
         *ledger=result;
+        if (budget) *budget={number_round,energy_round};
         return PB11_STATUS_OK;
     } catch (...) {
         return PB11_STATUS_EXCEPTION;
     }
+}
+
+extern "C" int fusion_c_energy_fp_trial(int n,int nb,double dt,
+    const double *edges,const double *old,const double *temperatures,
+    const double *diffusion,const double *birth,const double *escape,
+    double thermalization,double *trial,double *heat,
+    fusion_kinetic_ledger_v1 *ledger) {
+    return fusion_detail::energy_fp_trial_precise(n,nb,dt,edges,old,
+        temperatures,diffusion,birth,escape,thermalization,trial,heat,ledger,nullptr);
 }

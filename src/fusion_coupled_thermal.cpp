@@ -1,3 +1,5 @@
+#include "fusion_birth_floor_precise_internal.h"
+#include "fusion_kinetic_rounding_internal.h"
 #include "fusion_source_rounding_internal.h"
 #include "fusion_coupled_sources.h"
 #include "fusion_beam_birth_table_internal.h"
@@ -137,7 +139,9 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
   std::array<std::vector<double>,5> grids;
   double rates[5]{},mean_a[5]{},mean_b[5]{},oldUi[6]{},trialNi[6]{},trialUi[6]{};
   fusion_coupled_thermal_v1 result{};auto&l=result.ledger;
-  std::array<R,6> belowN{},belowE{};
+  std::array<R,6> belowN{},belowE{},mapped_floorN{},physical_floorN{},physical_floorE{},precise_correction{};
+  std::array<fusion_detail::kinetic_rounding_budget,6> conversion_budget{};
+  bool precise_floor_active=false;R original_floor_reservoir=0,floor_borrowed_bound=0;
   for(int i=0;i<6;++i)if(!put(R(1.5L)*Ti*thermal[i],oldUi[i]))return NUM;
   for(int ch=0;ch<5;++ch){st=fusion_c_nuclear_channel(ch,&reactions[ch]);if(st)return st;
    if(!op->channels[ch]||thermal[reactions[ch].reactant_ids[0]]==0||thermal[reactions[ch].reactant_ids[1]]==0)continue;
@@ -334,12 +338,56 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
     R scale=R(burn.events_m3[ch])/rates[ch];
     for(int i=0;i<6;++i){belowN[i]+=scale*source[ch].below_number_m3_s[i];belowE[i]+=scale*source[ch].below_energy_J_m3_s[i];}
    }
+   double N[6]{},E[6]{};bool rate_only=false;std::array<bool,6> precise_species{};
+   for(int i=0;i<6;++i){
+    if(!put(belowN[i],N[i])||!put(belowE[i],E[i]))return NUM;
+    precise_species[i]=(N[i]==0&&belowN[i]>0)||(E[i]==0&&belowE[i]>0);rate_only=rate_only||precise_species[i];
+   }
+   if(rate_only){
+    precise_floor_active=true;original_floor_reservoir=ionU;
+    std::array<R,6> preciseN{},preciseE{};double normalN[6]{},normalE[6]{},reservoir=0;
+    for(int i=0;i<6;++i){if(precise_species[i]){preciseN[i]=belowN[i];preciseE[i]=belowE[i];}
+     else{normalN[i]=N[i];normalE[i]=E[i];}}
+    if(!put(ionU,reservoir)||reservoir<=0)return NUM;
+    fusion_birth_floor_options_v1 options{double(centers[0]),Ti,reservoir,
+     floor_limits->max_center_over_ion_kT,floor_limits->max_ion_energy_fraction};
+    st=fusion_c_birth_floor_project(&options,normalN,normalE,&floor_result);if(st)return st;
+    fusion_detail::precise_floor_ledger projected{};
+    st=fusion_detail::project_floor_precise(centers[0],Ti,ionU,
+       floor_limits->max_center_over_ion_kT,floor_limits->max_ion_energy_fraction,
+       preciseN,preciseE,projected);if(st)return st;
+    for(int i=0;i<6;++i){
+     if(precise_species[i]){
+      mapped_floorN[i]=physical_floorN[i]=projected.number[i];
+      physical_floorE[i]=projected.physical_energy[i];precise_correction[i]=projected.correction[i];
+      if(!put(projected.number[i],floor_result.born_number_m3[i])||
+         !put(projected.number[i],floor_result.mapped_number_m3[i])||
+         !put(projected.physical_energy[i],floor_result.born_energy_J_m3[i])||
+         !put(projected.mapped_energy[i],floor_result.mapped_energy_J_m3[i])||
+         !put(projected.correction[i],floor_result.ion_energy_correction_J_m3[i]))return NUM;
+     }else{
+      mapped_floorN[i]=floor_result.mapped_number_m3[i];physical_floorN[i]=floor_result.born_number_m3[i];
+      physical_floorE[i]=floor_result.born_energy_J_m3[i];precise_correction[i]=floor_result.ion_energy_correction_J_m3[i];
+     }
+     // Positive corrections return energy; never use them to hide a borrowing bound.
+     // A normal species may have representable N but mapped energy below the
+     // binary64 quantum. Its returned correction can be zero; retain the
+     // physical mapping displacement in the joint borrowing limit as well.
+     const R physical_borrow=mapped_floorN[i]*centers[0]-physical_floorE[i];
+     if(!fusion_detail::accumulate_rounding(std::max({R(0),-precise_correction[i],physical_borrow}),floor_borrowed_bound))return NUM;
+     ionU+=precise_correction[i];
+    }
+    if(floor_borrowed_bound>R(floor_limits->max_ion_energy_fraction)*original_floor_reservoir||
+       floor_borrowed_bound>=original_floor_reservoir)return PB11_STATUS_OUT_OF_RANGE;
+    if(!put(ionU,floor_result.remaining_ion_energy_J_m3)||floor_result.remaining_ion_energy_J_m3<=0||
+       !put(ionU/(1.5L*Npool),Ti)||Ti<=0)return NUM;
+   }else{
    double N[6]{},E[6]{},reservoir=0;
    for(int i=0;i<6;++i){
     if(!put(belowN[i],N[i])||!put(belowE[i],E[i]))return NUM;
     // Do not lose a source rate representable in double when the corresponding
     // per-step amount rounds to zero. Such a case needs a rate-aware interface.
-    if((N[i]==0&&double(belowN[i]/dt)!=0)||(E[i]==0&&double(belowE[i]/dt)!=0))return NUM;
+
     double rate=0;
     if(!floor_source_rate(N[i],dt,rate))return NUM;
     const R nr=std::abs(belowN[i]-N[i]),er=std::abs(belowE[i]-E[i]);
@@ -358,6 +406,20 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
    }
    bool active=false;for(int i=0;i<6;++i){active=active||N[i]>0;ionU+=floor_result.ion_energy_correction_J_m3[i];}
    if(active&&(!put(ionU/(1.5L*Npool),Ti)||Ti<=0))return NUM;
+
+    for(int i=0;i<6;++i){mapped_floorN[i]=floor_result.mapped_number_m3[i];
+     physical_floorN[i]=floor_result.born_number_m3[i];physical_floorE[i]=floor_result.born_energy_J_m3[i];
+     precise_correction[i]=floor_result.ion_energy_correction_J_m3[i];}
+   }
+   // A representable mapped particle amount can have unrepresentable energy.
+   // Measure the floor account conversion itself, including the ordinary
+   // projector path; source-rate conversion alone does not cover this loss.
+   for(int i=0;i<6;++i){
+    const R mapped=mapped_floorN[i]*centers[0];
+    const R error=std::abs(mapped+R(floor_result.ion_energy_correction_J_m3[i])-physical_floorE[i]);
+    if(mapped<std::numeric_limits<double>::min()&&
+       !fusion_detail::accumulate_rounding(error,conversion_budget[i].energy))return NUM;
+   }
    trial_stage("floor_done");
   }
   std::vector<double> birth(6*n),s(6*n),t(6*n);R unrepresentedN=0,unrepresentedE=0;R Q=0,neutronN=fast_neutronN,neutronE=fast_neutronE;
@@ -366,17 +428,31 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
    for(int j=0;j<n;++j){R amount=fast_birth.empty()?0:fast_birth[i*n+j];
     for(int ch=0;ch<5;++ch)if(burn.events_m3[ch]>0){if(rates[ch]<=0)return NUM;amount+=R(grids[ch][i*n+j])/rates[ch]*burn.events_m3[ch];}
     bornN+=amount;bornE+=amount*centers[j];
-    if(floor_limits&&j==0)amount+=floor_result.mapped_number_m3[i];
+    if(floor_limits&&j==0)amount+=mapped_floorN[i];
     R ex=R(dt)*external[i*n+j];extN+=ex;extE+=ex*centers[j];
     if(floor_limits){
      R lost=0;if(!floor_source_rate(amount+ex,dt,birth[i*n+j],&lost))return NUM;
      if(!source_roundoff_accumulate(lost,centers[j],unrepresentedN,unrepresentedE))return NUM;
+     R difference=std::abs(R(birth[i*n+j])*dt-(amount+ex));
+     if(precise_floor_active&&j==0&&mapped_floorN[i]>0){
+      // Worst-case combined-source upward rounding is bounded separately from
+      // physical floor correction; it is not attributed to an external source.
+      R extra=std::max(R(0),R(birth[i*n+j])*dt-(amount+ex))*centers[j];
+      if(!fusion_detail::accumulate_rounding(extra,floor_borrowed_bound))return NUM;
+     }
+     if(R(birth[i*n+j])<std::numeric_limits<double>::min()){
+      if(!fusion_detail::accumulate_rounding(difference,conversion_budget[i].number)||!fusion_detail::accumulate_rounding(difference*centers[j],conversion_budget[i].energy))return NUM;}
     }
     else if(!put((amount+ex)/dt,birth[i*n+j]))return NUM;
    }
-   if(floor_limits){bornN+=floor_result.born_number_m3[i];bornE+=floor_result.born_energy_J_m3[i];}
+   if(floor_limits){bornN+=physical_floorN[i];bornE+=physical_floorE[i];}
    if(!put(bornN,l.nuclear_born_number_m3[i])||!put(bornE,l.nuclear_born_energy_J_m3[i])||!put(extN,l.external_born_number_m3[i])||!put(extE,l.external_born_energy_J_m3[i]))return NUM;
+   if(bornN<std::numeric_limits<double>::min())if(!fusion_detail::accumulate_rounding(std::abs(bornN-R(l.nuclear_born_number_m3[i])),conversion_budget[i].number))return NUM;
+   if(bornE<std::numeric_limits<double>::min())if(!fusion_detail::accumulate_rounding(std::abs(bornE-R(l.nuclear_born_energy_J_m3[i])),conversion_budget[i].energy))return NUM;
+   if(extN<std::numeric_limits<double>::min())if(!fusion_detail::accumulate_rounding(std::abs(extN-R(l.external_born_number_m3[i])),conversion_budget[i].number))return NUM;
+   if(extE<std::numeric_limits<double>::min())if(!fusion_detail::accumulate_rounding(std::abs(extE-R(l.external_born_energy_J_m3[i])),conversion_budget[i].energy))return NUM;
   }
+  if(precise_floor_active&&(floor_borrowed_bound>R(floor_limits->max_ion_energy_fraction)*original_floor_reservoir||floor_borrowed_bound>=original_floor_reservoir))return PB11_STATUS_OUT_OF_RANGE;
   for(int ch=0;ch<5;++ch)if(burn.events_m3[ch]>0){R N=R(source[ch].below_number_m3_s[6])+source[ch].above_number_m3_s[6],E=R(source[ch].below_energy_J_m3_s[6])+source[ch].above_energy_J_m3_s[6];for(int j=0;j<n;++j){N+=grids[ch][6*n+j];E+=R(grids[ch][6*n+j])*centers[j];}neutronN+=N/rates[ch]*burn.events_m3[ch];neutronE+=E/rates[ch]*burn.events_m3[ch];}
   if(!put(neutronN,l.neutron_number_m3)||!put(neutronE,l.neutron_energy_J_m3))return NUM;
   std::vector<fusion_maxwellian_bath_v1> baths(nb);
@@ -385,14 +461,16 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
   for(int j=0;j<ninert;++j)baths[j+7]={inert[j].density_m3,inert[j].mass_kg,inert[j].mean_charge_squared,Ti,1};
   std::vector<double> temperatures(nb),diffusion(nb*(n-1)),transfer(n),zero(n),heat(nb),after(n);
   for(int b=0;b<nb;++b)temperatures[b]=baths[b].kT_J;
-  for(int i=0;i<6;++i){bool active=oldN[i]>0||l.nuclear_born_number_m3[i]>0||l.external_born_number_m3[i]>0;if(!active)continue;
+  for(int i=0;i<6;++i){bool active=oldN[i]>0||l.nuclear_born_number_m3[i]>0||l.external_born_number_m3[i]>0;for(int j=0;j<n&&!active;++j)active=birth[i*n+j]>0;if(!active)continue;
    std::fill(transfer.begin(),transfer.end(),0.);
    for(int b=0;b<nb;++b){baths[b].coulomb_log=logs[i*nb+b];
     for(int j=0;j<n-1;++j){fusion_coulomb_energy_v1 coefficient{};st=fusion_c_coulomb_energy(edges[j+1],mass[i].mass_kg,mass[i].nuclear_charge,&baths[b],&coefficient);if(st)return st;diffusion[b*(n-1)+j]=coefficient.diffusion_J2_s;}
     if(b>0)for(int j=0;j<n;++j){double lambda=0;st=fusion_c_coulomb_transfer_rate(double(centers[j]),mass[i].mass_kg,mass[i].nuclear_charge,&baths[b],&lambda);if(st)return st;if(!put(R(transfer[j])+lambda,transfer[j]))return NUM;}
    }
    fusion_two_component_ledger_v1 fp{};
-   st=fusion_c_two_component_trial(n,nb,dt,edges,fp_s+i*n,fp_t+i*n,temperatures.data(),diffusion.data(),birth.data()+i*n,zero.data(),escape+i*n,transfer.data(),s.data()+i*n,t.data()+i*n,heat.data(),&fp);if(st)return st;
+   fusion_detail::kinetic_rounding_budget fp_round{};
+   st=fusion_detail::two_component_trial_precise(n,nb,dt,edges,fp_s+i*n,fp_t+i*n,temperatures.data(),diffusion.data(),birth.data()+i*n,zero.data(),escape+i*n,transfer.data(),s.data()+i*n,t.data()+i*n,heat.data(),&fp,&fp_round);if(st)return st;
+   if(!fusion_detail::accumulate_rounding(fp_round.number,conversion_budget[i].number)||!fusion_detail::accumulate_rounding(fp_round.energy,conversion_budget[i].energy))return NUM;
    if(diagnostics){
     observation.transferred_number_m3[i]=fp.transferred_number_m3;
     observation.transferred_energy_J_m3[i]=fp.transferred_energy_J_m3;
@@ -426,18 +504,19 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
   R escapedE=0,externalE=0;
   for(int i=0;i<6;++i){R N=0,E=0,H=result.inert_ion_heat_J_m3[i];for(int b=0;b<7;++b)H+=l.heat_to_bath_J_m3[i*7+b];
    for(int j=0;j<n;++j){R z=R(s[i*n+j])+t[i*n+j];N+=z;E+=z*centers[j];}
-   if(!close({N,-oldN[i],-R(l.nuclear_born_number_m3[i]),-R(l.external_born_number_m3[i]),R(l.escaped_number_m3[i]),R(l.handed_off_number_m3[i]),R(l.fast_consumed_number_m3[i])})||
-      !close({E,-oldE[i],-R(l.nuclear_born_energy_J_m3[i]),-R(l.external_born_energy_J_m3[i]),R(l.escaped_energy_J_m3[i]),R(l.handed_off_energy_J_m3[i]),H,R(l.fast_consumed_energy_J_m3[i]),R(floor_result.ion_energy_correction_J_m3[i])}))return NUM;
+   if(!close({N,-oldN[i],-R(l.nuclear_born_number_m3[i]),-R(l.external_born_number_m3[i]),R(l.escaped_number_m3[i]),R(l.handed_off_number_m3[i]),R(l.fast_consumed_number_m3[i])},conversion_budget[i].number)||
+      !close({E,-oldE[i],-R(l.nuclear_born_energy_J_m3[i]),-R(l.external_born_energy_J_m3[i]),R(l.escaped_energy_J_m3[i]),R(l.handed_off_energy_J_m3[i]),H,R(l.fast_consumed_energy_J_m3[i]),R(floor_result.ion_energy_correction_J_m3[i])},conversion_budget[i].energy))return NUM;
    R dN=R(trialNi[i])-thermal[i]+N-oldN[i]-l.nuclear_born_number_m3[i]+l.thermal_consumed_number_m3[i]-l.external_born_number_m3[i]+l.escaped_number_m3[i]+l.fast_consumed_number_m3[i];
    // Difference-of-inventory residuals inherit rounding from BOTH pools,
    // including a seeded kinetic species with no thermal counterpart.
    R round=16*std::numeric_limits<double>::epsilon()*(R(thermal[i])+trialNi[i]+oldN[i]+N);
-   if(!put(dN,result.particle_residual_m3[i])||!close({R(trialNi[i])-thermal[i],N-oldN[i],-R(l.nuclear_born_number_m3[i]),R(l.thermal_consumed_number_m3[i]),-R(l.external_born_number_m3[i]),R(l.escaped_number_m3[i]),R(l.fast_consumed_number_m3[i])},round))return NUM;
+   if(!put(dN,result.particle_residual_m3[i])||!close({R(trialNi[i])-thermal[i],N-oldN[i],-R(l.nuclear_born_number_m3[i]),R(l.thermal_consumed_number_m3[i]),-R(l.external_born_number_m3[i]),R(l.escaped_number_m3[i]),R(l.fast_consumed_number_m3[i])},round+conversion_budget[i].number))return NUM;
    nuclearE+=l.nuclear_born_energy_J_m3[i];removedE+=R(l.thermal_consumed_energy_J_m3[i])+l.fast_consumed_energy_J_m3[i];totalOld+=oldE[i];totalNew+=E;escapedE+=l.escaped_energy_J_m3[i];externalE+=l.external_born_energy_J_m3[i];
   }
   if(!close({nuclearE,-removedE,-Q}))return NUM;
   R residual=totalNew-totalOld+neutronE+escapedE-externalE-Q;
   R round=16*std::numeric_limits<double>::epsilon()*(std::abs(totalOld)+std::abs(totalNew));
+  for(int i=0;i<6;++i)if(!fusion_detail::accumulate_rounding(conversion_budget[i].energy,round))return NUM;
   if(!put(residual,result.energy_residual_J_m3)||!close({totalNew-totalOld,neutronE,escapedE,-externalE,-Q},round))return NUM;
   bool valid=true;ledger_fields(l,[&](double x){if(!finite_value(x))valid=false;});if(!valid)return NUM;
   std::vector<double> packet_rounded;fusion_birth_packets_v1 packet_result{};

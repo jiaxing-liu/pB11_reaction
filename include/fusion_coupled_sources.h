@@ -61,7 +61,11 @@ int fusion_c_coupled_sources_trial(double dt_s,
  * Above-grid spill retains strict rejection. Existing entry points unchanged.
  * Non-floor per-cell source rounding admits only both-unrepresentable packet/rate
  * tails, with upward-bounded trial aggregate missing N/E below half a binary64
- * subnormal quantum in SI. Mapped floor packets retain strict positive-rate checks.
+ * subnormal quantum in SI. Floor amounts use private extended precision so a
+ * representable aggregate rate survives per-step binary64 amount underflow.
+ * Public amount ledgers still round to binary64; only measured subnormal
+ * conversion error is admitted in inventory checks. Packet extraction keeps
+ * its separate strict positive-amount representability requirement.
  * See docs/BIRTH_FLOOR.md; coupled physical convergence remains required. */
 typedef struct fusion_coupled_floor_limits_v1 {
  double max_center_over_ion_kT, max_ion_energy_fraction;
