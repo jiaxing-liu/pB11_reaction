@@ -52,6 +52,9 @@ struct Mapper {
  struct Boost {R beta,gamma,d;explicit Boost(R b):beta(b){R root=std::sqrt(1-beta*beta);gamma=1/root;d=beta*beta/(root*(1+root));}};
  void isotropic(int id,R mass,R K,const Boost&boost,R w){
   const R beta=boost.beta,gamma=boost.gamma,d=boost.d,rest=mass*c2;
+  // A zero boost or a product at rest in CM has an exact delta spectrum.
+  // Avoid forming two independently rounded endpoints for zero width.
+  if(beta==0||K==0){delta(id,gamma*K+d*rest,w);return;}
   R mid=gamma*K+d*rest,half=gamma*beta*std::sqrt(K*(K+2*rest));
   R hi=mid+half;
   // (mid-half)*(mid+half)=(K-(gamma-1)*mc^2)^2 avoids

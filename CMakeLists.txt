@@ -635,6 +635,12 @@ if(BUILD_TESTING)
     target_link_libraries(test_fusion_thermal_birth PRIVATE pb11::pb11)
     add_test(NAME fusion_thermal_birth_tests COMMAND test_fusion_thermal_birth)
 
+    # Include the private mapper implementation in this test translation unit;
+    # do not export an internal mapping API solely for a numerical regression.
+    add_executable(test_fusion_birth_mapper tests/test_fusion_birth_mapper.cpp)
+    target_link_libraries(test_fusion_birth_mapper PRIVATE pb11::pb11)
+    add_test(NAME fusion_birth_mapper_tests COMMAND test_fusion_birth_mapper)
+
     add_executable(test_fusion_thermal_birth_width tests/test_fusion_thermal_birth_width.cpp)
     target_link_libraries(test_fusion_thermal_birth_width PRIVATE pb11::pb11)
     add_test(NAME fusion_thermal_birth_width_tests COMMAND test_fusion_thermal_birth_width)
