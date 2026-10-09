@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(pb11_reaction VERSION 1.0.0 LANGUAGES CXX)
 
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 
 option(PB11_BUILD_FORTRAN
        "Build the ISO_C_BINDING Fortran module when a compiler is available"
@@ -1154,5 +1155,21 @@ install(
 install(
     EXPORT pb11Targets
     NAMESPACE pb11::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/pb11_reaction"
+)
+
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/pb11_reactionConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/pb11_reactionConfig.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/pb11_reaction"
+)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/pb11_reactionConfigVersion.cmake"
+    COMPATIBILITY SameMajorVersion
+)
+install(
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/pb11_reactionConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/pb11_reactionConfigVersion.cmake"
     DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/pb11_reaction"
 )
