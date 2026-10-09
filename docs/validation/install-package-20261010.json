@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-10",
+  "scope": "relocatable CMake package and clean C++ consumer",
+  "external_commit": "bcf02cc1c29d6be4f2201ca283d06131d7fb01d4",
+  "command": "python3 tests/test_install_package.py",
+  "build_options": ["-DPB11_BUILD_FORTRAN=OFF", "CMAKE_BUILD_PARALLEL_LEVEL=1"],
+  "consumer": {
+    "find_package": "pb11_reaction 1.0 CONFIG REQUIRED",
+    "target": "pb11::pb11",
+    "runtime_check": "pb11_c_abi_version()==1 and finite nonnegative pb11_c_reactivity_fast(100 keV)"
+  },
+  "result": "pass",
+  "source_hashes": {
+    "tests/test_install_package.py": "42f8c53bf19812222a8508ca1f58883e6b241ae1b274b3a9eb5f52d555341163",
+    "CMakeLists.txt": "6873c0ac299b42e815786d2405a31893bf62edca1ea25edb971ce0ee972fd6f2",
+    "cmake/pb11_reactionConfig.cmake.in": "499f3bb9184f4ab64e63f42d16f0992778a66872cb51dc584b7c988b51c0096b",
+    "docs/INSTALL_PACKAGE.md": "6f845b2ccf0076e9697596252fdc697ac00034e9b3a443d2fc6f4c4495ec916e"
+  },
+  "physics_acceptance": false,
+  "baldur_acceptance": false
+}
