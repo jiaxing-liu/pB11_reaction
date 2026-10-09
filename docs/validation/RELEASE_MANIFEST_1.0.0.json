@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "package": "pb11_reaction",
+  "version": "1.0.0",
+  "status": "pre_release_candidate",
+  "branch": "feature/exl50u-fusion-library",
+  "commit": "00d96b5438c0fccfd521d34d7136208730c7ed35",
+  "scope": {
+    "public_c_abi": true,
+    "public_cpp_api": true,
+    "fortran_iso_c_binding": true,
+    "thermal_network": true,
+    "beam_birth_and_fast_sources": true,
+    "coupled_trial_rollback": true,
+    "device_host_coupling": false
+  },
+  "kernel_identity": "54b35a3cf27a6224908c5fcc9a0bc61ade2ba46a237074e68f087f659af928dd",
+  "validation_receipts": [
+    "docs/validation/install-package-20261010.json",
+    "docs/validation/install-package-fortran-20261010.json",
+    "docs/validation/package-core-regression-20261010.json",
+    "docs/validation/pb-fast-floor-regression-20261010.json"
+  ],
+  "validated_install_consumers": {
+    "cxx": "pass",
+    "fortran_gfortran": "pass"
+  },
+  "known_open_gates": [
+    "full current-commit CTest terminal receipt on a resource-suitable host",
+    "Intel consumer matrix for this package commit",
+    "full host spatial loss and transport convergence",
+    "BALDUR four-fuel full-window acceptance"
+  ],
+  "physics_acceptance": false,
+  "baldur_acceptance": false
+}
