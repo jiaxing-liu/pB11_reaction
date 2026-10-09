@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-10",
+  "scope": "current package commit core C++ regression subset",
+  "source_commit": "30e197a3910665def6efd1b3a0a407ef29ec2417",
+  "build": {
+    "directory": "/tmp/pB11-package-ctest",
+    "options": ["-DPB11_BUILD_FORTRAN=OFF", "-j1"]
+  },
+  "tests": {
+    "selected": 11,
+    "passed": 11,
+    "failed": 0,
+    "names": [
+      "pb11_unit_tests", "pb11_c_abi_tests", "fusion_network_tests",
+      "fusion_rates_tests", "fusion_cross_sections_tests",
+      "fusion_coupled_fast_tests", "fusion_coupled_thermal_tests",
+      "fusion_pb_population_tests", "fusion_pb_birth_tests",
+      "fusion_source_state_tests", "fusion_coupled_restart_tests"
+    ],
+    "elapsed_s": 12.73
+  },
+  "full_ctest": {
+    "status": "not_accepted",
+    "observation": "single-thread run stopped before the heavy floor test produced a terminal receipt under the 15 GiB host resource pressure",
+    "full_suite_claim": false
+  },
+  "physics_acceptance": false,
+  "baldur_acceptance": false
+}
