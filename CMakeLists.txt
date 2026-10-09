@@ -55,6 +55,13 @@ target_include_directories(
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(pb11 PRIVATE -Wall -Wextra -Wpedantic)
+    # A Fortran executable that consumes the static C++ library is linked by
+    # the Fortran driver, which does not add the C++ runtime automatically.
+    # Propagate it only for Fortran final links; C++ consumers keep their
+    # normal driver behavior.
+    target_link_libraries(pb11 INTERFACE
+        "$<$<LINK_LANGUAGE:Fortran>:stdc++>"
+    )
 elseif(MSVC)
     target_compile_options(pb11 PRIVATE /W4)
 endif()

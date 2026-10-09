@@ -51,6 +51,47 @@ def main() -> int:
         run(["cmake", "--build", str(consumer_build), "-j1"], consumer, env)
         run([str(consumer_build / "consumer")], consumer, env)
         print("installed CMake package consumer: PASS")
+
+        if shutil.which("gfortran"):
+            fortran_build = base / "fortran-build"
+            fortran_prefix = base / "fortran-prefix"
+            fortran_consumer = base / "fortran-consumer"
+            fortran_consumer.mkdir()
+            (fortran_consumer / "CMakeLists.txt").write_text(
+                "cmake_minimum_required(VERSION 3.16)\n"
+                "project(pb11_fortran_consumer LANGUAGES Fortran)\n"
+                "find_package(pb11_reaction 1.0 CONFIG REQUIRED)\n"
+                "add_executable(fortran_consumer main.f90)\n"
+                "target_link_libraries(fortran_consumer PRIVATE pb11::fortran)\n"
+            )
+            (fortran_consumer / "main.f90").write_text(
+                "program consumer\n"
+                "  use, intrinsic :: iso_c_binding, only: c_double, c_int\n"
+                "  use pb11_fortran\n"
+                "  real(c_double) :: rate\n"
+                "  integer(c_int) :: status\n"
+                "  call pb11_reactivity_fast(100.0_c_double, rate, status)\n"
+                "  if (status /= PB11_STATUS_OK .or. rate < 0.0_c_double) stop 2\n"
+                "end program consumer\n"
+            )
+            run([
+                "cmake", "-S", str(ROOT), "-B", str(fortran_build),
+                "-DPB11_BUILD_FORTRAN=ON",
+                f"-DCMAKE_INSTALL_PREFIX={fortran_prefix}",
+            ], ROOT, env)
+            # The install export contains every optional Fortran target, so the
+            # install target must build those archives before copying them.
+            run(["cmake", "--build", str(fortran_build), "--target", "install", "--", "-j1"], ROOT, env)
+            fortran_consumer_build = base / "fortran-consumer-build"
+            run([
+                "cmake", "-S", str(fortran_consumer), "-B", str(fortran_consumer_build),
+                f"-DCMAKE_PREFIX_PATH={fortran_prefix}", "-DCMAKE_BUILD_TYPE=Release",
+            ], fortran_consumer, env)
+            run(["cmake", "--build", str(fortran_consumer_build), "-j1"], fortran_consumer, env)
+            run([str(fortran_consumer_build / "fortran_consumer")], fortran_consumer, env)
+            print("installed Fortran package consumer: PASS")
+        else:
+            print("installed Fortran package consumer: SKIP (gfortran unavailable)")
     return 0
 
 
