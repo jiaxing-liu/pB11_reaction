@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-10",
+  "scope": "independent pB fast-source and low-energy floor regression",
+  "library_commit_before": "e5e285d726de141d07db51eb09a5fdd3e62b6044",
+  "build_dir": "/tmp/pB11-current-e5e285d-build",
+  "tests": [
+    {
+      "command": "/tmp/pB11-current-e5e285d-build/test_fusion_coupled_fast",
+      "status": "pass",
+      "elapsed_s": 2.205,
+      "coverage": "fast DT accounting/parity/rollback/source-state/late-spill regression"
+    },
+    {
+      "command": "/tmp/pB11-current-e5e285d-build/test_fusion_coupled_floor",
+      "status": "pass",
+      "elapsed_s": 44.875,
+      "coverage": "real low-energy pB fast proton source, three-alpha packets, floor projection, ion correction, rejection and retry"
+    }
+  ],
+  "observed_pB": {
+    "legacy_status": 3,
+    "floor_status": 0,
+    "born_alpha_number_m3": 48628519.853708304,
+    "born_alpha_energy_J_m3": 4.691659426037958e-09,
+    "ion_energy_correction_J_m3": -3.0994883995236957e-09,
+    "retry_status": "pass"
+  },
+  "classification": "M3 independent regression evidence; not host coupling or EXL-50U window acceptance",
+  "limitations": [
+    "synthetic fixed grid and bath",
+    "no spatial loss model",
+    "no BALDUR host energy closure",
+    "no time/grid convergence claim"
+  ]
+}
