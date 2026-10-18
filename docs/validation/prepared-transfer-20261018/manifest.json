@@ -1,0 +1,7 @@
+{
+  "src/fusion_transfer_rate.cpp": "53b4253ed727fd427cc6f4b2e8bfd6d063b4698085bb610b6bece732a81cf538",
+  "src/fusion_coupled_thermal.cpp": "4d7dbfe74b4d52ff9e02ff4bfe3cac851982e49a786ce8c165876435f9edea8e",
+  "src/fusion_transfer_prepared_internal.h": "5fd2de0ca5c11de40487cb3852590595d1241974edb4abdd3d389911932a82c2",
+  "reference_frozen": "1fde7b552bb539ef0e3b010256caccb7a3bf64321125f971d4247f62b7c8244f",
+  "edges": "d35ebf103b4348d9cf642c1ff6ba4190e84071ff8486eba3a6dcf9ddca6e40a8"
+}

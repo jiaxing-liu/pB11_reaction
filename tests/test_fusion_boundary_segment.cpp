@@ -9,7 +9,10 @@ int main(){try{
  b[0]=2.8;b[2]=0;ck(run(256,1e-5,2000)==0&&out.result==FUSION_SEGMENT_GEOMETRIC_CANDIDATE);
  ck(out.fraction_lo<.5&&out.fraction_hi>.5); // exact torus exit at x=2.4
  ck(out.tolerance_met==0); // midpoint at the actual boundary is ambiguous
- ck(run(256,.001,2000)==0&&out.result==FUSION_SEGMENT_GEOMETRIC_CANDIDATE&&out.tolerance_met==0);
+ // Continue proving the inside prefix instead of stopping at a small
+ // unresolved leaf while retaining a wider outside ancestor.
+ ck(run(256,.001,2000)==0&&out.result==FUSION_SEGMENT_GEOMETRIC_CANDIDATE&&out.tolerance_met==1);
+ ck(out.fraction_lo<.5&&out.fraction_hi>.5&&out.fraction_hi-out.fraction_lo<=.001);
  ck(run(256,.0015,2000)==0&&out.result==FUSION_SEGMENT_GEOMETRIC_CANDIDATE&&out.tolerance_met==1);
  ck(out.fraction_lo<.5&&out.fraction_hi>.5&&out.fraction_hi-out.fraction_lo<=.0015);
  ck(run(256,1e-5,1)==0&&out.result==FUSION_SEGMENT_GEOMETRIC_CANDIDATE&&out.tolerance_met==0&&out.intervals_visited==1);

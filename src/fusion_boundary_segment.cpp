@@ -63,7 +63,12 @@ template<class Query> int segment_impl(Query query,double geom,
   long double clearance=std::max(static_cast<long double>(a.boundary.polygon_distance_m)-a.boundary.uncertainty_m,static_cast<long double>(b.boundary.polygon_distance_m)-b.boundary.uncertainty_m);
   if(inside_b&&clearance>len)continue;
   if(b.boundary.classification==FUSION_BOUNDARY_OUTSIDE){candidate=node;have_candidate=true;}
-  if(b.fraction-a.fraction<=tolerance)return finish(node,FUSION_SEGMENT_FRACTION_LIMIT);
+  // A small unresolved leaf does not make a wider retained ancestor
+  // candidate satisfy the requested bracket tolerance. Continue proving
+  // the inside prefix until the known outside endpoint is close enough.
+  if(b.fraction-a.fraction<=tolerance&&
+     (!have_candidate||candidate.b.fraction-a.fraction<=tolerance))
+   return finish(node,FUSION_SEGMENT_FRACTION_LIMIT);
   if(visited>=budget)return finish(node,FUSION_SEGMENT_BUDGET_LIMIT);
   if(node.depth>=52)return finish(node,FUSION_SEGMENT_RESOLUTION_LIMIT);
   double f=a.fraction+(b.fraction-a.fraction)/2;

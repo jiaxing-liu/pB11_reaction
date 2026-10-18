@@ -281,3 +281,22 @@ relative to the manifest so the archived figures remain reproducible.
 This is a local hot/dense temporal study with fixed energy/angular grids,
 not an EXL-50U discharge, four-fuel comparison or complete M3 validation.
 No core sources, ABI, cache identity or model coefficients were changed.
+
+## Prepared transfer constants (reviewed 2026-10-18)
+
+The internal transfer evaluator now prepares projectile/bath logarithmic
+constants once per bath in a coupled trial. Public scalar argument validation,
+output clearing, long-double expression order, Maxwellian-tail conversion and
+bath accumulation order remain unchanged. There is no public ABI change.
+74184 inputs match the frozen old scalar status/output bits, and67993 valid
+inputs also match the prepared evaluator.
+
+Six alternating508-grid full frozen collision/handoff benchmarks with1000
+trials each give paired median1.13763x speedup (~12.1% less time), with all
+50040 output bytes identical to the old reference. This is one frozen trial
+benchmark, not an observed complete-host speedup. Reproduction sources, exact
+inputs, scalar reference, logs and hashes are under
+validation/prepared-transfer-20261018/. The combined reviewed revision passes
+120/120 GNU-C++/Intel-ifx tests plus installed C11/Fortran consumers; see
+validation/reviewed-library-20261018/. Future cache identity changes because
+core sources changed; existing running host binaries/caches were not replaced.

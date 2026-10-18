@@ -1,0 +1,31 @@
+{
+  "scope": "reviewed independent library build/test/install; not deployed into D880",
+  "ctest": {
+    "passed": 120,
+    "failed": 0,
+    "elapsed_s": 84.38,
+    "per_test_wall_budget_s": 43200
+  },
+  "compiler_configuration": "GNU C++ Release noLTO / Intel ifx2026.1.1 FortranON",
+  "kernel_identity": "25e6491c74e9c8025d5fe7fbe4713cfb4cb6396ef46b6975628d20cf4c717306",
+  "source_sha256": {
+    "src/fusion_transfer_rate.cpp": "53b4253ed727fd427cc6f4b2e8bfd6d063b4698085bb610b6bece732a81cf538",
+    "src/fusion_transfer_prepared_internal.h": "5fd2de0ca5c11de40487cb3852590595d1241974edb4abdd3d389911932a82c2",
+    "src/fusion_coupled_thermal.cpp": "4d7dbfe74b4d52ff9e02ff4bfe3cac851982e49a786ce8c165876435f9edea8e",
+    "src/fusion_boundary_segment.cpp": "3dc11a2150a2a9ff1d25bc04892e144cadea57bef91b30c6dd18f9dbf966fb0c",
+    "tests/test_fusion_boundary_segment.cpp": "164e24889fc018fd7946d9f382eb6eaf217ca865149a9a156fc9acd94b64b2ff"
+  },
+  "static_library_sha256": "dd6dfb78cb67511b3acdb675be64ce37072df48ffe59bb8415405fddba796fde",
+  "installed_c11_consumer_passed": true,
+  "installed_fortran_consumer_passed": true,
+  "formal_fp_output_bytes": 50040,
+  "formal_fp_output_sha256": "5b6b6752c5bbcbb35d8cc297405fda26f99a1b6e3939ef7724e0f1e634a35c44",
+  "active_D880_library_replaced": false,
+  "active_D880_kernel_identity": "54b35a3cf27a6224908c5fcc9a0bc61ade2ba46a237074e68f087f659af928dd",
+  "limitations": [
+    "No complete-host speedup measured.",
+    "New identity requires fresh correctly identified caches before future host deployment.",
+    "Four historical model-boundary events are not full-source wall losses.",
+    "Full M0-M7 goal remains incomplete."
+  ]
+}

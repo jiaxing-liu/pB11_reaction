@@ -1,3 +1,4 @@
+#include "fusion_transfer_prepared_internal.h"
 #include "fusion_birth_floor_precise_internal.h"
 #include "fusion_kinetic_rounding_internal.h"
 #include "fusion_source_rounding_internal.h"
@@ -465,7 +466,7 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
    std::fill(transfer.begin(),transfer.end(),0.);
    for(int b=0;b<nb;++b){baths[b].coulomb_log=logs[i*nb+b];
     for(int j=0;j<n-1;++j){fusion_coulomb_energy_v1 coefficient{};st=fusion_c_coulomb_energy(edges[j+1],mass[i].mass_kg,mass[i].nuclear_charge,&baths[b],&coefficient);if(st)return st;diffusion[b*(n-1)+j]=coefficient.diffusion_J2_s;}
-    if(b>0)for(int j=0;j<n;++j){double lambda=0;st=fusion_c_coulomb_transfer_rate(double(centers[j]),mass[i].mass_kg,mass[i].nuclear_charge,&baths[b],&lambda);if(st)return st;if(!put(R(transfer[j])+lambda,transfer[j]))return NUM;}
+    if(b>0){fusion_detail::prepared_transfer prepared;fusion_detail::prepare_transfer_validated(mass[i].mass_kg,mass[i].nuclear_charge,baths[b],prepared);for(int j=0;j<n;++j){double lambda=0;st=fusion_detail::evaluate_transfer_prepared(double(centers[j]),prepared,&lambda);if(st)return st;if(!put(R(transfer[j])+lambda,transfer[j]))return NUM;}}
    }
    fusion_two_component_ledger_v1 fp{};
    fusion_detail::kinetic_rounding_budget fp_round{};

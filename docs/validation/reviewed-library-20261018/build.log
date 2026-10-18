@@ -1,0 +1,577 @@
+[  1%] Building CXX object CMakeFiles/pb11.dir/src/fusion_table_digest.cpp.o
+[  1%] Building CXX object CMakeFiles/pb11.dir/src/pb11.cpp.o
+[  1%] Building CXX object CMakeFiles/pb11.dir/src/pb11_c.cpp.o
+[  1%] Building CXX object CMakeFiles/pb11.dir/src/pb11_source.cpp.o
+[  2%] Building CXX object CMakeFiles/pb11.dir/src/fusion_network.cpp.o
+[  2%] Building CXX object CMakeFiles/pb11.dir/src/fusion_rates.cpp.o
+[  2%] Building CXX object CMakeFiles/pb11.dir/src/fusion_cross_sections.cpp.o
+[  2%] Building CXX object CMakeFiles/pb11.dir/src/fusion_kinetics.cpp.o
+[  3%] Building CXX object CMakeFiles/pb11.dir/src/fusion_radial_transport.cpp.o
+[  3%] Building CXX object CMakeFiles/pb11.dir/src/fusion_energy_work.cpp.o
+[  3%] Building CXX object CMakeFiles/pb11.dir/src/fusion_kinetic_geometry.cpp.o
+[  3%] Building CXX object CMakeFiles/pb11.dir/src/fusion_coulomb.cpp.o
+[  4%] Building CXX object CMakeFiles/pb11.dir/src/fusion_beam.cpp.o
+[  4%] Building CXX object CMakeFiles/pb11.dir/src/fusion_rate_model.cpp.o
+[  4%] Building CXX object CMakeFiles/pb11.dir/src/fusion_products.cpp.o
+[  5%] Building CXX object CMakeFiles/pb11.dir/src/fusion_laboratory.cpp.o
+[  5%] Building CXX object CMakeFiles/pb11.dir/src/fusion_nuclear_coulomb.cpp.o
+[  5%] Building CXX object CMakeFiles/pb11.dir/src/fusion_alpha_amplitudes.cpp.o
+[  5%] Building CXX object CMakeFiles/pb11.dir/src/fusion_alpha_spectrum.cpp.o
+[  6%] Building CXX object CMakeFiles/pb11.dir/src/fusion_alpha_events.cpp.o
+[  6%] Building CXX object CMakeFiles/pb11.dir/src/fusion_thermal_birth.cpp.o
+[  6%] Building CXX object CMakeFiles/pb11.dir/src/fusion_birth_table.cpp.o
+[  7%] Building CXX object CMakeFiles/pb11.dir/src/fusion_beam_birth_table.cpp.o
+[  7%] Building CXX object CMakeFiles/pb11.dir/src/fusion_coupled_thermal.cpp.o
+/home/cloud/cloud/research/pB11_reaction/src/fusion_coupled_thermal.cpp: In function ‘int {anonymous}::coupled_trial(double, const fusion_coupled_thermal_options_v1*, const fusion_birth_table_v1* const*, bool, int, int, const double*, const double*, double, double, double, const double*, int, const fusion_inert_ion_v1*, const double*, const double*, const double*, const double*, const double*, double*, double*, double*, fusion_coupled_thermal_v1*, fusion_handoff_diagnostics_v1*, bool, const fusion_fast_target_options_v1*, bool, int, const fusion_beam_table_entry_v1*, fusion_beam_table_usage_v1*, bool, const fusion_coupled_floor_limits_v1*, fusion_birth_floor_ledger_v1*, bool, int, uint64_t*, bool, double*, fusion_birth_packets_v1*, bool)’:
+/home/cloud/cloud/research/pB11_reaction/src/fusion_coupled_thermal.cpp:197:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  197 |     if(destination)return BAD;destination=entry.table;
+      |     ^~
+/home/cloud/cloud/research/pB11_reaction/src/fusion_coupled_thermal.cpp:197:31: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  197 |     if(destination)return BAD;destination=entry.table;
+      |                               ^~~~~~~~~~~
+[  7%] Building CXX object CMakeFiles/pb11.dir/src/fusion_pb_birth.cpp.o
+[  7%] Building CXX object CMakeFiles/pb11.dir/src/fusion_pb_population.cpp.o
+[  8%] Building CXX object CMakeFiles/pb11.dir/src/fusion_reaction_event.cpp.o
+[  8%] Building CXX object CMakeFiles/pb11.dir/src/fusion_target_burn.cpp.o
+[  8%] Building CXX object CMakeFiles/pb11.dir/src/fusion_target_network.cpp.o
+[  8%] Building CXX object CMakeFiles/pb11.dir/src/fusion_transfer_rate.cpp.o
+[  9%] Building CXX object CMakeFiles/pb11.dir/src/fusion_two_component.cpp.o
+[  9%] Building CXX object CMakeFiles/pb11.dir/src/fusion_birth_floor.cpp.o
+[  9%] Building CXX object CMakeFiles/pb11.dir/src/fusion_handoff.cpp.o
+[ 10%] Building CXX object CMakeFiles/pb11.dir/src/fusion_thermal_burn.cpp.o
+[ 10%] Building CXX object CMakeFiles/pb11.dir/src/fusion_nuclear_data.cpp.o
+[ 10%] Building CXX object CMakeFiles/pb11.dir/src/fusion_source_state.cpp.o
+[ 10%] Building CXX object CMakeFiles/pb11.dir/src/fusion_fast_moments.cpp.o
+[ 11%] Building CXX object CMakeFiles/pb11.dir/src/fusion_flux_field.cpp.o
+[ 11%] Building CXX object CMakeFiles/pb11.dir/src/fusion_flux_core.cpp.o
+[ 11%] Building CXX object CMakeFiles/pb11.dir/src/fusion_flux_inverse.cpp.o
+[ 11%] Building CXX object CMakeFiles/pb11.dir/src/fusion_flux_boundary.cpp.o
+[ 12%] Building CXX object CMakeFiles/pb11.dir/src/fusion_magnetic_push.cpp.o
+[ 12%] Building CXX object CMakeFiles/pb11.dir/src/fusion_boundary_segment.cpp.o
+[ 12%] Building CXX object CMakeFiles/pb11.dir/src/fusion_prompt_orbit.cpp.o
+[ 13%] Building CXX object CMakeFiles/pb11.dir/src/fusion_prompt_reduce.cpp.o
+[ 13%] Building CXX object CMakeFiles/pb11.dir/src/fusion_thermal_markers.cpp.o
+[ 13%] Linking CXX static library libpb11.a
+[ 13%] Built target pb11
+[ 13%] Building CXX object CMakeFiles/benchmark_pb11.dir/examples/benchmark_pb11.cpp.o
+[ 13%] Building CXX object CMakeFiles/thermal_network.dir/examples/thermal_network.cpp.o
+[ 13%] Linking CXX executable thermal_network
+[ 13%] Built target thermal_network
+[ 13%] Building Fortran object CMakeFiles/pb11_fortran.dir/fortran/pb11_fortran.f90.o
+[ 13%] Linking CXX executable benchmark_pb11
+[ 14%] Linking CXX static library libpb11_fortran.a
+[ 14%] Built target pb11_fortran
+[ 14%] Building Fortran object CMakeFiles/fusion_fortran.dir/fortran/fusion_fortran.f90.o
+[ 14%] Built target benchmark_pb11
+[ 15%] Building Fortran object CMakeFiles/fusion_kinetics_fortran.dir/fortran/fusion_kinetics_fortran.f90.o
+[ 16%] Linking CXX static library libfusion_fortran.a
+[ 16%] Linking CXX static library libfusion_kinetics_fortran.a
+[ 16%] Built target fusion_fortran
+[ 16%] Building Fortran object CMakeFiles/fusion_energy_work_fortran.dir/fortran/fusion_energy_work_fortran.f90.o
+[ 16%] Built target fusion_kinetics_fortran
+[ 16%] Building Fortran object CMakeFiles/fusion_radial_transport_fortran.dir/fortran/fusion_radial_transport_fortran.f90.o
+[ 17%] Linking CXX static library libfusion_energy_work_fortran.a
+[ 17%] Built target fusion_energy_work_fortran
+[ 17%] Linking CXX static library libfusion_radial_transport_fortran.a
+[ 17%] Building Fortran object CMakeFiles/fusion_two_component_fortran.dir/fortran/fusion_two_component_fortran.f90.o
+[ 17%] Built target fusion_radial_transport_fortran
+[ 17%] Building Fortran object CMakeFiles/fusion_handoff_fortran.dir/fortran/fusion_handoff_fortran.f90.o
+[ 17%] Linking CXX static library libfusion_two_component_fortran.a
+[ 17%] Built target fusion_two_component_fortran
+[ 18%] Linking CXX static library libfusion_handoff_fortran.a
+[ 18%] Building Fortran object CMakeFiles/fusion_birth_floor_fortran.dir/fortran/fusion_birth_floor_fortran.f90.o
+[ 18%] Built target fusion_handoff_fortran
+[ 18%] Building Fortran object CMakeFiles/fusion_thermal_birth_fortran.dir/fortran/fusion_thermal_birth_fortran.f90.o
+[ 18%] Linking CXX static library libfusion_birth_floor_fortran.a
+[ 18%] Built target fusion_birth_floor_fortran
+[ 19%] Building Fortran object CMakeFiles/fusion_source_state_fortran.dir/fortran/fusion_source_state_fortran.f90.o
+[ 19%] Linking CXX static library libfusion_thermal_birth_fortran.a
+[ 19%] Built target fusion_thermal_birth_fortran
+[ 19%] Building Fortran object CMakeFiles/fusion_target_network_fortran.dir/fortran/fusion_target_network_fortran.f90.o
+[ 19%] Linking CXX static library libfusion_source_state_fortran.a
+[ 20%] Linking CXX static library libfusion_target_network_fortran.a
+[ 20%] Built target fusion_source_state_fortran
+[ 20%] Built target fusion_target_network_fortran
+[ 20%] Building Fortran object CMakeFiles/fusion_laboratory_fortran.dir/fortran/fusion_laboratory_fortran.f90.o
+[ 20%] Building Fortran object CMakeFiles/fusion_beam_birth_fortran.dir/fortran/fusion_beam_birth_fortran.f90.o
+[ 21%] Linking CXX static library libfusion_beam_birth_fortran.a
+[ 21%] Linking CXX static library libfusion_laboratory_fortran.a
+[ 21%] Built target fusion_beam_birth_fortran
+[ 21%] Building Fortran object CMakeFiles/fusion_beam_fortran.dir/fortran/fusion_beam_fortran.f90.o
+[ 21%] Built target fusion_laboratory_fortran
+[ 21%] Building Fortran object CMakeFiles/fusion_pb_birth_fortran.dir/fortran/fusion_pb_birth_fortran.f90.o
+[ 22%] Linking CXX static library libfusion_beam_fortran.a
+[ 22%] Linking CXX static library libfusion_pb_birth_fortran.a
+[ 22%] Built target fusion_beam_fortran
+[ 22%] Built target fusion_pb_birth_fortran
+[ 22%] Building Fortran object CMakeFiles/fusion_spectrum_fortran.dir/fortran/fusion_spectrum_fortran.f90.o
+[ 22%] Building Fortran object CMakeFiles/fusion_fast_moments_fortran.dir/fortran/fusion_fast_moments_fortran.f90.o
+[ 22%] Linking CXX static library libfusion_fast_moments_fortran.a
+[ 22%] Linking CXX static library libfusion_spectrum_fortran.a
+[ 22%] Built target fusion_fast_moments_fortran
+[ 23%] Built target fusion_spectrum_fortran
+[ 23%] Building Fortran object CMakeFiles/fusion_source_volume_fortran.dir/fortran/fusion_source_volume_fortran.f90.o
+[ 24%] Building Fortran object CMakeFiles/fusion_nuclear_data_fortran.dir/fortran/fusion_nuclear_data_fortran.f90.o
+[ 24%] Linking CXX static library libfusion_nuclear_data_fortran.a
+[ 24%] Linking CXX static library libfusion_source_volume_fortran.a
+[ 24%] Built target fusion_nuclear_data_fortran
+[ 24%] Built target fusion_source_volume_fortran
+[ 24%] Building Fortran object CMakeFiles/fusion_thermal_burn_fortran.dir/fortran/fusion_thermal_burn_fortran.f90.o
+[ 24%] Building Fortran object CMakeFiles/fusion_rate_model_fortran.dir/fortran/fusion_rate_model_fortran.f90.o
+[ 26%] Linking CXX static library libfusion_rate_model_fortran.a
+[ 26%] Linking CXX static library libfusion_thermal_burn_fortran.a
+[ 26%] Built target fusion_rate_model_fortran
+[ 26%] Built target fusion_thermal_burn_fortran
+[ 27%] Building Fortran object CMakeFiles/fusion_products_fortran.dir/fortran/fusion_products_fortran.f90.o
+[ 27%] Building Fortran object CMakeFiles/fusion_target_burn_fortran.dir/fortran/fusion_target_burn_fortran.f90.o
+[ 28%] Linking CXX static library libfusion_products_fortran.a
+[ 28%] Linking CXX static library libfusion_target_burn_fortran.a
+[ 28%] Built target fusion_products_fortran
+[ 28%] Built target fusion_target_burn_fortran
+[ 28%] Building CXX object CMakeFiles/test_fusion_table_digest.dir/tests/test_fusion_table_digest.cpp.o
+[ 28%] Building CXX object CMakeFiles/test_pb11.dir/tests/test_pb11.cpp.o
+[ 29%] Linking CXX executable test_pb11
+[ 29%] Built target test_pb11
+[ 29%] Building CXX object CMakeFiles/test_pb11_c.dir/tests/test_pb11_c.cpp.o
+[ 30%] Linking CXX executable test_fusion_table_digest
+[ 30%] Built target test_fusion_table_digest
+[ 30%] Building CXX object CMakeFiles/test_pb11_source.dir/tests/test_pb11_source.cpp.o
+[ 30%] Linking CXX executable test_pb11_c
+[ 30%] Built target test_pb11_c
+[ 30%] Building CXX object CMakeFiles/test_fusion_network.dir/tests/test_fusion_network.cpp.o
+[ 30%] Linking CXX executable test_pb11_source
+[ 30%] Built target test_pb11_source
+[ 30%] Building CXX object CMakeFiles/test_fusion_rates.dir/tests/test_fusion_rates.cpp.o
+[ 31%] Linking CXX executable test_fusion_network
+[ 31%] Built target test_fusion_network
+[ 32%] Building CXX object CMakeFiles/test_fusion_cross_sections.dir/tests/test_fusion_cross_sections.cpp.o
+[ 32%] Linking CXX executable test_fusion_rates
+[ 32%] Built target test_fusion_rates
+[ 32%] Building CXX object CMakeFiles/test_fusion_closed_box.dir/tests/test_fusion_closed_box.cpp.o
+[ 33%] Linking CXX executable test_fusion_closed_box
+[ 33%] Built target test_fusion_closed_box
+[ 33%] Building CXX object CMakeFiles/test_fusion_boundary_energy.dir/tests/test_fusion_boundary_energy.cpp.o
+[ 33%] Linking CXX executable test_fusion_cross_sections
+[ 33%] Built target test_fusion_cross_sections
+[ 33%] Building CXX object CMakeFiles/test_fusion_energy_work.dir/tests/test_fusion_energy_work.cpp.o
+[ 33%] Linking CXX executable test_fusion_energy_work
+[ 33%] Built target test_fusion_energy_work
+[ 33%] Building CXX object CMakeFiles/test_fusion_radial_transport.dir/tests/test_fusion_radial_transport.cpp.o
+[ 33%] Linking CXX executable test_fusion_boundary_energy
+[ 33%] Built target test_fusion_boundary_energy
+[ 33%] Building CXX object CMakeFiles/test_fusion_kinetics.dir/tests/test_fusion_kinetics.cpp.o
+[ 33%] Linking CXX executable test_fusion_radial_transport
+[ 33%] Built target test_fusion_radial_transport
+[ 33%] Building CXX object CMakeFiles/test_fusion_coulomb.dir/tests/test_fusion_coulomb.cpp.o
+[ 33%] Linking CXX executable test_fusion_kinetics
+[ 33%] Built target test_fusion_kinetics
+[ 34%] Building CXX object CMakeFiles/test_fusion_slowing.dir/tests/test_fusion_slowing.cpp.o
+[ 34%] Linking CXX executable test_fusion_coulomb
+[ 34%] Built target test_fusion_coulomb
+[ 34%] Building CXX object CMakeFiles/test_fusion_rate_model.dir/tests/test_fusion_rate_model.cpp.o
+[ 34%] Linking CXX executable test_fusion_slowing
+[ 34%] Built target test_fusion_slowing
+[ 35%] Building CXX object CMakeFiles/test_fusion_beam.dir/tests/test_fusion_beam.cpp.o
+[ 35%] Linking CXX executable test_fusion_rate_model
+[ 35%] Built target test_fusion_rate_model
+[ 36%] Building CXX object CMakeFiles/test_fusion_transfer_rate.dir/tests/test_fusion_transfer_rate.cpp.o
+[ 36%] Linking CXX executable test_fusion_transfer_rate
+[ 36%] Built target test_fusion_transfer_rate
+[ 36%] Building CXX object CMakeFiles/test_fusion_two_component.dir/tests/test_fusion_two_component.cpp.o
+[ 36%] Linking CXX executable test_fusion_two_component
+[ 36%] Built target test_fusion_two_component
+[ 36%] Building CXX object CMakeFiles/test_fusion_two_component_slowing.dir/tools/study_finite_temperature_split.cpp.o
+[ 36%] Linking CXX executable test_fusion_beam
+[ 36%] Built target test_fusion_beam
+[ 36%] Building CXX object CMakeFiles/test_fusion_target_network.dir/tests/test_fusion_target_network.cpp.o
+[ 37%] Linking CXX executable test_fusion_two_component_slowing
+[ 37%] Built target test_fusion_two_component_slowing
+[ 37%] Building CXX object CMakeFiles/test_fusion_target_network_birth.dir/tests/test_fusion_target_network_birth.cpp.o
+[ 37%] Linking CXX executable test_fusion_target_network_birth
+[ 37%] Built target test_fusion_target_network_birth
+[ 37%] Building CXX object CMakeFiles/test_fusion_handoff.dir/tests/test_fusion_handoff.cpp.o
+[ 38%] Linking CXX executable test_fusion_target_network
+[ 38%] Built target test_fusion_target_network
+[ 38%] Building CXX object CMakeFiles/test_fusion_source_rounding.dir/tests/test_fusion_source_rounding.cpp.o
+[ 38%] Linking CXX executable test_fusion_handoff
+[ 38%] Built target test_fusion_handoff
+[ 39%] Building CXX object CMakeFiles/test_fusion_coupled_floor.dir/tests/test_fusion_coupled_floor.cpp.o
+[ 39%] Linking CXX executable test_fusion_source_rounding
+[ 39%] Built target test_fusion_source_rounding
+[ 39%] Building CXX object CMakeFiles/test_fusion_floor_rate_edges.dir/tests/test_fusion_floor_rate_edges.cpp.o
+[ 39%] Linking CXX executable test_fusion_floor_rate_edges
+[ 39%] Built target test_fusion_floor_rate_edges
+[ 39%] Building CXX object CMakeFiles/test_fusion_floor_precise.dir/tests/test_fusion_floor_precise.cpp.o
+[ 40%] Linking CXX executable test_fusion_floor_precise
+[ 40%] Built target test_fusion_floor_precise
+[ 40%] Building CXX object CMakeFiles/test_fusion_kinetic_rounding.dir/tests/test_fusion_kinetic_rounding.cpp.o
+[ 41%] Linking CXX executable test_fusion_kinetic_rounding
+[ 41%] Built target test_fusion_kinetic_rounding
+[ 42%] Building CXX object CMakeFiles/test_fusion_mixed_floor_boundary.dir/tests/test_fusion_mixed_floor_boundary.cpp.o
+[ 42%] Linking CXX executable test_fusion_mixed_floor_boundary
+[ 42%] Built target test_fusion_mixed_floor_boundary
+[ 43%] Building CXX object CMakeFiles/test_fusion_birth_floor.dir/tests/test_fusion_birth_floor.cpp.o
+[ 43%] Linking CXX executable test_fusion_birth_floor
+[ 43%] Built target test_fusion_birth_floor
+[ 44%] Building CXX object CMakeFiles/test_fusion_coupled_fast.dir/tests/test_fusion_coupled_fast.cpp.o
+[ 44%] Linking CXX executable test_fusion_coupled_floor
+[ 44%] Built target test_fusion_coupled_floor
+[ 44%] Building CXX object CMakeFiles/test_fusion_coupled_thermal.dir/tests/test_fusion_coupled_thermal.cpp.o
+[ 45%] Linking CXX executable test_fusion_coupled_thermal
+[ 45%] Linking CXX executable test_fusion_coupled_fast
+[ 45%] Built target test_fusion_coupled_thermal
+[ 45%] Built target test_fusion_coupled_fast
+[ 45%] Building CXX object CMakeFiles/test_fusion_beam_birth_table_bytes.dir/tests/test_fusion_beam_birth_table_bytes.cpp.o
+[ 45%] Building CXX object CMakeFiles/test_fusion_beam_birth_table.dir/tests/test_fusion_beam_birth_table.cpp.o
+[ 45%] Linking CXX executable test_fusion_beam_birth_table
+[ 45%] Built target test_fusion_beam_birth_table
+[ 46%] Building CXX object CMakeFiles/test_fusion_birth_table.dir/tests/test_fusion_birth_table.cpp.o
+[ 47%] Linking CXX executable test_fusion_beam_birth_table_bytes
+[ 47%] Built target test_fusion_beam_birth_table_bytes
+[ 47%] Building CXX object CMakeFiles/test_fusion_birth_table_bytes.dir/tests/test_fusion_birth_table_bytes.cpp.o
+[ 47%] Linking CXX executable test_fusion_birth_table
+[ 47%] Built target test_fusion_birth_table
+[ 47%] Building CXX object CMakeFiles/test_fusion_thermal_increment.dir/tests/test_fusion_thermal_increment.cpp.o
+[ 47%] Linking CXX executable test_fusion_thermal_increment
+[ 47%] Built target test_fusion_thermal_increment
+[ 47%] Building CXX object CMakeFiles/test_fusion_coupled_table.dir/tests/test_fusion_coupled_table.cpp.o
+[ 47%] Linking CXX executable test_fusion_coupled_table
+[ 47%] Built target test_fusion_coupled_table
+[ 47%] Building CXX object CMakeFiles/study_birth_table.dir/tools/study_birth_table.cpp.o
+[ 47%] Linking CXX executable test_fusion_birth_table_bytes
+[ 47%] Built target test_fusion_birth_table_bytes
+[ 47%] Building CXX object CMakeFiles/study_coupled_thermal.dir/tools/study_coupled_thermal.cpp.o
+[ 47%] Linking CXX executable study_birth_table
+[ 47%] Built target study_birth_table
+[ 48%] Building CXX object CMakeFiles/test_fusion_beam_birth_composition.dir/tests/test_fusion_beam_birth_composition.cpp.o
+[ 48%] Linking CXX executable test_fusion_beam_birth_composition
+[ 49%] Linking CXX executable study_coupled_thermal
+[ 49%] Built target test_fusion_beam_birth_composition
+[ 49%] Building CXX object CMakeFiles/test_fusion_beam_birth.dir/tests/test_fusion_beam_birth.cpp.o
+[ 49%] Built target study_coupled_thermal
+[ 49%] Building CXX object CMakeFiles/test_fusion_thermal_pair_birth.dir/tests/test_fusion_thermal_pair_birth.cpp.o
+[ 49%] Linking CXX executable test_fusion_thermal_pair_birth
+[ 49%] Linking CXX executable test_fusion_beam_birth
+[ 49%] Built target test_fusion_thermal_pair_birth
+[ 49%] Built target test_fusion_beam_birth
+[ 49%] Building CXX object CMakeFiles/test_fusion_thermal_birth.dir/tests/test_fusion_thermal_birth.cpp.o
+[ 50%] Building CXX object CMakeFiles/test_fusion_birth_mapper.dir/tests/test_fusion_birth_mapper.cpp.o
+[ 50%] Linking CXX executable test_fusion_thermal_birth
+[ 50%] Built target test_fusion_thermal_birth
+[ 50%] Building CXX object CMakeFiles/test_fusion_thermal_birth_width.dir/tests/test_fusion_thermal_birth_width.cpp.o
+[ 51%] Linking CXX executable test_fusion_thermal_birth_width
+[ 51%] Built target test_fusion_thermal_birth_width
+[ 52%] Building CXX object CMakeFiles/test_fusion_reaction_event.dir/tests/test_fusion_reaction_event.cpp.o
+[ 52%] Linking CXX executable test_fusion_birth_mapper
+[ 52%] Built target test_fusion_birth_mapper
+[ 53%] Building CXX object CMakeFiles/test_fusion_pb_population.dir/tests/test_fusion_pb_population.cpp.o
+[ 53%] Linking CXX executable test_fusion_reaction_event
+[ 53%] Built target test_fusion_reaction_event
+[ 53%] Building CXX object CMakeFiles/test_fusion_pb_birth.dir/tests/test_fusion_pb_birth.cpp.o
+[ 53%] Linking CXX executable test_fusion_pb_population
+[ 53%] Built target test_fusion_pb_population
+[ 53%] Building CXX object CMakeFiles/test_fusion_fsci.dir/tests/test_fusion_fsci.cpp.o
+[ 53%] Linking CXX executable test_fusion_fsci
+[ 53%] Built target test_fusion_fsci
+[ 53%] Building CXX object CMakeFiles/test_fusion_fast_moments.dir/tests/test_fusion_fast_moments.cpp.o
+[ 54%] Linking CXX executable test_fusion_pb_birth
+[ 54%] Built target test_fusion_pb_birth
+[ 54%] Building CXX object CMakeFiles/test_fusion_source_batch.dir/tests/test_fusion_source_batch.cpp.o
+[ 54%] Linking CXX executable test_fusion_fast_moments
+[ 54%] Built target test_fusion_fast_moments
+[ 54%] Building CXX object CMakeFiles/test_fusion_kinetic_geometry.dir/tests/test_fusion_kinetic_geometry.cpp.o
+[ 55%] Linking CXX executable test_fusion_source_batch
+[ 55%] Built target test_fusion_source_batch
+[ 55%] Building CXX object CMakeFiles/test_fusion_source_volume.dir/tests/test_fusion_source_volume.cpp.o
+[ 56%] Linking CXX executable test_fusion_kinetic_geometry
+[ 56%] Built target test_fusion_kinetic_geometry
+[ 56%] Building CXX object CMakeFiles/test_fusion_numerical_increment.dir/tests/test_fusion_numerical_increment.cpp.o
+[ 56%] Linking CXX executable test_fusion_source_volume
+[ 56%] Linking CXX executable test_fusion_numerical_increment
+[ 56%] Built target test_fusion_source_volume
+[ 56%] Building CXX object CMakeFiles/test_fusion_source_state_numerical.dir/tests/test_fusion_source_state_numerical.cpp.o
+[ 56%] Built target test_fusion_numerical_increment
+[ 56%] Building CXX object CMakeFiles/test_fusion_source_state.dir/tests/test_fusion_source_state.cpp.o
+[ 56%] Linking CXX executable test_fusion_source_state_numerical
+[ 56%] Built target test_fusion_source_state_numerical
+[ 56%] Building CXX object CMakeFiles/test_fusion_source_state_inert.dir/tests/test_fusion_source_state_inert.cpp.o
+[ 57%] Linking CXX executable test_fusion_source_state
+[ 57%] Built target test_fusion_source_state
+[ 57%] Building CXX object CMakeFiles/test_fusion_coupled_restart.dir/tests/test_fusion_coupled_restart.cpp.o
+[ 58%] Linking CXX executable test_fusion_source_state_inert
+[ 58%] Built target test_fusion_source_state_inert
+[ 58%] Building CXX object CMakeFiles/test_fusion_birth_packets.dir/tests/test_fusion_birth_packets.cpp.o
+[ 59%] Linking CXX executable test_fusion_coupled_restart
+[ 59%] Built target test_fusion_coupled_restart
+[ 59%] Building CXX object CMakeFiles/test_fusion_uniform_ensemble.dir/tests/test_fusion_uniform_ensemble.cpp.o
+[ 59%] Linking CXX executable test_fusion_uniform_ensemble
+[ 59%] Built target test_fusion_uniform_ensemble
+[ 59%] Building CXX object CMakeFiles/test_fusion_thermal_sphere.dir/tests/test_fusion_thermal_sphere.cpp.o
+[ 59%] Linking CXX executable test_fusion_thermal_sphere
+[ 59%] Built target test_fusion_thermal_sphere
+[ 59%] Building CXX object CMakeFiles/test_fusion_thermal_markers.dir/tests/test_fusion_thermal_markers.cpp.o
+[ 60%] Linking CXX executable test_fusion_birth_packets
+[ 60%] Built target test_fusion_birth_packets
+[ 60%] Building CXX object CMakeFiles/test_fusion_prompt_reduce.dir/tests/test_fusion_prompt_reduce.cpp.o
+[ 61%] Linking CXX executable test_fusion_thermal_markers
+[ 61%] Built target test_fusion_thermal_markers
+[ 62%] Building CXX object CMakeFiles/test_fusion_prompt_orbit.dir/tests/test_fusion_prompt_orbit.cpp.o
+[ 63%] Linking CXX executable test_fusion_prompt_reduce
+[ 63%] Built target test_fusion_prompt_reduce
+[ 63%] Building CXX object CMakeFiles/test_fusion_boundary_prepared.dir/tests/test_fusion_boundary_prepared.cpp.o
+[ 63%] Linking CXX executable test_fusion_prompt_orbit
+[ 63%] Built target test_fusion_prompt_orbit
+[ 63%] Building CXX object CMakeFiles/test_fusion_boundary_segment.dir/tests/test_fusion_boundary_segment.cpp.o
+[ 63%] Linking CXX executable test_fusion_boundary_segment
+[ 64%] Linking CXX executable test_fusion_boundary_prepared
+[ 64%] Built target test_fusion_boundary_segment
+[ 64%] Built target test_fusion_boundary_prepared
+[ 64%] Building CXX object CMakeFiles/test_fusion_magnetic_push.dir/tests/test_fusion_magnetic_push.cpp.o
+[ 64%] Building CXX object CMakeFiles/test_fusion_flux_boundary.dir/tests/test_fusion_flux_boundary.cpp.o
+[ 65%] Linking CXX executable test_fusion_flux_boundary
+[ 65%] Linking CXX executable test_fusion_magnetic_push
+[ 65%] Built target test_fusion_flux_boundary
+[ 65%] Building CXX object CMakeFiles/test_fusion_flux_inverse.dir/tests/test_fusion_flux_inverse.cpp.o
+[ 65%] Built target test_fusion_magnetic_push
+[ 65%] Building CXX object CMakeFiles/test_fusion_flux_core.dir/tests/test_fusion_flux_core.cpp.o
+[ 65%] Linking CXX executable test_fusion_flux_inverse
+[ 65%] Built target test_fusion_flux_inverse
+[ 65%] Building CXX object CMakeFiles/test_fusion_flux_field.dir/tests/test_fusion_flux_field.cpp.o
+[ 65%] Linking CXX executable test_fusion_flux_core
+[ 65%] Built target test_fusion_flux_core
+[ 65%] Building CXX object CMakeFiles/test_fusion_nuclear_data.dir/tests/test_fusion_nuclear_data.cpp.o
+[ 66%] Linking CXX executable test_fusion_flux_field
+[ 66%] Built target test_fusion_flux_field
+[ 66%] Building CXX object CMakeFiles/study_nuclear_windows.dir/tools/study_nuclear_windows.cpp.o
+[ 66%] Linking CXX executable test_fusion_nuclear_data
+[ 66%] Built target test_fusion_nuclear_data
+[ 66%] Building CXX object CMakeFiles/validate_nuclear_birth.dir/tools/validate_nuclear_birth.cpp.o
+[ 67%] Linking CXX executable validate_nuclear_birth
+[ 67%] Built target validate_nuclear_birth
+[ 67%] Building CXX object CMakeFiles/test_fusion_thermal_burn.dir/tests/test_fusion_thermal_burn.cpp.o
+[ 67%] Linking CXX executable test_fusion_thermal_burn
+[ 67%] Built target test_fusion_thermal_burn
+[ 67%] Building CXX object CMakeFiles/test_fusion_target_burn.dir/tests/test_fusion_target_burn.cpp.o
+[ 67%] Linking CXX executable study_nuclear_windows
+[ 67%] Built target study_nuclear_windows
+[ 68%] Building CXX object CMakeFiles/test_fusion_products.dir/tests/test_fusion_products.cpp.o
+[ 69%] Linking CXX executable test_fusion_target_burn
+[ 69%] Built target test_fusion_target_burn
+[ 69%] Building CXX object CMakeFiles/test_fusion_laboratory.dir/tests/test_fusion_laboratory.cpp.o
+[ 69%] Linking CXX executable test_fusion_products
+[ 69%] Built target test_fusion_products
+[ 69%] Building CXX object CMakeFiles/test_fusion_spectrum.dir/tests/test_fusion_spectrum.cpp.o
+[ 69%] Linking CXX executable test_fusion_laboratory
+[ 69%] Built target test_fusion_laboratory
+[ 70%] Building CXX object CMakeFiles/test_fusion_alpha_grid.dir/tests/test_fusion_alpha_grid.cpp.o
+[ 70%] Linking CXX executable test_fusion_spectrum
+[ 70%] Built target test_fusion_spectrum
+[ 71%] Building CXX object CMakeFiles/validate_alpha_grid.dir/tools/validate_alpha_grid.cpp.o
+[ 71%] Linking CXX executable test_fusion_alpha_grid
+[ 71%] Built target test_fusion_alpha_grid
+[ 71%] Building Fortran object CMakeFiles/test_pb11_fortran.dir/tests/test_pb11_fortran.f90.o
+[ 71%] Linking CXX executable validate_alpha_grid
+[ 72%] Linking Fortran executable test_pb11_fortran
+[ 72%] Built target validate_alpha_grid
+[ 73%] Building Fortran object CMakeFiles/test_fusion_fortran.dir/tests/test_fusion_fortran.f90.o
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 73%] Built target test_pb11_fortran
+[ 74%] Building Fortran object CMakeFiles/test_fusion_kinetics_fortran.dir/tests/test_fusion_kinetics_fortran.f90.o
+[ 74%] Linking Fortran executable test_fusion_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 74%] Linking Fortran executable test_fusion_kinetics_fortran
+[ 74%] Built target test_fusion_fortran
+[ 75%] Building Fortran object CMakeFiles/test_fusion_rate_model_fortran.dir/tests/test_fusion_rate_model_fortran.f90.o
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 75%] Built target test_fusion_kinetics_fortran
+[ 75%] Building Fortran object CMakeFiles/test_fusion_beam_fortran.dir/tests/test_fusion_beam_fortran.f90.o
+[ 75%] Linking Fortran executable test_fusion_rate_model_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 75%] Built target test_fusion_rate_model_fortran
+[ 76%] Building Fortran object CMakeFiles/test_fusion_energy_work_fortran.dir/tests/test_fusion_energy_work_fortran.f90.o
+[ 76%] Linking Fortran executable test_fusion_beam_fortran
+[ 76%] Linking Fortran executable test_fusion_energy_work_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 76%] Built target test_fusion_beam_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 76%] Building Fortran object CMakeFiles/test_fusion_radial_transport_fortran.dir/tests/test_fusion_radial_transport_fortran.f90.o
+[ 76%] Built target test_fusion_energy_work_fortran
+[ 77%] Building Fortran object CMakeFiles/test_fusion_two_component_fortran.dir/tests/test_fusion_two_component_fortran.f90.o
+[ 78%] Linking Fortran executable test_fusion_radial_transport_fortran
+[ 78%] Linking Fortran executable test_fusion_two_component_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 78%] Built target test_fusion_radial_transport_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 79%] Building Fortran object CMakeFiles/test_fusion_handoff_fortran.dir/tests/test_fusion_handoff_fortran.f90.o
+[ 79%] Built target test_fusion_two_component_fortran
+[ 79%] Building Fortran object CMakeFiles/test_fusion_birth_floor_fortran.dir/tests/test_fusion_birth_floor_fortran.f90.o
+[ 79%] Linking Fortran executable test_fusion_birth_floor_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 79%] Linking Fortran executable test_fusion_handoff_fortran
+[ 79%] Built target test_fusion_birth_floor_fortran
+[ 80%] Building Fortran object CMakeFiles/test_fusion_target_network_fortran.dir/tests/test_fusion_target_network_fortran.f90.o
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 80%] Built target test_fusion_handoff_fortran
+[ 80%] Building Fortran object CMakeFiles/test_fusion_beam_birth_fortran.dir/tests/test_fusion_beam_birth_fortran.f90.o
+[ 80%] Linking Fortran executable test_fusion_target_network_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 81%] Linking Fortran executable test_fusion_beam_birth_fortran
+[ 81%] Built target test_fusion_target_network_fortran
+[ 82%] Building Fortran object CMakeFiles/test_fusion_thermal_pair_birth_fortran.dir/tests/test_fusion_thermal_pair_birth_fortran.f90.o
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 82%] Built target test_fusion_beam_birth_fortran
+[ 83%] Building Fortran object CMakeFiles/test_fusion_thermal_birth_fortran.dir/tests/test_fusion_thermal_birth_fortran.f90.o
+[ 83%] Linking Fortran executable test_fusion_thermal_pair_birth_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 83%] Built target test_fusion_thermal_pair_birth_fortran
+[ 83%] Building Fortran object CMakeFiles/test_fusion_pb_birth_fortran.dir/tests/test_fusion_pb_birth_fortran.f90.o
+[ 83%] Linking Fortran executable test_fusion_thermal_birth_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 83%] Linking Fortran executable test_fusion_pb_birth_fortran
+[ 83%] Built target test_fusion_thermal_birth_fortran
+[ 84%] Building Fortran object CMakeFiles/test_fusion_fast_moments_fortran.dir/tests/test_fusion_fast_moments_fortran.f90.o
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 84%] Linking Fortran executable test_fusion_fast_moments_fortran
+[ 84%] Built target test_fusion_pb_birth_fortran
+[ 85%] Building Fortran object CMakeFiles/test_fusion_source_volume_fortran.dir/tests/test_fusion_source_volume_fortran.f90.o
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 85%] Built target test_fusion_fast_moments_fortran
+[ 85%] Building Fortran object CMakeFiles/test_fusion_source_state_fortran.dir/tests/test_fusion_source_state_fortran.f90.o
+[ 85%] Linking Fortran executable test_fusion_source_volume_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 85%] Built target test_fusion_source_volume_fortran
+[ 86%] Building Fortran object CMakeFiles/test_source_grid_fortran.dir/tests/test_source_grid_fortran.f90.o
+[ 86%] Linking Fortran executable test_source_grid_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 86%] Built target test_source_grid_fortran
+[ 86%] Building Fortran object CMakeFiles/test_fusion_nuclear_data_fortran.dir/tests/test_fusion_nuclear_data_fortran.f90.o
+[ 86%] Linking Fortran executable test_fusion_source_state_fortran
+[ 87%] Linking Fortran executable test_fusion_nuclear_data_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 87%] Built target test_fusion_source_state_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 87%] Building Fortran object CMakeFiles/test_fusion_thermal_burn_fortran.dir/tests/test_fusion_thermal_burn_fortran.f90.o
+[ 87%] Built target test_fusion_nuclear_data_fortran
+[ 87%] Building Fortran object CMakeFiles/test_fusion_target_burn_fortran.dir/tests/test_fusion_target_burn_fortran.f90.o
+[ 87%] Linking Fortran executable test_fusion_target_burn_fortran
+[ 88%] Linking Fortran executable test_fusion_thermal_burn_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 88%] Built target test_fusion_target_burn_fortran
+[ 88%] Building Fortran object CMakeFiles/test_fusion_products_fortran.dir/tests/test_fusion_products_fortran.f90.o
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 88%] Built target test_fusion_thermal_burn_fortran
+[ 89%] Building Fortran object CMakeFiles/test_fusion_laboratory_fortran.dir/tests/test_fusion_laboratory_fortran.f90.o
+[ 89%] Linking Fortran executable test_fusion_products_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 89%] Linking Fortran executable test_fusion_laboratory_fortran
+[ 89%] Built target test_fusion_products_fortran
+[ 90%] Building Fortran object CMakeFiles/test_fusion_spectrum_fortran.dir/tests/test_fusion_spectrum_fortran.f90.o
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 90%] Built target test_fusion_laboratory_fortran
+[ 90%] Building Fortran object CMakeFiles/test_fusion_alpha_grid_fortran.dir/tests/test_fusion_alpha_grid_fortran.f90.o
+[ 90%] Linking Fortran executable test_fusion_spectrum_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 90%] Built target test_fusion_spectrum_fortran
+[ 91%] Building Fortran object CMakeFiles/fusion_birth_table_fortran.dir/fortran/fusion_birth_table_fortran.f90.o
+[ 91%] Linking CXX static library libfusion_birth_table_fortran.a
+[ 91%] Linking Fortran executable test_fusion_alpha_grid_fortran
+[ 91%] Built target fusion_birth_table_fortran
+[ 92%] Building Fortran object CMakeFiles/fusion_coupled_thermal_fortran.dir/fortran/fusion_coupled_thermal_fortran.f90.o
+/home/cloud/cloud/research/pB11_reaction/fortran/fusion_coupled_thermal_fortran.f90(821): warning #5462: Global name too long, shortened from: fusion_coupled_thermal_fortran_mp_FUSION_COUPLED_THERMAL_TABLE_TRIAL_EFFECTIVE_CHARGE_DIAGNOSED to: n_coupled_thermal_fortran_mp_FUSION_COUPLED_THERMAL_TABLE_TRIAL_EFFECTIVE_CHARGE_DIAGNOSED
+  subroutine fusion_coupled_thermal_table_trial_effective_charge_diagnosed( &
+-------------^
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 92%] Built target test_fusion_alpha_grid_fortran
+[ 92%] Building Fortran object CMakeFiles/fusion_beam_birth_table_fortran.dir/fortran/fusion_beam_birth_table_fortran.f90.o
+[ 92%] Linking CXX static library libfusion_beam_birth_table_fortran.a
+[ 92%] Linking CXX static library libfusion_coupled_thermal_fortran.a
+[ 92%] Built target fusion_beam_birth_table_fortran
+[ 92%] Building Fortran object CMakeFiles/fusion_reaction_event_fortran.dir/fortran/fusion_reaction_event_fortran.f90.o
+[ 92%] Built target fusion_coupled_thermal_fortran
+[ 93%] Building Fortran object CMakeFiles/fusion_pb_population_fortran.dir/fortran/fusion_pb_population_fortran.f90.o
+[ 93%] Linking CXX static library libfusion_pb_population_fortran.a
+[ 93%] Linking CXX static library libfusion_reaction_event_fortran.a
+[ 93%] Built target fusion_pb_population_fortran
+[ 93%] Building Fortran object CMakeFiles/fusion_fsci_fortran.dir/fortran/fusion_fsci_fortran.f90.o
+[ 93%] Built target fusion_reaction_event_fortran
+[ 93%] Building Fortran object CMakeFiles/fusion_source_state_numerical_fortran.dir/fortran/fusion_source_state_numerical_fortran.f90.o
+[ 93%] Linking CXX static library libfusion_fsci_fortran.a
+[ 93%] Linking CXX static library libfusion_source_state_numerical_fortran.a
+[ 93%] Built target fusion_fsci_fortran
+[ 93%] Built target fusion_source_state_numerical_fortran
+[ 93%] Building Fortran object CMakeFiles/fusion_kinetic_geometry_fortran.dir/fortran/fusion_kinetic_geometry_fortran.f90.o
+[ 93%] Building Fortran object CMakeFiles/test_fusion_table_digest_fortran.dir/tests/test_fusion_table_digest.f90.o
+[ 93%] Linking Fortran executable test_fusion_table_digest_fortran
+[ 93%] Linking CXX static library libfusion_kinetic_geometry_fortran.a
+[ 93%] Built target fusion_kinetic_geometry_fortran
+[ 93%] Building Fortran object CMakeFiles/test_fusion_beam_birth_table_bytes_fortran.dir/tests/test_fusion_beam_birth_table_bytes.f90.o
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 93%] Built target test_fusion_table_digest_fortran
+[ 94%] Building Fortran object CMakeFiles/test_fusion_beam_birth_table_fortran.dir/tests/test_fusion_beam_birth_table_fortran.f90.o
+[ 94%] Linking Fortran executable test_fusion_beam_birth_table_bytes_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 94%] Built target test_fusion_beam_birth_table_bytes_fortran
+[ 94%] Building Fortran object CMakeFiles/test_fusion_birth_table_fortran.dir/tests/test_fusion_birth_table_fortran.f90.o
+[ 95%] Linking Fortran executable test_fusion_birth_table_fortran
+[ 95%] Linking Fortran executable test_fusion_beam_birth_table_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 95%] Built target test_fusion_birth_table_fortran
+[ 96%] Building Fortran object CMakeFiles/test_fusion_birth_table_bytes_fortran.dir/tests/test_fusion_birth_table_bytes.f90.o
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 96%] Built target test_fusion_beam_birth_table_fortran
+[ 96%] Building Fortran object CMakeFiles/test_fusion_coupled_thermal_fortran.dir/tests/test_fusion_coupled_thermal_fortran.f90.o
+/home/cloud/cloud/research/pB11_reaction/tests/test_fusion_coupled_thermal_fortran.f90(1): warning #5462: Global name too long, shortened from: fusion_coupled_thermal_fortran_mp_FUSION_COUPLED_THERMAL_TABLE_TRIAL_EFFECTIVE_CHARGE_DIAGNOSED to: n_coupled_thermal_fortran_mp_FUSION_COUPLED_THERMAL_TABLE_TRIAL_EFFECTIVE_CHARGE_DIAGNOSED
+program test_fusion_coupled_thermal_fortran
+--------^
+[ 96%] Linking Fortran executable test_fusion_birth_table_bytes_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 96%] Built target test_fusion_birth_table_bytes_fortran
+[ 96%] Building Fortran object CMakeFiles/test_fusion_reaction_event_fortran.dir/tests/test_fusion_reaction_event_fortran.f90.o
+[ 96%] Linking Fortran executable test_fusion_reaction_event_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 96%] Built target test_fusion_reaction_event_fortran
+[ 96%] Building Fortran object CMakeFiles/test_fusion_pb_population_fortran.dir/tests/test_fusion_pb_population_fortran.f90.o
+[ 96%] Linking Fortran executable test_fusion_pb_population_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 96%] Built target test_fusion_pb_population_fortran
+[ 97%] Building Fortran object CMakeFiles/test_fusion_fsci_fortran.dir/tests/test_fusion_fsci_fortran.f90.o
+[ 97%] Linking Fortran executable test_fusion_fsci_fortran
+[ 97%] Linking Fortran executable test_fusion_coupled_thermal_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 97%] Built target test_fusion_fsci_fortran
+[ 97%] Built target test_fusion_coupled_thermal_fortran
+[ 97%] Building Fortran object CMakeFiles/test_fusion_kinetic_geometry_fortran.dir/tests/test_fusion_kinetic_geometry_fortran.f90.o
+[ 98%] Building Fortran object CMakeFiles/test_fusion_source_state_numerical_fortran.dir/tests/test_fusion_source_state_numerical_fortran.f90.o
+[ 98%] Linking Fortran executable test_fusion_source_state_numerical_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 98%] Built target test_fusion_source_state_numerical_fortran
+[ 98%] Building Fortran object CMakeFiles/fusion_coupled_fast_fortran.dir/fortran/fusion_coupled_fast_fortran.f90.o
+[ 98%] Linking Fortran executable test_fusion_kinetic_geometry_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 98%] Linking CXX static library libfusion_coupled_fast_fortran.a
+[ 98%] Built target test_fusion_kinetic_geometry_fortran
+[ 98%] Built target fusion_coupled_fast_fortran
+[ 98%] Building Fortran object CMakeFiles/test_fusion_coupled_fast_fortran.dir/tests/test_fusion_coupled_fast_fortran.f90.o
+[ 98%] Building Fortran object CMakeFiles/fusion_coupled_sources_fortran.dir/fortran/fusion_coupled_sources_fortran.f90.o
+[ 98%] Linking CXX static library libfusion_coupled_sources_fortran.a
+[ 98%] Built target fusion_coupled_sources_fortran
+[ 99%] Building Fortran object CMakeFiles/fusion_coupled_sources_floor_fortran.dir/fortran/fusion_coupled_sources_floor_fortran.f90.o
+[ 99%] Linking Fortran executable test_fusion_coupled_fast_fortran
+[ 99%] Linking CXX static library libfusion_coupled_sources_floor_fortran.a
+[ 99%] Built target fusion_coupled_sources_floor_fortran
+[ 99%] Building Fortran object CMakeFiles/test_fusion_coupled_sources_fortran.dir/tests/test_fusion_coupled_sources_fortran.f90.o
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[ 99%] Built target test_fusion_coupled_fast_fortran
+[ 99%] Building Fortran object CMakeFiles/test_fusion_birth_packets_fortran.dir/tests/test_fusion_birth_packets_fortran.f90.o
+[100%] Linking Fortran executable test_fusion_coupled_sources_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[100%] Built target test_fusion_coupled_sources_fortran
+[100%] Building Fortran object CMakeFiles/test_fusion_coupled_sources_floor_fortran.dir/tests/test_fusion_coupled_sources_floor_fortran.f90.o
+[100%] Linking Fortran executable test_fusion_coupled_sources_floor_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[100%] Built target test_fusion_coupled_sources_floor_fortran
+[100%] Building CXX object CMakeFiles/test_fusion_birth_packets_fortran.dir/tests/fusion_birth_packets_layout.cpp.o
+[100%] Linking Fortran executable test_fusion_birth_packets_fortran
+/usr/bin/x86_64-linux-gnu-ld.bfd: warning: libintlc.so.5, needed by /opt/intel/oneapi/compiler/2026.1/lib/libimf.so, not found (try using -rpath or -rpath-link)
+[100%] Built target test_fusion_birth_packets_fortran

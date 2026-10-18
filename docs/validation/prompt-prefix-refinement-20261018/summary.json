@@ -1,0 +1,37 @@
+{
+  "scope": "four historical-marker geometric correction; not physical loss closure",
+  "coarse_fine_checks": [
+    {
+      "marker": 0,
+      "coarse_levels": 4,
+      "fine_levels": 7,
+      "coarse_fine_event_time_spread_s": 3.8254110745969524e-13
+    },
+    {
+      "marker": 1,
+      "coarse_levels": 4,
+      "fine_levels": 7,
+      "coarse_fine_event_time_spread_s": 2.506771464411304e-13
+    },
+    {
+      "marker": 2,
+      "coarse_levels": 4,
+      "fine_levels": 7,
+      "coarse_fine_event_time_spread_s": 2.6717224215374967e-13
+    },
+    {
+      "marker": 3,
+      "coarse_levels": 4,
+      "fine_levels": 7,
+      "coarse_fine_event_time_spread_s": 1.3375981927786697e-13
+    }
+  ],
+  "max_event_time_spread_s": 3.8254110745969524e-13,
+  "all_four_events": true,
+  "test_boundary_segment_pass": true,
+  "test_prompt_orbit_pass": true,
+  "test_boundary_prepared_pass": true,
+  "native_case_modified": false,
+  "next_library_cache_identity": "25e6491c74e9c8025d5fe7fbe4713cfb4cb6396ef46b6975628d20cf4c717306",
+  "production_deployed": false
+}

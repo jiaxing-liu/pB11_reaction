@@ -1,0 +1,1 @@
+{"horizon_s":9.9999999999999995e-08,"initial_dt_s":5.0000000000000003e-10,"geometry_time_budget_s":1e-14,"event_time_tolerance_s":9.9999999999999998e-13,"event_position_tolerance_m":1.0000000000000001e-05,"final_position_tolerance_m":1.0000000000000001e-05,"final_u_relative_tolerance":0.0001,"min_levels":7,"max_levels":7,"max_steps_per_level":1000000}

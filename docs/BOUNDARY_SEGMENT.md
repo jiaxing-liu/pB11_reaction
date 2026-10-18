@@ -40,3 +40,24 @@ only safe outside samples shrink the upper endpoint. Thus nonmonotone out/in/out
 classification cannot erase an earlier possible crossing. Tolerance uses the
 returned bracket width, not the shrinking heuristic search interval. All extra
 queries consume the same bounded work budget. This is not a monotone root solve.
+
+## Inside-prefix refinement correction (2026-10-18)
+
+A small unresolved leaf does not ensure that a retained safe-outside ancestor
+candidate meets the requested fractional tolerance. Previously the traversal
+could stop at the leaf limit and retain a needlessly wide ancestor; shrinking
+only the outside endpoint could not advance its unproved inside prefix.
+Now it continues left-first prefix proof in that case. The algorithm retains
+safe inside/outside witnesses, no guessed ambiguous classifications, depth
+and traversal caps, and the existing boundary/roundoff allowances.
+
+The analytic circle regression now meets0.001 fractional tolerance;1e-5
+remains below the geometric uncertainty and keeps tolerance_met=0. Four
+historical unresolved trajectories become stable model-boundary events at
+unchanged physical tolerances. A stricter min_levels7 rerun keeps all four
+classifications, with maximum coarse/fine event bracket spread3.826e-13s
+below the existing1e-12s requirement. This does not establish physical wall
+losses, the full birth measure, horizon sufficiency or FP/prompt ownership.
+Raw inputs/results and the geometry-only isolated prototype are archived in
+validation/prompt-prefix-refinement-20261018/. The final combined library
+passes all120 C++/Fortran tests; formal installed consumers also pass.

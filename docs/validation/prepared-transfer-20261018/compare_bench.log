@@ -1,0 +1,7 @@
+comparison count=74184 prepared=67993 mismatch=0 zero=50198 subnormal=304 numerical_failure=3217
+pair=0 scalar=0.760931775 prepared=0.345167372 speedup=2.204530 checksum=628591012345.47253 evaluations=2133600
+pair=1 scalar=0.751454255 prepared=0.341960951 speedup=2.197486 checksum=628591012345.47253 evaluations=2133600
+pair=2 scalar=0.755805967 prepared=0.343415865 speedup=2.200848 checksum=628591012345.47253 evaluations=2133600
+pair=3 scalar=0.753709715 prepared=0.341880451 speedup=2.204600 checksum=628591012345.47253 evaluations=2133600
+pair=4 scalar=0.751538038 prepared=0.344014690 speedup=2.184610 checksum=628591012345.47253 evaluations=2133600
+pair=5 scalar=0.752635910 prepared=0.340077970 speedup=2.213128 checksum=628591012345.47253 evaluations=2133600

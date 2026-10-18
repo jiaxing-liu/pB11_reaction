@@ -1,0 +1,28 @@
+{
+  "comparison": "comparison count=74184 prepared=67993 mismatch=0 zero=50198 subnormal=304 numerical_failure=3217",
+  "pairs": 6,
+  "evaluations_per_mode_per_pair": 2133600,
+  "scalar_median_s": 0.7531728124999999,
+  "prepared_median_s": 0.342688408,
+  "paired_speedup_median": 2.2026890000000003,
+  "paired_speedup_range": [
+    2.18461,
+    2.213128
+  ],
+  "compiler": "Ubuntu GCC 15.2.0-16ubuntu1",
+  "flags": "-O3 -DNDEBUG -std=c++17; no LTO",
+  "source_nml_sha256": "84d053e9d806688904cf3b9b989c5c34363b1962535f6c66a0de2d7442e0be94",
+  "affected_tests": {
+    "passed": 6,
+    "failed": 0,
+    "wall_seconds": 47.6,
+    "names": [
+      "fusion_transfer_rate_tests",
+      "fusion_two_component_tests",
+      "fusion_coupled_fast_tests",
+      "fusion_coupled_thermal_tests",
+      "fusion_coupled_table_tests",
+      "fusion_coupled_floor_tests"
+    ]
+  }
+}
