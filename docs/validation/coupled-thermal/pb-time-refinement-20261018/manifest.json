@@ -1,0 +1,266 @@
+{
+  "id": "D869",
+  "status": "complete",
+  "pid": 4,
+  "started_utc": "2026-10-18T09:40:43Z",
+  "validated_kernel_source_commit": "ff6c200d6b61bfd13e004ed143e7c614dad810fb",
+  "external_evidence_commit": "f8524cc32af8686a6c2749c9c5c9e60a10af7aae",
+  "kernel_identity": "54b35a3cf27a6224908c5fcc9a0bc61ade2ba46a237074e68f087f659af928dd",
+  "binary_sha256": "f50f983fe46accdf673db648e0d8e5972dab9bd6414fb357fbb602bac93e50a8",
+  "driver_sha256": "1a452d2e4da12438f09e876b7d2491c11077e4cb92ea33dbe16ac8a6c15fdb0b",
+  "scope": "pB local evolving-bath time refinement; not EXL-50U or a four-fuel comparison",
+  "parameters": {
+    "ne_m3": 1e+22,
+    "nC_over_ne": 0.001,
+    "initial_Te_keV": 5,
+    "initial_Ti_keV": 100,
+    "cells": 800,
+    "duration_s": 0.001,
+    "handoff": 1,
+    "alpha_order": 8,
+    "steps": [
+      64,
+      128,
+      256
+    ],
+    "wall_limit_s_per_resolution": 43200
+  },
+  "runs": [
+    {
+      "steps": 64,
+      "command": [
+        "/usr/bin/time",
+        "-v",
+        "-o",
+        "/home/cloud/cloud/research/pB-baldur/cache/benchmarks/pb-time-refinement-d869/resources-64.txt",
+        "timeout",
+        "--kill-after=60s",
+        "43200s",
+        "stdbuf",
+        "-oL",
+        "/home/cloud/cloud/research/pB-baldur/cache/benchmarks/pb-time-refinement-d869/study_coupled_thermal",
+        "64",
+        "800",
+        "pb",
+        "0.001",
+        "1",
+        "8"
+      ],
+      "status": "complete",
+      "returncode": 0,
+      "elapsed_s": 916.6940217450028,
+      "endpoint": {
+        "step": 64.0,
+        "time_s": 0.001,
+        "Te_keV": 5.05150000987,
+        "Ti_keV": 99.9939637091,
+        "Ue_J_m3": 12140092.923688,
+        "Ui_J_m3": 79854406.615038,
+        "fast_energy_J_m3": 158849.02006987,
+        "neutron_energy_J_m3": 0.0,
+        "Q_J_m3": 268518.59889577,
+        "energy_relative_residual": -8.30831834473e-16,
+        "inert_heat_J_m3": 24.243450501166,
+        "events_pb": 1.9303020655578e+17,
+        "events_dd_tp": 0.0,
+        "events_dd_he3n": 0.0,
+        "events_dt": 0.0,
+        "events_dhe3": 0.0,
+        "thermal_H": 1.6564736364601e+21,
+        "thermal_D": 0.0,
+        "thermal_T": 0.0,
+        "thermal_He3": 0.0,
+        "thermal_He4": 0.0,
+        "thermal_B11": 1.6564736364601e+21,
+        "fast_He4": 5.7909061966735e+17,
+        "thermalized_He4": 0.0,
+        "projections": 0.0,
+        "electron_heat_J_m3": 123768.16868791,
+        "network_ion_heat_J_m3": 4113.227199808,
+        "removed_thermal_energy_J_m3": 18236.060512315
+      },
+      "max_energy_residual": 8.30831834473e-16,
+      "csv_sha256": "5fb5488b6fa8467e107780c1bde879edb8e1a7bf09e74e606f11c70766ac13ac"
+    },
+    {
+      "steps": 128,
+      "command": [
+        "/usr/bin/time",
+        "-v",
+        "-o",
+        "/home/cloud/cloud/research/pB-baldur/cache/benchmarks/pb-time-refinement-d869/resources-128.txt",
+        "timeout",
+        "--kill-after=60s",
+        "43200s",
+        "stdbuf",
+        "-oL",
+        "/home/cloud/cloud/research/pB-baldur/cache/benchmarks/pb-time-refinement-d869/study_coupled_thermal",
+        "128",
+        "800",
+        "pb",
+        "0.001",
+        "1",
+        "8"
+      ],
+      "status": "complete",
+      "returncode": 0,
+      "elapsed_s": 1843.34003810602,
+      "endpoint": {
+        "step": 128.0,
+        "time_s": 0.001,
+        "Te_keV": 5.05134427505,
+        "Ti_keV": 99.9939144789,
+        "Ue_J_m3": 12139718.65166,
+        "Ui_J_m3": 79854367.30422,
+        "fast_energy_J_m3": 159262.48713048,
+        "neutron_energy_J_m3": 0.0,
+        "Q_J_m3": 268518.48311,
+        "energy_relative_residual": 9.31941592751e-16,
+        "inert_heat_J_m3": 23.99490324832,
+        "events_pb": 1.9303012332076e+17,
+        "events_dd_tp": 0.0,
+        "events_dd_he3n": 0.0,
+        "events_dt": 0.0,
+        "events_dhe3": 0.0,
+        "thermal_H": 1.6564736365433e+21,
+        "thermal_D": 0.0,
+        "thermal_T": 0.0,
+        "thermal_He3": 0.0,
+        "thermal_He4": 0.0,
+        "thermal_B11": 1.6564736365433e+21,
+        "fast_He4": 5.7909036996229e+17,
+        "thermalized_He4": 0.0,
+        "projections": 0.0,
+        "electron_heat_J_m3": 123393.89665981,
+        "network_ion_heat_J_m3": 4074.1521008932,
+        "removed_thermal_energy_J_m3": 18236.047684432
+      },
+      "max_energy_residual": 1.00453263695e-15,
+      "csv_sha256": "4337773595c13874fb9bd6ca4a4d17b7df98c9c1b1d84be7465f7fc44844562a"
+    },
+    {
+      "steps": 256,
+      "command": [
+        "/usr/bin/time",
+        "-v",
+        "-o",
+        "/home/cloud/cloud/research/pB-baldur/cache/benchmarks/pb-time-refinement-d869/resources-256.txt",
+        "timeout",
+        "--kill-after=60s",
+        "43200s",
+        "stdbuf",
+        "-oL",
+        "/home/cloud/cloud/research/pB-baldur/cache/benchmarks/pb-time-refinement-d869/study_coupled_thermal",
+        "256",
+        "800",
+        "pb",
+        "0.001",
+        "1",
+        "8"
+      ],
+      "status": "complete",
+      "returncode": 0,
+      "elapsed_s": 3736.6774343230063,
+      "endpoint": {
+        "step": 256.0,
+        "time_s": 0.001,
+        "Te_keV": 5.05126595317,
+        "Ti_keV": 99.9938898153,
+        "Ue_J_m3": 12139530.423433,
+        "Ui_J_m3": 79854347.610057,
+        "fast_energy_J_m3": 159470.35091929,
+        "neutron_energy_J_m3": 0.0,
+        "Q_J_m3": 268518.42450915,
+        "energy_relative_residual": -1.43226948764e-16,
+        "inert_heat_J_m3": 23.870586631622,
+        "events_pb": 1.9303008119432e+17,
+        "events_dd_tp": 0.0,
+        "events_dd_he3n": 0.0,
+        "events_dt": 0.0,
+        "events_dhe3": 0.0,
+        "thermal_H": 1.6564736365855e+21,
+        "thermal_D": 0.0,
+        "thermal_T": 0.0,
+        "thermal_He3": 0.0,
+        "thermal_He4": 0.0,
+        "thermal_B11": 1.6564736365855e+21,
+        "fast_He4": 5.7909024358295e+17,
+        "thermalized_He4": 0.0,
+        "projections": 0.0,
+        "electron_heat_J_m3": 123205.66843305,
+        "network_ion_heat_J_m3": 4054.575782834,
+        "removed_thermal_energy_J_m3": 18236.041212655
+      },
+      "max_energy_residual": 8.70242291189e-16,
+      "csv_sha256": "a25c3e4b1767ec8b30941f9be59e0dd9741ceb726d6775bc13a71dc3d14208e6"
+    }
+  ],
+  "physics_accepted": false,
+  "m3_accepted": false,
+  "comparisons": {
+    "64_to_128": {
+      "Ue_J_m3": {
+        "absolute_difference": 374.2720279991627,
+        "relative_to_finer": 3.0830370846196194e-05
+      },
+      "Ui_J_m3": {
+        "absolute_difference": 39.31081798672676,
+        "relative_to_finer": 4.92281378136338e-07
+      },
+      "fast_energy_J_m3": {
+        "absolute_difference": 413.4670606100117,
+        "relative_to_finer": 0.0025961359015526857
+      },
+      "Q_J_m3": {
+        "absolute_difference": 0.11578577000182122,
+        "relative_to_finer": 4.312022347988201e-07
+      },
+      "electron_heat_J_m3": {
+        "absolute_difference": 374.27202810000745,
+        "relative_to_finer": 0.0030331486259150588
+      },
+      "network_ion_heat_J_m3": {
+        "absolute_difference": 39.07509891479958,
+        "relative_to_finer": 0.00959097695597396
+      },
+      "inert_heat_J_m3": {
+        "absolute_difference": 0.24854725284599866,
+        "relative_to_finer": 0.010358335279530692
+      }
+    },
+    "128_to_256": {
+      "Ue_J_m3": {
+        "absolute_difference": 188.22822700068355,
+        "relative_to_finer": 1.5505396043766702e-05
+      },
+      "Ui_J_m3": {
+        "absolute_difference": 19.694163009524345,
+        "relative_to_finer": 2.4662605855468823e-07
+      },
+      "fast_energy_J_m3": {
+        "absolute_difference": 207.86378881000564,
+        "relative_to_finer": 0.0013034635442371865
+      },
+      "Q_J_m3": {
+        "absolute_difference": 0.05860084999585524,
+        "relative_to_finer": 2.1823772466629518e-07
+      },
+      "electron_heat_J_m3": {
+        "absolute_difference": 188.22822675999487,
+        "relative_to_finer": 0.0015277562238321702
+      },
+      "network_ion_heat_J_m3": {
+        "absolute_difference": 19.57631805919982,
+        "relative_to_finer": 0.00482820376476394
+      },
+      "inert_heat_J_m3": {
+        "absolute_difference": 0.12431661669799965,
+        "relative_to_finer": 0.005207941414113138
+      }
+    }
+  },
+  "limitations": [
+    "fixed energy/angular grids; temporal differences are not rigorous error bounds",
+    "finite-source spectrum assumptions and EXL host coupling remain separate"
+  ]
+}

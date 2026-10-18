@@ -1,0 +1,81 @@
+{
+  "scope": "pB local evolving-bath time refinement; not EXL-50U or a four-fuel comparison",
+  "manifest_sha256": "ecd4acd4c22b3dc156175097fb35eab75a1d9dddc552612999afcfbc4f24204b",
+  "comparisons": [
+    {
+      "coarse_steps": 64,
+      "fine_steps": 128,
+      "endpoint_differences": {
+        "fast_energy_J_m3": {
+          "absolute_difference_J_m3": 413.4670606100117,
+          "relative_to_finer": 0.0025961359015526857
+        },
+        "Q_J_m3": {
+          "absolute_difference_J_m3": 0.11578577000182122,
+          "relative_to_finer": 4.312022347988201e-07
+        },
+        "electron_heat_J_m3": {
+          "absolute_difference_J_m3": 374.27202810000745,
+          "relative_to_finer": 0.0030331486259150588
+        },
+        "network_ion_heat_J_m3": {
+          "absolute_difference_J_m3": 39.07509891479958,
+          "relative_to_finer": 0.00959097695597396
+        },
+        "inert_heat_J_m3": {
+          "absolute_difference_J_m3": 0.24854725284599866,
+          "relative_to_finer": 0.010358335279530692
+        },
+        "Ue_J_m3": {
+          "absolute_difference_J_m3": 374.2720279991627,
+          "relative_to_finer": 3.0830370846196194e-05
+        },
+        "Ui_J_m3": {
+          "absolute_difference_J_m3": 39.31081798672676,
+          "relative_to_finer": 4.92281378136338e-07
+        }
+      }
+    },
+    {
+      "coarse_steps": 128,
+      "fine_steps": 256,
+      "endpoint_differences": {
+        "fast_energy_J_m3": {
+          "absolute_difference_J_m3": 207.86378881000564,
+          "relative_to_finer": 0.0013034635442371865
+        },
+        "Q_J_m3": {
+          "absolute_difference_J_m3": 0.05860084999585524,
+          "relative_to_finer": 2.1823772466629518e-07
+        },
+        "electron_heat_J_m3": {
+          "absolute_difference_J_m3": 188.22822675999487,
+          "relative_to_finer": 0.0015277562238321702
+        },
+        "network_ion_heat_J_m3": {
+          "absolute_difference_J_m3": 19.57631805919982,
+          "relative_to_finer": 0.00482820376476394
+        },
+        "inert_heat_J_m3": {
+          "absolute_difference_J_m3": 0.12431661669799965,
+          "relative_to_finer": 0.005207941414113138
+        },
+        "Ue_J_m3": {
+          "absolute_difference_J_m3": 188.22822700068355,
+          "relative_to_finer": 1.5505396043766702e-05
+        },
+        "Ui_J_m3": {
+          "absolute_difference_J_m3": 19.694163009524345,
+          "relative_to_finer": 2.4662605855468823e-07
+        }
+      }
+    }
+  ],
+  "max_energy_residual": 1.00453263695e-15,
+  "m3_accepted": false,
+  "limitations": [
+    "No time-zero rows are invented.",
+    "Fixed energy/angular grids and source model; not a full convergence proof.",
+    "No EXL-50U or four-fuel comparison is represented."
+  ]
+}

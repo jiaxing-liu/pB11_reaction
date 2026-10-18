@@ -1,0 +1,23 @@
+	Command being timed: "timeout --kill-after=60s 43200s stdbuf -oL /home/cloud/cloud/research/pB-baldur/cache/benchmarks/pb-time-refinement-d869/study_coupled_thermal 128 800 pb 0.001 1 8"
+	User time (seconds): 1842.93
+	System time (seconds): 0.50
+	Percent of CPU this job got: 100%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 30:43.33
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 7644
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1357
+	Voluntary context switches: 18424
+	Involuntary context switches: 11680
+	Swaps: 0
+	File system inputs: 8
+	File system outputs: 440
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

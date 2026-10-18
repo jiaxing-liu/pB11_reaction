@@ -257,3 +257,27 @@ any host geometry transport/work operation. Handoff energy differs from the
 original candidate energy by the separately accounted signed bath correction;
 compare full energy ledgers, not those two fields alone. These observations
 are trial-local, not cumulative inventories or a full restart representation.
+
+## Completed local pB temporal refinement (D869, 2026-10-18)
+
+`validation/coupled-thermal/pb-time-refinement-20261018/` archives the current
+source64/128/256-step,800-cell evolving-bath pB study at1ms, initial
+ne=1e22 m^-3,Te=5keV,Ti=100keV,carbon=0.001ne and angular order8.
+Each resolution had a12-hour wall budget and completed without retries.
+The64-step output exactly reproduces the prior28-column reference.
+
+128->256 endpoint differences relative to the finer result are fast stored
+energy0.13035%,electron heat0.15278%,network-ion heat0.48282%,carbon heat
+0.52079% (absolute0.124317J/m^3), and nuclearQ2.1824e-7. Carbon-heat
+differences decrease from2.0472% at32->64 to1.0358% at64->128 and0.5208%
+at128->256, consistent with first-order temporal refinement here. Maximum
+accumulated energy residual across the completed new sequence is1.005e-15.
+
+The terminal manifest pins CSV, binary, driver and physical source hashes.
+The standalone plotter checks full CSV hashes, finite increasing histories,
+endpoints and energy closure before rendering PNG/PDF figures. Archived
+absolute execution paths record the original run; plot inputs are resolved
+relative to the manifest so the archived figures remain reproducible.
+This is a local hot/dense temporal study with fixed energy/angular grids,
+not an EXL-50U discharge, four-fuel comparison or complete M3 validation.
+No core sources, ABI, cache identity or model coefficients were changed.
