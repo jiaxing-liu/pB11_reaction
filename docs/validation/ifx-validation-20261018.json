@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-18",
+  "source_commit": "ff6c200d6b61bfd13e004ed143e7c614dad810fb",
+  "scope": "GNU C++ Release kernel plus Intel ifx Fortran modules/tests and clean installed Fortran consumer; no BALDUR physics acceptance",
+  "compiler": {
+    "Fortran": "ifx (IFX) 2026.1.1 20260724",
+    "CXX": "c++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0"
+  },
+  "configuration": {
+    "PB11_BUILD_FORTRAN": true,
+    "BUILD_TESTING": true,
+    "CMAKE_BUILD_TYPE": "Release",
+    "jobs": 1,
+    "CMAKE_Fortran_COMPILER": "/opt/intel/oneapi/compiler/2026.1/bin/ifx"
+  },
+  "ctest": {
+    "selected": 120,
+    "passed": 120,
+    "failed": 0,
+    "elapsed_s": 83.91,
+    "fortran_named_tests": 41
+  },
+  "kernel_identity": "54b35a3cf27a6224908c5fcc9a0bc61ade2ba46a237074e68f087f659af928dd",
+  "installed_consumer": {
+    "status": "pass",
+    "find_package": "pb11_reaction 1.0 CONFIG REQUIRED",
+    "target": "pb11::fortran",
+    "source_file": "ifx-consumer-main-20261018.f90",
+    "CMakeLists_file": "ifx-consumer-CMakeLists-20261018.txt",
+    "temperature_keV": 100.0,
+    "reactivity_m3_s": 7.065449573224985e-23,
+    "checks": [
+      "status OK",
+      "finite rate",
+      "strictly positive rate"
+    ],
+    "only_installed_package_used": true
+  },
+  "artifacts_sha256": {
+    "ifx-consumer-CMakeLists-20261018.txt": "ae8019a8df9aa6ce47ae2f3d95eda2d79aeab80757733080daa0a905e81e534c",
+    "ifx-consumer-main-20261018.f90": "47c560636dd25a2e988995b606b9d53c5a83a82bd2ff8e6f260f641515a9ec98",
+    "ifx-full-20261018.log": "7509fa27e56e1df6137358dc19da39835f9382c3112e0f8730c0d035d7286053",
+    "ifx-full-20261018.xml": "e0faab4a7be846ea9f0727319ad95b84bb625b64f13d7a309aced135c833f1d0"
+  },
+  "limitations": [
+    "one Linux x86_64 host/compiler configuration",
+    "Fortran module files require compatible producing/consuming compiler",
+    "not a BALDUR host-transport or burn acceptance"
+  ],
+  "physics_acceptance": false,
+  "baldur_acceptance": false
+}

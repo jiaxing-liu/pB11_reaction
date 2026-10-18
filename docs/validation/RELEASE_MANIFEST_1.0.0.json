@@ -19,18 +19,27 @@
     "docs/validation/install-package-20261010.json",
     "docs/validation/install-package-fortran-20261010.json",
     "docs/validation/package-core-regression-20261010.json",
-    "docs/validation/pb-fast-floor-regression-20261010.json"
+    "docs/validation/pb-fast-floor-regression-20261010.json",
+    "docs/validation/ifx-validation-20261018.json"
   ],
   "validated_install_consumers": {
     "cxx": "pass",
-    "fortran_gfortran": "pass"
+    "fortran_gfortran": "pass",
+    "fortran_ifx_2026_1_1": "pass"
   },
   "known_open_gates": [
-    "full current-commit CTest terminal receipt on a resource-suitable host",
-    "Intel consumer matrix for this package commit",
     "full host spatial loss and transport convergence",
-    "BALDUR four-fuel full-window acceptance"
+    "BALDUR four-fuel full-window acceptance",
+    "broader platform/compiler coverage beyond recorded Linux configurations"
   ],
   "physics_acceptance": false,
-  "baldur_acceptance": false
+  "baldur_acceptance": false,
+  "current_source_ctest": {
+    "source_commit": "ff6c200d6b61bfd13e004ed143e7c614dad810fb",
+    "tests": 120,
+    "passed": 120,
+    "Fortran_compiler": "ifx 2026.1.1",
+    "elapsed_s": 83.91,
+    "receipt": "docs/validation/ifx-validation-20261018.json"
+  }
 }

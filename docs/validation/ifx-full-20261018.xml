@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Linux-c++"
+	tests="120"
+	failures="0"
+	disabled="0"
+	skipped="0"
+	hostname="cloud"
+	time="83"
+	timestamp="2026-10-18T17:27:30"
+	>
+	<testcase name="fusion_table_digest_tests" classname="fusion_table_digest_tests" time="0.30948" status="run">
+		<properties/>
+		<system-out>thermal 6808 e079185f828555e9bd63e9b634990bddd8a89cc67e9537852401b6f81fee7c94
+beam 2248 428c1cae806e051a78eb415eab962935ccb73f1a2b7459b6b9b84a9e3aaafaf5
+TABLE_DIGEST_PASS
+</system-out>
+	</testcase>
+	<testcase name="fusion_table_digest_hashlib_tests" classname="fusion_table_digest_hashlib_tests" time="0.364095" status="run">
+		<properties/>
+		<system-out>HASHLIB_ORACLE_PASS 17
+</system-out>
+	</testcase>
+	<testcase name="pb11_unit_tests" classname="pb11_unit_tests" time="0.00228782" status="run">
+		<properties/>
+		<system-out>All p-11B tests passed
+</system-out>
+	</testcase>
+	<testcase name="pb11_c_abi_tests" classname="pb11_c_abi_tests" time="0.00141734" status="run">
+		<properties/>
+		<system-out>All p-11B C ABI tests passed
+</system-out>
+	</testcase>
+	<testcase name="pb11_instant_source_tests" classname="pb11_instant_source_tests" time="0.00150704" status="run">
+		<properties/>
+		<system-out>All p-11B instant-source tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_network_tests" classname="fusion_network_tests" time="0.00129148" status="run">
+		<properties/>
+		<system-out>All fusion-network tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_rates_tests" classname="fusion_rates_tests" time="0.00132996" status="run">
+		<properties/>
+		<system-out>PASS: published thermal rates, domains, SI, DD symmetry, secondary channels and ABI errors
+</system-out>
+	</testcase>
+	<testcase name="fusion_cross_sections_tests" classname="fusion_cross_sections_tests" time="0.0019074" status="run">
+		<properties/>
+		<system-out>channel 1 maximum integral/fit relative difference 0.0190878
+channel 2 maximum integral/fit relative difference 0.0109297
+channel 3 maximum integral/fit relative difference 0.007483
+channel 4 maximum integral/fit relative difference 0.031454
+PASS: published cross sections, thermal quadrature, fit transitions and domains
+</system-out>
+	</testcase>
+	<testcase name="fusion_closed_box_tests" classname="fusion_closed_box_tests" time="0.00252232" status="run">
+		<properties/>
+		<system-out>DD secondary network scaled refinement errors 1.27021e-11 -&gt; 7.78527e-13
+PASS: analytic channel burn, DD secondary network, particle and nuclear-Q ledgers
+</system-out>
+	</testcase>
+	<testcase name="fusion_boundary_energy_tests" classname="fusion_boundary_energy_tests" time="0.00179799" status="run">
+		<properties/>
+		<system-out>PASS boundary exact rounding and 18 public geometry/stage/restart scenarios
+</system-out>
+	</testcase>
+	<testcase name="fusion_energy_work_tests" classname="fusion_energy_work_tests" time="0.0528865" status="run">
+		<properties/>
+		<system-out>refinement C=-1 cells=80 steps=80 spectrum_L1=0.330102 energy_relative=0.00327578
+refinement C=-1 cells=160 steps=160 spectrum_L1=0.252124 energy_relative=0.00163673
+refinement C=-1 cells=320 steps=320 spectrum_L1=0.176291 energy_relative=0.000818077
+refinement C=-1 cells=640 steps=640 spectrum_L1=0.129119 energy_relative=0.000408966
+refinement C=1 cells=80 steps=80 spectrum_L1=0.342375 energy_relative=0.0039355
+refinement C=1 cells=160 steps=160 spectrum_L1=0.25096 energy_relative=0.00196889
+refinement C=1 cells=320 steps=320 spectrum_L1=0.194861 energy_relative=0.000984727
+refinement C=1 cells=640 steps=640 spectrum_L1=0.147914 energy_relative=0.000492435
+PASS energy work analytic, refinement, signed ledgers and failures
+</system-out>
+	</testcase>
+	<testcase name="fusion_radial_transport_tests" classname="fusion_radial_transport_tests" time="0.00246124" status="run">
+		<properties/>
+		<system-out>PASS radial transport: geometry, analytic fluxes, positivity, balance and failure atomicity
+</system-out>
+	</testcase>
+	<testcase name="fusion_kinetics_tests" classname="fusion_kinetics_tests" time="0.00178391" status="run">
+		<properties/>
+		<system-out>All fusion-kinetics tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_coulomb_tests" classname="fusion_coulomb_tests" time="0.00187819" status="run">
+		<properties/>
+		<system-out>Coulomb first-moment relative error at 101 cells: 0.000329629
+Coulomb first-moment relative error at 201 cells: 9.85657e-05
+Coulomb first-moment relative error at 401 cells: 4.00203e-05
+PASS: Coulomb normalization, limits, drift-diffusion identity and kinetic energy exchange
+</system-out>
+	</testcase>
+	<testcase name="fusion_slowing_tests" classname="fusion_slowing_tests" time="1.66835" status="run">
+		<properties/>
+		<system-out>cells,steps,mean_energy_keV,electron_fraction,ion_fraction,particle_residual,energy_residual,maxwellian_L1,max_step_energy_residual
+200,250,15.000813966,0.806209348783,0.188790379895,-4.4408920985e-16,-4.61964472192e-16,1.40016765794e-05,4.52265022824e-17
+200,500,15.0002951519,0.806209372606,0.18879052901,-3.33066907388e-16,-6.92946708287e-16,5.15949255236e-06,3.78673270357e-17
+200,1000,15.0001675903,0.806209378225,0.188790565912,-5.55111512313e-16,1.15491118048e-16,2.9018742419e-06,5.74354022128e-17
+400,250,15.0000132591,0.806316494521,0.188683501059,-2.99760216649e-15,-5.77455590239e-16,4.95156070876e-08,3.0395367494e-17
+400,500,15.0000114511,0.806316494574,0.188683501609,-2.88657986403e-15,5.77455590239e-16,4.45245723138e-09,4.33655614154e-17
+400,1000,15.0000113208,0.806316494578,0.188683501649,-3.33066907388e-15,-5.77455590239e-16,1.0029373363e-09,4.79897175092e-17
+800,250,15.0000113342,0.806343267202,0.18865672902,-2.77555756156e-15,-6.92946708287e-16,1.47274434882e-09,1.92861144396e-17
+800,500,15.000011...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="fusion_rate_model_tests" classname="fusion_rate_model_tests" time="0.0617604" status="run">
+		<properties/>
+		<system-out>All fusion rate-model tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_beam_tests" classname="fusion_beam_tests" time="5.99809" status="run">
+		<properties/>
+		<system-out>DT cold-limit T/keV 0.1 relative error 0.0140586
+DT cold-limit T/keV 0.01 relative error 0.00140831
+DT cold-limit T/keV 0.001 relative error 0.000140855
+DT cold-limit T/keV 0.0001 relative error 1.40858e-05
+channel 3 independent target-angle rate error 3.33067e-16, target-energy error 5.55112e-16
+channel 0 independent target-angle rate error 1.11022e-16, target-energy error 5.55112e-16
+channel 3 double-Maxwellian versus relative-Maxwellian error 4.44089e-14
+channel 0 double-Maxwellian versus relative-Maxwellian error 5.55112e-15
+unequal-temperature direct average rate error 1.71974e-13, a-energy error 0, b-energy error 2.66343e-13
+PASS: beam kinematics, explicit data gaps, reaction-conditioned energy and Maxwellian limits
+</system-out>
+	</testcase>
+	<testcase name="fusion_transfer_rate_tests" classname="fusion_transfer_rate_tests" time="0.00693762" status="run">
+		<properties/>
+		<system-out>max friction-divergence relative error 1.2055412224e-09; radial integral and ABI/domain checks pass
+</system-out>
+	</testcase>
+	<testcase name="fusion_two_component_tests" classname="fusion_two_component_tests" time="0.00144176" status="run">
+		<properties/>
+		<system-out>All two-component fusion tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_two_component_slowing_tests" classname="fusion_two_component_slowing_tests" time="1.91996" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="fusion_target_network_tests" classname="fusion_target_network_tests" time="0.00211675" status="run">
+		<properties/>
+		<system-out>fusion target network tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_target_network_birth_tests" classname="fusion_target_network_birth_tests" time="0.111264" status="run">
+		<properties/>
+		<system-out>events 21229200419828784 max_species_relative 7.17741838185e-17 energy_relative 1.94072188875e-17 DD_branch_relative 4.53196508099e-17 iterations 2
+</system-out>
+	</testcase>
+	<testcase name="fusion_handoff_tests" classname="fusion_handoff_tests" time="0.0063602" status="run">
+		<properties/>
+		<system-out>All fusion-handoff tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_source_rounding_tests" classname="fusion_source_rounding_tests" time="0.00141691" status="run">
+		<properties/>
+		<system-out>PASS source rounding: 48 checks
+</system-out>
+	</testcase>
+	<testcase name="fusion_coupled_floor_tests" classname="fusion_coupled_floor_tests" time="47.2902" status="run">
+		<properties/>
+		<system-out>DT legacy=0 floor=0
+pB legacy=3 floor=0 lowN=48628519.853708304 lowU=4.6916594260379579e-09 correction=-3.0994883995236957e-09
+ion_before_numerical=25290.913741581269 ion_expected=25290.91374157817 ion_actual=25290.91374157817 delta=-3.0994883995236957e-09
+PASS diagnostic coupled floor
+</system-out>
+	</testcase>
+	<testcase name="fusion_floor_rate_edges_tests" classname="fusion_floor_rate_edges_tests" time="0.00132482" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="fusion_floor_precise_tests" classname="fusion_floor_precise_tests" time="0.000947835" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="fusion_kinetic_rounding_tests" classname="fusion_kinetic_rounding_tests" time="0.00145434" status="run">
+		<properties/>
+		<system-out></system-out>
+	</testcase>
+	<testcase name="fusion_mixed_floor_boundary_tests" classname="fusion_mixed_floor_boundary_tests" time="0.00140883" status="run">
+		<properties/>
+		<system-out>fixture scale=0.0999999999980000065281124 normalN=9.83190635204416874402666e-322 preciseN=9.88131291662730527025809e-325 normalBorrow=9.83190635224080643378138e-325 preciseBorrow=9.88131291662730547595633e-328 limit=9.83684700869921865506182e-325 total=9.8417876651574337394862e-325
+RESULT mode=strict status=3 all_outputs_zero=1 physics_accepted=0
+</system-out>
+	</testcase>
+	<testcase name="fusion_mixed_floor_boundary_high_tests" classname="fusion_mixed_floor_boundary_high_tests" time="0.00139299" status="run">
+		<properties/>
+		<system-out>fixture scale=0.0999999999980000065281124 normalN=9.83190635204416874402666e-322 preciseN=9.88131291662730527025809e-325 normalBorrow=9.83190635224080643378138e-325 preciseBorrow=9.88131291662730547595633e-328 limit=9.83684700869921865506182e-325 total=9.8417876651574337394862e-325
+RESULT mode=high status=4 all_outputs_zero=1 physics_accepted=0
+</system-out>
+	</testcase>
+	<testcase name="fusion_birth_floor_tests" classname="fusion_birth_floor_tests" time="0.00130841" status="run">
+		<properties/>
+		<system-out>PASS fusion_birth_floor: 89 checks
+</system-out>
+	</testcase>
+	<testcase name="fusion_coupled_fast_tests" classname="fusion_coupled_fast_tests" time="2.08319" status="run">
+		<properties/>
+		<system-out>PASS: coupled fast DT accounting, parity, rollback, source-state acceptance and late spill tests
+</system-out>
+	</testcase>
+	<testcase name="fusion_coupled_thermal_tests" classname="fusion_coupled_thermal_tests" time="0.0508872" status="run">
+		<properties/>
+		<system-out>PASS: coupled thermal identity, DT source/energy closure, inert-ion heat, rejection and repeatability tests
+</system-out>
+	</testcase>
+	<testcase name="fusion_beam_birth_table_bytes_tests" classname="fusion_beam_birth_table_bytes_tests" time="0.41979" status="run">
+		<properties/>
+		<system-out>PASS: beam persistence identity, canonical roundtrip, parity, request matching, atomic failures, malformed wires, semantic guards, subnormals
+</system-out>
+	</testcase>
+	<testcase name="fusion_beam_birth_table_tests" classname="fusion_beam_birth_table_tests" time="6.05138" status="run">
+		<properties/>
+		<system-out>PASS: full beam tables, exact knots, off-sample rate/debit/shape, budgets, copied inputs and clearing
+</system-out>
+	</testcase>
+	<testcase name="fusion_birth_table_tests" classname="fusion_birth_table_tests" time="1.25897" status="run">
+		<properties/>
+		<system-out>All fusion birth-table tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_birth_table_bytes_tests" classname="fusion_birth_table_bytes_tests" time="0.766742" status="run">
+		<properties/>
+		<system-out>Thermal byte roundtrip and basic rejection PASS
+</system-out>
+	</testcase>
+	<testcase name="fusion_thermal_increment_tests" classname="fusion_thermal_increment_tests" time="0.0020385" status="run">
+		<properties/>
+		<system-out>Thermal increment signed accounting and weak-signal tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_coupled_table_tests" classname="fusion_coupled_table_tests" time="0.732286" status="run">
+		<properties/>
+		<system-out>Coupled table/direct parity and failure tests passed; carbon relative difference=4.8013e-05
+</system-out>
+	</testcase>
+	<testcase name="fusion_beam_birth_composition_tests" classname="fusion_beam_birth_composition_tests" time="0.0568955" status="run">
+		<properties/>
+		<system-out>events=3185065884590081 target_final=9.9968149341154099e+18 removed_fast_J_m3=46.238580230834231 removed_target_J_m3=7.5268267761855219 number_relative=-1.3948260949e-16 energy_relative=-1.36446843407e-16
+</system-out>
+	</testcase>
+	<testcase name="fusion_beam_birth_tests" classname="fusion_beam_birth_tests" time="0.145015" status="run">
+		<properties/>
+		<system-out>PASS: bounded beam birth cold/warm rates, canonical debits, product and Q-energy closure, cutoff, zero-source, and clearing
+</system-out>
+	</testcase>
+	<testcase name="fusion_thermal_pair_birth_tests" classname="fusion_thermal_pair_birth_tests" time="0.271769" status="run">
+		<properties/>
+		<system-out>PASS: pair thermal birth equal-T parity, unequal-T reference debits, conservation, DD swap, and clearing
+</system-out>
+	</testcase>
+	<testcase name="fusion_thermal_birth_tests" classname="fusion_thermal_birth_tests" time="4.95756" status="run">
+		<properties/>
+		<system-out>channel 1 T/keV 0.1 rate=1.67161e-37 rate/reference=1 debit discrepancy=1.07941e-08
+channel 1 T/keV 1 rate=1.0015e-28 rate/reference=1 debit discrepancy=7.80356e-11
+channel 1 T/keV 20 rate=2.44476e-24 rate/reference=1 debit discrepancy=1.12231e-11
+channel 2 T/keV 0.1 rate=1.62065e-37 rate/reference=1 debit discrepancy=1.08375e-08
+channel 2 T/keV 1 rate=9.83441e-29 rate/reference=1 debit discrepancy=6.90066e-11
+channel 2 T/keV 20 rate=2.63111e-24 rate/reference=1 debit discrepancy=1.05128e-11
+channel 3 T/keV 0.1 rate=2.66534e-36 rate/reference=1 debit discrepancy=2.93805e-08
+channel 3 T/keV 1 rate=6.89725e-27 rate/reference=1 debit discrepancy=2.79848e-10
+channel 3 T/keV 20 rate=4.36262e-22 rate/reference=1 debit discrepancy=1.51581e-10
+channel 4 T/keV 0.1 rate=1.71502e-47 rate/reference=1 debit discrepancy=1.81636e-07
+channel 4 T/keV 1 rate=3.07403e-32 rate/reference=1 debit discrepancy=3.22219e-09
+channel 4 T/keV 20 rate=3.46774e-24 rate/reference=1 debit discrepancy=5.63926e-10
+channel 0 T/keV 1 rate=5.7367...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="fusion_birth_mapper_tests" classname="fusion_birth_mapper_tests" time="0.0418865" status="run">
+		<properties/>
+		<system-out>PASS zero-width spectra cases=9012 legacy_endpoint_inversions=375
+</system-out>
+	</testcase>
+	<testcase name="fusion_thermal_birth_width_tests" classname="fusion_thermal_birth_width_tests" time="1.24041" status="run">
+		<properties/>
+		<system-out>1 2 relative second-moment difference 3.67612e-06 bound 5.52138e-06
+1 0 relative second-moment difference 4.38103e-07 bound 6.64348e-07
+2 3 relative second-moment difference 5.45197e-06 bound 8.18462e-06
+2 6 relative second-moment difference 6.60476e-07 bound 9.97378e-07
+3 4 relative second-moment difference 3.19325e-07 bound 4.82582e-07
+3 6 relative second-moment difference 2.10052e-08 bound 3.51012e-08
+4 4 relative second-moment difference 2.92681e-07 bound 4.41021e-07
+4 0 relative second-moment difference 1.91952e-08 bound 3.0793e-08
+</system-out>
+	</testcase>
+	<testcase name="fusion_reaction_event_tests" classname="fusion_reaction_event_tests" time="0.00208836" status="run">
+		<properties/>
+		<system-out>400 laboratory events preserve energy momentum and product mass shells
+</system-out>
+	</testcase>
+	<testcase name="fusion_pb_population_tests" classname="fusion_pb_population_tests" time="0.158801" status="run">
+		<properties/>
+		<system-out>Population weighting tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_pb_birth_tests" classname="fusion_pb_birth_tests" time="0.0199641" status="run">
+		<properties/>
+		<system-out>PASS: alpha0 analytic source, dense box projection, mixture parity and validation
+</system-out>
+	</testcase>
+	<testcase name="fusion_fsci_tests" classname="fusion_fsci_tests" time="0.0656532" status="run">
+		<properties/>
+		<system-out>All finite-radius FSCI tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_fast_moments_tests" classname="fusion_fast_moments_tests" time="0.0016822" status="run">
+		<properties/>
+		<system-out>PASS canonical charge moments, nonuniform S/T energy, NR pressure and rejection clearing
+</system-out>
+	</testcase>
+	<testcase name="fusion_source_batch_tests" classname="fusion_source_batch_tests" time="0.00134393" status="run">
+		<properties/>
+		<system-out>PASS: atomic multi-context acceptance and rejection preservation
+</system-out>
+	</testcase>
+	<testcase name="fusion_kinetic_geometry_tests" classname="fusion_kinetic_geometry_tests" time="0.00149863" status="run">
+		<properties/>
+		<system-out>PASS actual operator composition, independent SI balances and volume-state batch acceptance
+PASS identity and pure-coordinate GCL with all species and both components
+PASS invalid late-zone/component inputs and atomic failure clearing
+</system-out>
+	</testcase>
+	<testcase name="fusion_source_volume_tests" classname="fusion_source_volume_tests" time="0.00145673" status="run">
+		<properties/>
+		<system-out>PASS analytic volume/work/spatial/domain/source/inert sequence and v3 restart
+PASS normalization rejection, invalid-stage invalidation, atomic volume batch and legacy guards
+PASS SI DT ledger source-volume normalization (synthetic budget-only energy split)
+PASS actual radial + energy-work composition: N0=22 N1=20.4318 grid_out_N=1.56818 U0=44 U1=39.7327 work=2.00541 grid_out_U=6.27273
+</system-out>
+	</testcase>
+	<testcase name="fusion_numerical_increment_tests" classname="fusion_numerical_increment_tests" time="0.00135005" status="run">
+		<properties/>
+		<system-out>PASS numerical fluid increment: zero parity, signed six-species sum, cancellation before rounding, atomic failures
+</system-out>
+	</testcase>
+	<testcase name="fusion_source_state_numerical_tests" classname="fusion_source_state_numerical_tests" time="0.00142642" status="run">
+		<properties/>
+		<system-out>PASS numerical state: stationary/moving accounting, reject/discard/commit, legacy API exclusion, restart v4/v5
+</system-out>
+	</testcase>
+	<testcase name="fusion_source_state_tests" classname="fusion_source_state_tests" time="0.00140214" status="run">
+		<properties/>
+		<system-out>All fusion source-state tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_source_state_inert_tests" classname="fusion_source_state_inert_tests" time="0.0013726" status="run">
+		<properties/>
+		<system-out>All fusion source-state inert tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_coupled_restart_tests" classname="fusion_coupled_restart_tests" time="0.336042" status="run">
+		<properties/>
+		<system-out>restart=0 DT events=1.07487e+19 carbon heat=448.984 Ue=1.45518e+07 Ui=4.77364e+07
+restart=1 DT events=1.07487e+19 carbon heat=448.984 Ue=1.45518e+07 Ui=4.77364e+07
+Coupled thermal inert-state restart passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_birth_packets_tests" classname="fusion_birth_packets_tests" time="0.0572881" status="run">
+		<properties/>
+		<system-out>PASS source packet parity, shape, moments and failure atomicity
+</system-out>
+	</testcase>
+	<testcase name="fusion_uniform_ensemble_tests" classname="fusion_uniform_ensemble_tests" time="0.0110409" status="run">
+		<properties/>
+		<system-out>horizon_phase,initial_dt_phase,event_count,retained_count,unresolved_count,max_event_phase_error,max_event_position_error,max_retained_position_error
+1,0.2,4,8,0,0.0006510501794023682,0.000168220616544483,0.0005993818273629756
+1,0.1,4,8,0,0.0001675345364839931,0.000127975297617469,0.0001498267237056721
+1,0.05,4,8,0,4.155157413909816e-05,2.709161129074981e-05,3.745551036744546e-05
+1,0.025,4,8,0,1.03908635702421e-05,4.775028480557612e-06,9.363804435678297e-06
+1,0.0125,4,8,0,2.600733676638711e-06,2.257629521478606e-06,2.340946537719341e-06
+6.283185307179586,0.2,10,2,0,0.001539078478128619,0.000824547124840695,1.501732256971725e-15
+6.283185307179586,0.1,10,2,0,0.0005075569968300275,0.0002690745005377769,1.083478208823138e-15
+6.283185307179586,0.05,10,2,0,8.406691505635777e-05,3.794536642791633e-05,1.515204919676368e-15
+6.283185307179586,0.025,10,2,0,3.1840611355749e-05,1.704424725169314e-05,1.071774234920822e-15
+6.283185307179586,0.0125,10,2,0,8.081936965442793e-06,4.349828772484176e-06,5.915154015480127e-16
+# ne...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="fusion_thermal_sphere_tests" classname="fusion_thermal_sphere_tests" time="3.94839" status="run">
+		<properties/>
+		<system-out>family,radial_order,angle_order,markers,mean_r2,discrete_exact,continuous_exact,quadrature_error,unresolved_weight,max_relative_time_error
+angle_only,0,4,32,0.25,0.5,0.625,-0.125,0,3.474609781008192e-11
+angle_only,0,8,128,0.25,0.681341891689181,0.625,0.056341891689181,0,4.278305086789141e-11
+angle_only,0,16,512,0.25,0.5947253052275343,0.625,-0.03027469477246574,0,2.559582407869783e-11
+angle_only,0,32,2048,0.25,0.6430116038374036,0.625,0.01801160383740361,0,4.307819735157961e-11
+angle_only,0,64,8192,0.25,0.6205753704983674,0.625,-0.004424629501632638,0,4.328057932475409e-11
+spatial,4,8,65536,0.6005439070606161,0.689931115600171,0.6875,0.002431115600170984,0,4.457367703351464e-11
+spatial,6,8,221184,0.6001566695396209,0.6891467049938262,0.6875,0.001646704993826229,0,4.472773499825011e-11
+spatial,8,8,524288,0.6000636121216448,0.68694236906795,0.6875,-0.00055763093205002,0,4.47129337098427e-11
+angular,8,4,131072,0.6000636121216448,0.6874940263922475,0.6875,-5.973607752500932e-06,0,4.472379653660705e-11
+angular,8,6...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="fusion_thermal_markers_tests" classname="fusion_thermal_markers_tests" time="0.00180196" status="run">
+		<properties/>
+		<system-out>PASS thermal tensor weights, proper velocity, reduction, replay and atomic rejection
+</system-out>
+	</testcase>
+	<testcase name="fusion_prompt_reduce_tests" classname="fusion_prompt_reduce_tests" time="0.00131172" status="run">
+		<properties/>
+		<system-out>prompt reduction counts/energy/bounds/undefined/error/representation tests pass
+</system-out>
+	</testcase>
+	<testcase name="fusion_prompt_orbit_tests" classname="fusion_prompt_orbit_tests" time="0.00207931" status="run">
+		<properties/>
+		<system-out>uniform B levels=7 time_error=5.96959e-08 spread=7.3032e-07
+prompt orbit analytic/domain/failure/budget tests pass
+</system-out>
+	</testcase>
+	<testcase name="fusion_boundary_prepared_tests" classname="fusion_boundary_prepared_tests" time="0.846276" status="run">
+		<properties/>
+		<system-out>PASS point=1008 segment=81 ownership/threads/errors
+</system-out>
+	</testcase>
+	<testcase name="fusion_boundary_segment_tests" classname="fusion_boundary_segment_tests" time="0.0146043" status="run">
+		<properties/>
+		<system-out>segment inside, crossing, out-and-back, ambiguity, budget and errors passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_magnetic_push_tests" classname="fusion_magnetic_push_tests" time="0.00167102" status="run">
+		<properties/>
+		<system-out>U=100000 sign=-1 N=20 position_error/U=0.000426182
+U=100000 sign=-1 N=40 position_error/U=0.00010654
+U=100000 sign=-1 N=80 position_error/U=2.66346e-05
+U=100000 sign=1 N=20 position_error/U=0.000426182
+U=100000 sign=1 N=40 position_error/U=0.00010654
+U=100000 sign=1 N=80 position_error/U=2.66346e-05
+U=2e+08 sign=-1 N=20 position_error/U=0.000426182
+U=2e+08 sign=-1 N=40 position_error/U=0.00010654
+U=2e+08 sign=-1 N=80 position_error/U=2.66346e-05
+U=2e+08 sign=1 N=20 position_error/U=0.000426182
+U=2e+08 sign=1 N=40 position_error/U=0.00010654
+U=2e+08 sign=1 N=80 position_error/U=2.66346e-05
+uniform-B sign, relativistic energy, position convergence, reversal, zero field and errors passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_flux_boundary_tests" classname="fusion_flux_boundary_tests" time="0.318624" status="run">
+		<properties/>
+		<system-out>boundary analytic, shaped, refinement, winding and failure checks passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_flux_inverse_tests" classname="fusion_flux_inverse_tests" time="0.00262378" status="run">
+		<properties/>
+		<system-out>inverse axis/core/boundary roundtrips, seed agreement and failure separation passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_flux_core_tests" classname="fusion_flux_core_tests" time="0.00140488" status="run">
+		<properties/>
+		<system-out>regular-core analytic geometry, axis, matching, outer parity and failure checks passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_flux_field_tests" classname="fusion_flux_field_tests" time="0.00146374" status="run">
+		<properties/>
+		<system-out>flux geometry, signed field, cubic slopes, periodicity, divergence and failure contracts passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_nuclear_data_tests" classname="fusion_nuclear_data_tests" time="0.00133323" status="run">
+		<properties/>
+		<system-out>All nuclear-data tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_nuclear_birth_four_momentum_tests" classname="fusion_nuclear_birth_four_momentum_tests" time="0.00143861" status="run">
+		<properties/>
+		<system-out>channel,Ecm_MeV,boosted,Q_MeV,lab_kinetic_gain_MeV,relative_Q_residual,relative_momentum_residual
+1,0,0,4.0326638987390382,4.0326638987390373,1.56281647968573e-16,0
+1,0,1,4.0326638987390382,4.03266389873904,4.6884494390571901e-16,6.588352796010353e-18
+1,0.01,0,4.0326638987390382,4.0326638987390382,5.8605617988214877e-17,0
+1,0.01,1,4.0326638987390382,4.0326638987390364,3.1256329593714599e-16,7.5335022507359934e-18
+1,1,0,4.0326638987390382,4.0326638987390373,1.56281647968573e-16,0
+1,1,1,4.0326638987390382,4.0326638987390391,3.9070411992143248e-16,8.1139637476014026e-18
+2,0,0,3.2688569508269825,3.2688569508269825,0,0
+2,0,1,3.2688569508269825,3.2688569508269834,1.9279869669392116e-16,4.5952129061767418e-18
+2,0.01,0,3.2688569508269825,3.2688569508269825,2.4099837086740144e-17,0
+2,0.01,1,3.2688569508269825,3.2688569508269838,3.8559739338784231e-16,7.4089365981013484e-18
+2,1,0,3.2688569508269825,3.2688569508269829,4.8199674173480289e-17,0
+2,1,1,3.2688569508269825,3.2688569508269829,9.6399348346960578e-17,1.094257427...
+[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]
+</system-out>
+	</testcase>
+	<testcase name="fusion_thermal_burn_tests" classname="fusion_thermal_burn_tests" time="0.00136726" status="run">
+		<properties/>
+		<system-out>DD refinement errors 0.0164939 0.00844893 ratio 1.95219
+All fusion thermal-burn tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_target_burn_tests" classname="fusion_target_burn_tests" time="0.00263368" status="run">
+		<properties/>
+		<system-out>target ODE errors 0.0067541 0.00339717 0.00170368
+PASS: target burn, conservation, rollback and physical-window composition
+</system-out>
+	</testcase>
+	<testcase name="fusion_products_tests" classname="fusion_products_tests" time="0.0126457" status="run">
+		<properties/>
+		<system-out>PASS: 45 sequential events, mass shells, intermediate invariant and angle reflection
+Prescribed birth -&gt; collisions 100-step number residual 4.7187e-17, energy residual -8.83158e-18
+PASS: conservative product birth mapping and sequential kinematics
+</system-out>
+	</testcase>
+	<testcase name="fusion_laboratory_tests" classname="fusion_laboratory_tests" time="0.0013193" status="run">
+		<properties/>
+		<system-out>PASS: 15 pair boosts, inverse and total invariants; rotated three-alpha boost; stopped limit
+</system-out>
+	</testcase>
+	<testcase name="fusion_spectrum_tests" classname="fusion_spectrum_tests" time="0.00217785" status="run">
+		<properties/>
+		<system-out>PASS: 27 coherent events, cyclic/secondary/rotation checks and independent angular polynomial
+</system-out>
+	</testcase>
+	<testcase name="fusion_alpha_grid_tests" classname="fusion_alpha_grid_tests" time="0.532966" status="run">
+		<properties/>
+		<system-out>64/128 per-event histogram normalized L1 difference 0.0138133
+PASS: explicit cutoff, normalized spectrum, coherent mixture, spill and refinement
+</system-out>
+	</testcase>
+	<testcase name="pb11_fortran_binding_tests" classname="pb11_fortran_binding_tests" time="0.00278355" status="run">
+		<properties/>
+		<system-out>All p-11B Fortran bindings tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_fortran_binding_tests" classname="fusion_fortran_binding_tests" time="0.00188257" status="run">
+		<properties/>
+		<system-out>All Fortran fusion-network tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_kinetics_fortran_binding_tests" classname="fusion_kinetics_fortran_binding_tests" time="0.00174755" status="run">
+		<properties/>
+		<system-out>All Fortran fusion-kinetics tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_rate_model_fortran_binding_tests" classname="fusion_rate_model_fortran_binding_tests" time="0.00313305" status="run">
+		<properties/>
+		<system-out>All Fortran fusion-rate-model tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_beam_fortran_binding_tests" classname="fusion_beam_fortran_binding_tests" time="0.00263569" status="run">
+		<properties/>
+		<system-out>All Fortran fusion-beam tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_energy_work_fortran_binding_tests" classname="fusion_energy_work_fortran_binding_tests" time="0.00160341" status="run">
+		<properties/>
+		<system-out> PASS Fortran energy-work ABI, signed cooling and extent rejection
+</system-out>
+	</testcase>
+	<testcase name="fusion_radial_transport_fortran_binding_tests" classname="fusion_radial_transport_fortran_binding_tests" time="0.00165234" status="run">
+		<properties/>
+		<system-out> PASS radial transport Fortran ABI, diffusion, signed faces, inventory and atomi
+ c failures
+</system-out>
+	</testcase>
+	<testcase name="fusion_two_component_fortran_binding_tests" classname="fusion_two_component_fortran_binding_tests" time="0.00182394" status="run">
+		<properties/>
+		<system-out>All Fortran two-component binding tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_handoff_fortran_binding_tests" classname="fusion_handoff_fortran_binding_tests" time="0.00206817" status="run">
+		<properties/>
+		<system-out>All Fortran handoff tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_birth_floor_fortran_binding_tests" classname="fusion_birth_floor_fortran_binding_tests" time="0.00172903" status="run">
+		<properties/>
+		<system-out> PASS birth floor Fortran ABI, energy correction and failure atomicity
+</system-out>
+	</testcase>
+	<testcase name="fusion_table_digest_fortran_tests" classname="fusion_table_digest_fortran_tests" time="0.00185292" status="run">
+		<properties/>
+		<system-out>1 6808 E079185F828555E9BD63E9B634990BDDD8A89CC67E9537852401B6F81FEE7C94
+2 2248 428C1CAE806E051A78EB415EAB962935CCB73F1A2B7459B6B9B84A9E3AAAFAF5
+ FORTRAN_TABLE_DIGEST_PASS
+</system-out>
+	</testcase>
+	<testcase name="fusion_beam_birth_table_bytes_fortran_tests" classname="fusion_beam_birth_table_bytes_fortran_tests" time="0.765334" status="run">
+		<properties/>
+		<system-out>PASS: Fortran beam-table byte wrappers
+</system-out>
+	</testcase>
+	<testcase name="fusion_beam_birth_table_fortran_binding_tests" classname="fusion_beam_birth_table_fortran_binding_tests" time="0.11404" status="run">
+		<properties/>
+		<system-out>Fortran beam-birth-table smoke test passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_birth_table_fortran_binding_tests" classname="fusion_birth_table_fortran_binding_tests" time="0.0359372" status="run">
+		<properties/>
+		<system-out>All Fortran birth-table tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_birth_table_bytes_fortran_tests" classname="fusion_birth_table_bytes_fortran_tests" time="0.236231" status="run">
+		<properties/>
+		<system-out>Fortran thermal birth-table byte test passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_coupled_thermal_fortran_binding_tests" classname="fusion_coupled_thermal_fortran_binding_tests" time="0.00235181" status="run">
+		<properties/>
+		<system-out>All Fortran coupled-thermal tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_birth_packets_fortran_tests" classname="fusion_birth_packets_fortran_tests" time="0.00177511" status="run">
+		<properties/>
+		<system-out>Fortran source-packet layout, call and failure clearing passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_coupled_sources_floor_fortran_binding_tests" classname="fusion_coupled_sources_floor_fortran_binding_tests" time="0.00178244" status="run">
+		<properties/>
+		<system-out>Fortran coupled-floor direct ABI smoke test passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_coupled_sources_fortran_binding_tests" classname="fusion_coupled_sources_fortran_binding_tests" time="0.176642" status="run">
+		<properties/>
+		<system-out>Fortran coupled-source binding smoke test passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_coupled_fast_fortran_binding_tests" classname="fusion_coupled_fast_fortran_binding_tests" time="0.0185374" status="run">
+		<properties/>
+		<system-out> fusion_coupled_fast_fortran smoke: PASS
+</system-out>
+	</testcase>
+	<testcase name="fusion_target_network_fortran_binding_tests" classname="fusion_target_network_fortran_binding_tests" time="0.0024363" status="run">
+		<properties/>
+		<system-out>All Fortran target-network tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_beam_birth_fortran_binding_tests" classname="fusion_beam_birth_fortran_binding_tests" time="0.00194912" status="run">
+		<properties/>
+		<system-out>beam birth Fortran binding smoke test passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_thermal_pair_birth_fortran_binding_tests" classname="fusion_thermal_pair_birth_fortran_binding_tests" time="0.0126194" status="run">
+		<properties/>
+		<system-out>pair birth Fortran binding smoke test passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_thermal_birth_fortran_binding_tests" classname="fusion_thermal_birth_fortran_binding_tests" time="0.166511" status="run">
+		<properties/>
+		<system-out>All Fortran thermal-birth tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_reaction_event_fortran_binding_tests" classname="fusion_reaction_event_fortran_binding_tests" time="0.00239509" status="run">
+		<properties/>
+		<system-out>All Fortran reaction-event tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_pb_population_fortran_binding_tests" classname="fusion_pb_population_fortran_binding_tests" time="0.0183885" status="run">
+		<properties/>
+		<system-out>All Fortran pB-population tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_pb_birth_fortran_binding_tests" classname="fusion_pb_birth_fortran_binding_tests" time="0.00792985" status="run">
+		<properties/>
+		<system-out>All Fortran pB birth tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_fsci_fortran_binding_tests" classname="fusion_fsci_fortran_binding_tests" time="0.00796234" status="run">
+		<properties/>
+		<system-out>All Fortran FSCI tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_fast_moments_fortran_tests" classname="fusion_fast_moments_fortran_tests" time="0.00167312" status="run">
+		<properties/>
+		<system-out> PASS fast moments Fortran ABI, S/T alpha charge and pressure, bad extents
+</system-out>
+	</testcase>
+	<testcase name="fusion_kinetic_geometry_fortran_binding_tests" classname="fusion_kinetic_geometry_fortran_binding_tests" time="0.00165819" status="run">
+		<properties/>
+		<system-out>All Fortran kinetic-geometry binding tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_source_state_numerical_fortran_binding_tests" classname="fusion_source_state_numerical_fortran_binding_tests" time="0.00174983" status="run">
+		<properties/>
+		<system-out>PASS numerical Fortran binding: stationary/moving remap, old API rejection, restart
+</system-out>
+	</testcase>
+	<testcase name="fusion_source_volume_fortran_binding_tests" classname="fusion_source_volume_fortran_binding_tests" time="0.00182409" status="run">
+		<properties/>
+		<system-out>All Fortran source-volume binding tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_source_state_fortran_binding_tests" classname="fusion_source_state_fortran_binding_tests" time="0.00190766" status="run">
+		<properties/>
+		<system-out>All Fortran source-state binding tests passed
+</system-out>
+	</testcase>
+	<testcase name="source_grid_fortran_binding_tests" classname="source_grid_fortran_binding_tests" time="0.00174206" status="run">
+		<properties/>
+		<system-out> PASS source grid Fortran matching and guards
+</system-out>
+	</testcase>
+	<testcase name="fusion_nuclear_data_fortran_binding_tests" classname="fusion_nuclear_data_fortran_binding_tests" time="0.00166605" status="run">
+		<properties/>
+		<system-out>All Fortran nuclear-data tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_thermal_burn_fortran_binding_tests" classname="fusion_thermal_burn_fortran_binding_tests" time="0.00170103" status="run">
+		<properties/>
+		<system-out>All Fortran thermal-burn tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_target_burn_fortran_binding_tests" classname="fusion_target_burn_fortran_binding_tests" time="0.00174774" status="run">
+		<properties/>
+		<system-out>All Fortran target-burn tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_products_fortran_binding_tests" classname="fusion_products_fortran_binding_tests" time="0.00173748" status="run">
+		<properties/>
+		<system-out>All Fortran fusion-products tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_laboratory_fortran_binding_tests" classname="fusion_laboratory_fortran_binding_tests" time="0.00175949" status="run">
+		<properties/>
+		<system-out>All Fortran fusion-laboratory tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_spectrum_fortran_binding_tests" classname="fusion_spectrum_fortran_binding_tests" time="0.00183083" status="run">
+		<properties/>
+		<system-out>All Fortran fusion-spectrum tests passed
+</system-out>
+	</testcase>
+	<testcase name="fusion_alpha_grid_fortran_binding_tests" classname="fusion_alpha_grid_fortran_binding_tests" time="0.0189172" status="run">
+		<properties/>
+		<system-out>All Fortran alpha-grid tests passed
+</system-out>
+	</testcase>
+</testsuite>
