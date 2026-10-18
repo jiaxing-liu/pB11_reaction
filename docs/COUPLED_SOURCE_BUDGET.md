@@ -1,8 +1,10 @@
 # Explicit pB source budgets in complete coupled trials
 
 Include `fusion_coupled_sources_budget.h` and call
-`fusion_c_coupled_sources_packets_budget_trial`. It retains all arguments and
-ownership rules of the covered/packet trial and appends mandatory
+`fusion_c_coupled_sources_covered_budget_trial` for normal source evaluation,
+or `fusion_c_coupled_sources_packets_budget_trial` when mapped birth packets
+are explicitly required. Each retains the arguments and ownership rules of its
+original covered or packet entry and appends mandatory
 `fusion_thermal_birth_budget_policy_v1 *pb_policy` and
 `fusion_coupled_source_accuracy_v1 *accuracy` arguments. Inputs and outputs must
 not overlap. No physical state is advanced: accept or discard fluid, kinetic,
@@ -38,8 +40,12 @@ These are numerical estimates against the same finite source reference,
 including cells and spills, not nuclear/continuous-source uncertainties,
 off-sample interpolation guarantees, or subsequent plasma response bounds.
 The source rate/debit discrepancy gates remain separately enforced. Existing
-charged-spill, numerical floor, beam coverage, FP, handoff, packet
-representability, weak-source and conservation checks remain enforced.
+charged-spill, numerical floor, beam coverage, FP, handoff, weak-source and
+conservation checks remain enforced. Packet representability is checked only
+by the packet entry: requesting accuracy alone must not turn on extraction.
+The covered entry retains the original covered weak-source rounding behavior;
+a positive source whose mapped amount cannot be represented may therefore
+pass covered evaluation while correctly failing explicit packet extraction.
 
 All accuracy and physical outputs clear on failure for valid dimensions.
 Provisional observations are held locally and published only after the entire
@@ -52,6 +58,8 @@ Fortran users link `pb11::fusion_coupled_sources_budget_fortran` and use
 `(cells,7,5,2)`, including neutron; thermal/fast inventory arrays remain
 `(cells,6)`. Malformed shapes clear outputs and reject before forming C pointers.
 The module re-exports required common ABI types and policy/report types.
+It also exposes the raw BIND(C) `c_fusion_c_coupled_sources_covered_budget_trial`
+for callers that own the shapes and need nullable floor pointers.
 
 The engineering tests use tiny finite quadratures to verify interface, exact
 zero-budget parity, matching, serialization reuse, failure atomicity and language

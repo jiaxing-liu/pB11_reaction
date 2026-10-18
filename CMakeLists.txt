@@ -689,6 +689,10 @@ if(BUILD_TESTING)
     target_link_libraries(test_fusion_coupled_fast PRIVATE pb11::pb11)
     add_test(NAME fusion_coupled_fast_tests COMMAND test_fusion_coupled_fast)
 
+    add_executable(test_fusion_coupled_sources_covered_budget tests/test_fusion_coupled_sources_covered_budget.cpp)
+    target_link_libraries(test_fusion_coupled_sources_covered_budget PRIVATE pb11::pb11)
+    add_test(NAME fusion_coupled_sources_covered_budget_tests COMMAND test_fusion_coupled_sources_covered_budget)
+
     add_executable(test_fusion_coupled_sources_budget tests/test_fusion_coupled_sources_budget.cpp)
     target_link_libraries(test_fusion_coupled_sources_budget PRIVATE pb11::pb11)
     add_test(NAME fusion_coupled_sources_budget_tests COMMAND test_fusion_coupled_sources_budget)

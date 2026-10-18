@@ -759,6 +759,21 @@ extern "C" int fusion_c_coupled_sources_packets_trial(double dt,const fusion_cou
   floor_limits!=nullptr||floor_ledger!=nullptr,table_policy,outside_direct,true,packet_output,packet_meta,true);
 }
 
+extern "C" int fusion_c_coupled_sources_covered_budget_trial(double dt,const fusion_coupled_thermal_options_v1*op,
+ const fusion_fast_target_options_v1*fastop,const fusion_birth_table_v1*const*tables,
+ int beam_count,const fusion_beam_table_entry_v1*beam_entries,int effective_charge,
+ int n,const double*edges,const double*thermal,double Ue,double Ui,double ne,const double*charge2,
+ int ninert,const fusion_inert_ion_v1*inert,const double*logs,const double*old_s,const double*old_t,
+ const double*external,const double*escape,double*new_thermal,double*new_s,double*new_t,
+ fusion_coupled_thermal_v1*out,fusion_handoff_diagnostics_v1*diagnostics,fusion_beam_table_usage_v1*usage,
+ const fusion_coupled_floor_limits_v1*floor_limits,fusion_birth_floor_ledger_v1*floor_ledger,int table_policy,uint64_t*outside_direct,
+ const fusion_thermal_birth_budget_policy_v1*pb_policy,fusion_coupled_source_accuracy_v1*accuracy){
+ return coupled_trial(dt,op,tables,tables!=nullptr,effective_charge,n,edges,thermal,Ue,Ui,ne,charge2,
+  ninert,inert,logs,old_s,old_t,external,escape,new_thermal,new_s,new_t,out,diagnostics,true,fastop,true,
+  beam_count,beam_entries,usage,true,floor_limits,floor_ledger,
+  floor_limits!=nullptr||floor_ledger!=nullptr,table_policy,outside_direct,true,nullptr,nullptr,false,pb_policy,accuracy,true);
+}
+
 extern "C" int fusion_c_coupled_sources_packets_budget_trial(double dt,const fusion_coupled_thermal_options_v1*op,
  const fusion_fast_target_options_v1*fastop,const fusion_birth_table_v1*const*tables,
  int beam_count,const fusion_beam_table_entry_v1*beam_entries,int effective_charge,

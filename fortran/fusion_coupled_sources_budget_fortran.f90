@@ -56,7 +56,52 @@ module fusion_coupled_sources_budget_fortran
     type(fusion_thermal_birth_budget_report_v1) :: direct
     type(fusion_birth_table_budget_info_v1) :: table
   end type fusion_coupled_source_accuracy_v1
+  public :: c_fusion_c_coupled_sources_covered_budget_trial
   interface
+     function c_fusion_c_coupled_sources_covered_budget_trial( &
+          dt_s, options, fast_options, thermal_tables, beam_table_count, &
+          beam_tables, effective_charge, cells, edges, thermal_number, &
+          electron_energy, ion_energy, electron_density, &
+          thermal_charge_squared, inert_count, inert, coulomb_logs, old_s, &
+          old_t, external_birth, escape, new_thermal_number, new_s, new_t, &
+          out, diagnostics, usage, floor_limits, floor_ledger, table_domain_policy, outside_count, &
+          pb_policy, accuracy) &
+          bind(C, name="fusion_c_coupled_sources_covered_budget_trial") result(status)
+       import :: c_double, c_int, c_ptr
+       real(c_double), value :: dt_s
+       type(c_ptr), value :: options
+       type(c_ptr), value :: fast_options
+       type(c_ptr), value :: thermal_tables
+       integer(c_int), value :: beam_table_count
+       type(c_ptr), value :: beam_tables
+       integer(c_int), value :: effective_charge
+       integer(c_int), value :: cells
+       type(c_ptr), value :: edges
+       type(c_ptr), value :: thermal_number
+       real(c_double), value :: electron_energy
+       real(c_double), value :: ion_energy
+       real(c_double), value :: electron_density
+       type(c_ptr), value :: thermal_charge_squared
+       integer(c_int), value :: inert_count
+       type(c_ptr), value :: inert
+       type(c_ptr), value :: coulomb_logs
+       type(c_ptr), value :: old_s
+       type(c_ptr), value :: old_t
+       type(c_ptr), value :: external_birth
+       type(c_ptr), value :: escape
+       type(c_ptr), value :: new_thermal_number
+       type(c_ptr), value :: new_s
+       type(c_ptr), value :: new_t
+       type(c_ptr), value :: out
+       type(c_ptr), value :: diagnostics
+       type(c_ptr), value :: usage
+       type(c_ptr), value :: floor_limits
+       type(c_ptr), value :: floor_ledger
+       integer(c_int), value :: table_domain_policy
+       type(c_ptr), value :: outside_count
+       type(c_ptr), value :: pb_policy, accuracy
+       integer(c_int) :: status
+     end function c_fusion_c_coupled_sources_covered_budget_trial
      function c_budget_trial( &
           dt_s, options, fast_options, thermal_tables, beam_table_count, &
           beam_tables, effective_charge, cells, edges, thermal_number, &
