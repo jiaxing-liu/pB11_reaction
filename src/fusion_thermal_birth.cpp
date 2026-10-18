@@ -1,3 +1,4 @@
+#include "fusion_thermal_birth_budget.h"
 #include "fusion_thermal_birth.h"
 #include "fusion_thermal_parent_internal.h"
 #include "fusion_beam_birth.h"
@@ -210,9 +211,86 @@ int thermal_parent_preflight(int ch,long double E,long double C,double ma,double
  return PB11_STATUS_OK;
 }
 }
+static int emit_budgeted_pb_source(double T,const fusion_thermal_birth_options_v1&o,
+ const fusion_thermal_birth_budget_policy_v1&policy,const fusion_nuclear_channel_v1&reaction,
+ const fusion_nuclear_mass_v1&ma,const fusion_nuclear_mass_v1&mb,
+ const fusion_nuclear_mass_v1*products,const std::vector<CMNode>&cm,
+ const std::vector<fusion_detail::QuadNode>&nodes,const std::vector<fusion_detail::QuadNode>&angular,
+ const std::vector<double>&knots,Mapper&map,R&rate,R&ea,R&eb,R&max_shift,R&shell_shift,
+ fusion_thermal_birth_budget_report_v1&report){
+ const int ch=0;int st=0;R M=R(ma.mass_kg)+mb.mass_kg,mu=R(ma.mass_kg)*mb.mass_kg/M;
+ R prefactor=std::sqrt(8/(pi*mu))/(R(T)*std::sqrt(R(T)));
+ report.version=1;report.full_nq=o.nq;report.full_ncos=o.ncos;
+ report.coarse_nq=policy.coarse_nq;report.coarse_ncos=policy.coarse_ncos;
+ report.number_roundoff_allowance=1e-12;report.energy_roundoff_allowance=1e-12;
+  // Equal-temperature pB positive mixture. All reference parent weights remain.
+  struct BudgetParent {R w,A,beta,energy,score;bool high=false;};
+  struct BudgetGroup {R E;std::size_t begin,end;};
+  std::vector<BudgetParent> parents;std::vector<BudgetGroup> groups;
+  R W=0,U=0;
+  for(std::size_t interval=1;interval<knots.size();++interval){
+   R mid=(R(knots[interval])+knots[interval-1])/2,h=(R(knots[interval])-knots[interval-1])/2;
+   for(auto q:nodes){R E=mid+h*q.x;double sigma=0;
+    st=fusion_c_cross_section_model(ch,o.continuation,o.pb_low,double(E),&sigma);if(st)return st;
+    R wr=h*q.w*prefactor*E*sigma*std::exp(-E/T);if(wr==0||double(wr)==0)continue;
+    BudgetGroup group{E,parents.size(),0};
+    for(auto cq:cm){R w=wr*cq.weight;if(w==0)continue;
+     fusion_reaction_parent_v1 par{};
+     st=parent(ch,E,cq.kinetic,ma.mass_kg,mb.mass_kg,par);if(st)return st;
+     R A=par.available_cm_energy_J,beta=std::abs(R(par.boost_velocity_m_s[2]))/c;
+     // Preserve original parent traversal and scalar arithmetic.
+     rate+=w;ea+=w*(R(ma.mass_kg)/M*cq.kinetic+R(mb.mass_kg)/M*E);
+     eb+=w*(R(mb.mass_kg)/M*cq.kinetic+R(ma.mass_kg)/M*E);
+     max_shift=std::max(max_shift,std::abs(A-(R(reaction.q_J)+E))/(R(reaction.q_J)+E));
+     R energy=R(reaction.q_J)+E+cq.kinetic;
+     if(!std::isfinite(w)||!std::isfinite(energy)||!(w>0&&energy>0))return PB11_STATUS_NUMERICAL_FAILURE;
+     parents.push_back({w,A,beta,energy,0,false});W+=w;U+=w*energy;
+    }
+    group.end=parents.size();groups.push_back(group);
+   }
+  }
+  report.relative_nodes=groups.size();report.cm_nodes=cm.size();report.joint_nodes=parents.size();
+  if(!parents.empty()){
+   if(!std::isfinite(W)||!std::isfinite(U)||!(W>0&&U>0))return PB11_STATUS_NUMERICAL_FAILURE;
+   std::vector<std::size_t> order(parents.size());
+   for(std::size_t i=0;i<order.size();++i){order[i]=i;parents[i].score=std::max(parents[i].w/W,parents[i].w*parents[i].energy/U);}
+   std::stable_sort(order.begin(),order.end(),[&](auto a,auto b){return parents[a].score>parents[b].score;});
+   std::vector<R> tailN(order.size()+1),tailE(order.size()+1);
+   for(std::size_t i=order.size();i-->0;){auto&p=parents[order[i]];tailN[i]=tailN[i+1]+p.w;tailE[i]=tailE[i+1]+p.w*p.energy;}
+   std::size_t selected=0;
+   if((policy.number_L1_tolerance==0||policy.energy_L1_tolerance==0))selected=order.size();
+   else while(selected<order.size()&&(std::min(2.L,2*tailN[selected]/W)>policy.number_L1_tolerance||std::min(2.L,2*tailE[selected]/U)>policy.energy_L1_tolerance))++selected;
+   for(std::size_t i=0;i<selected;++i)parents[order[i]].high=true;
+   report.high_pairs=selected;report.low_pairs=parents.size()-selected;
+   report.number_L1_bound=double(std::min(2.L,2*tailN[selected]/W));report.energy_L1_bound=double(std::min(2.L,2*tailE[selected]/U));
+   report.reaction_weight_m3_s=double(W);report.product_energy_weight_J_m3_s=double(U);
+  }
+  auto coarse=o;coarse.nq=policy.coarse_nq;coarse.ncos=policy.coarse_ncos;
+  const auto coarse_angular=fusion_detail::gauss_legendre(policy.coarse_ncos);
+  for(const auto&group:groups){
+   bool high=false,low=false;
+   for(std::size_t i=group.begin;i<group.end;++i){high|=parents[i].high;low|=!parents[i].high;}
+   SourceWeights full_weights,low_weights;
+   if(high){++report.high_relative_nodes;st=prepare_weights(ch,group.E,o,reaction,full_weights);if(st)return st;}
+   if(low){++report.low_relative_nodes;st=prepare_weights(ch,group.E,coarse,reaction,low_weights);if(st)return st;}
+   for(std::size_t i=group.begin;i<group.end;++i){const auto&p=parents[i];
+    st=emit_products(ch,p.A,p.beta,p.w,p.high?o:coarse,reaction,products,
+      p.high?angular:coarse_angular,p.high?full_weights:low_weights,map,shell_shift);
+    if(st)return st;
+   }
+  }
+ report.mixed=report.low_pairs!=0;
+ for(double v:{report.number_L1_bound,report.energy_L1_bound,report.reaction_weight_m3_s,
+   report.product_energy_weight_J_m3_s})if(!std::isfinite(v))return PB11_STATUS_NUMERICAL_FAILURE;
+ return PB11_STATUS_OK;
+}
+
 static int pair_birth_impl(int ch,double Ta,double Tb,int correlation_order,const fusion_thermal_birth_options_v1*op,
- int n,const double*edges,double*birth,fusion_thermal_birth_v1*out){
+ int n,const double*edges,double*birth,fusion_thermal_birth_v1*out,
+ const fusion_thermal_birth_budget_policy_v1*budget=nullptr,
+ fusion_thermal_birth_budget_report_v1*budget_report=nullptr){
  double T=Ta;
+ if(budget_report)*budget_report={};
  if(out)*out={};
  if(n>0&&n<=100000&&birth)std::fill(birth,birth+7*n,0.);
  if(!out||!birth)return PB11_STATUS_NULL_OUTPUT;
@@ -228,6 +306,16 @@ static int pair_birth_impl(int ch,double Ta,double Tb,int correlation_order,cons
  if(o.relative_order<4||o.relative_order>64||o.cm_order<4||o.cm_order>32||o.nq<4||o.nq>1024||o.ncos<4||o.ncos>1024||
    o.remainder_policy<0||o.remainder_policy>2||(o.broad_mode!=1&&o.broad_mode!=3&&o.broad_mode!=13)||o.fsci_policy<0||o.fsci_policy>1)
   return PB11_STATUS_INVALID_ARGUMENT;
+ if(budget){
+  if(!budget_report)return PB11_STATUS_NULL_OUTPUT;
+  if(ch!=0||Ta!=Tb||budget->version!=1||budget->reserved!=0||
+     budget->coarse_nq<4||budget->coarse_nq>o.nq||
+     budget->coarse_ncos<4||budget->coarse_ncos>o.ncos||
+     !finite_value(budget->number_L1_tolerance)||!finite_value(budget->energy_L1_tolerance)||
+     budget->number_L1_tolerance<0||budget->number_L1_tolerance>2||
+     budget->energy_L1_tolerance<0||budget->energy_L1_tolerance>2)
+    return PB11_STATUS_INVALID_ARGUMENT;
+ }
  for(int j=0;j<=n;++j)if(!finite_value(edges[j])||edges[j]<0||(j&&edges[j]<=edges[j-1]))return PB11_STATUS_INVALID_ARGUMENT;
  try{
   fusion_nuclear_channel_v1 reaction{};int st=fusion_c_nuclear_channel(ch,&reaction);if(st)return st;
@@ -265,6 +353,11 @@ static int pair_birth_impl(int ch,double Ta,double Tb,int correlation_order,cons
   R M=R(ma.mass_kg)+mb.mass_kg,mu=R(ma.mass_kg)*mb.mass_kg/M;
   R prefactor=std::sqrt(8/(pi*mu))/(R(T)*std::sqrt(R(T)));
   R cmprob=0;for(auto q:cm)cmprob+=q.weight;
+  fusion_thermal_birth_budget_report_v1 local_budget{};
+  if(budget){
+   st=emit_budgeted_pb_source(T,o,*budget,reaction,ma,mb,products,cm,nodes,angular,knots,
+    map,rate,ea,eb,max_shift,shell_shift,local_budget);if(st)return st;
+  }else{
   for(std::size_t interval=1;interval<knots.size();++interval){
    R mid=(R(knots[interval])+knots[interval-1])/2,h=(R(knots[interval])-knots[interval-1])/2;
    for(auto q:nodes){R E=mid+h*q.x;double sigma=0;
@@ -299,6 +392,7 @@ static int pair_birth_impl(int ch,double Ta,double Tb,int correlation_order,cons
     }
    }
   }
+  }
   result.reactivity_m3_s=double(rate);result.reference_reactivity_m3_s=reference.total.resolved_reactivity_m3_s;
   result.reactant_energy_moment_J_m3_s[0]=double(ea);result.reactant_energy_moment_J_m3_s[1]=double(eb);
   result.reference_reactant_energy_moment_J_m3_s[0]=reference.total.projectile_energy_reactivity_J_m3_s;
@@ -308,7 +402,9 @@ static int pair_birth_impl(int ch,double Ta,double Tb,int correlation_order,cons
   result.cm_tail_probability=double(tail);
   result.cm_tail_energy_moment_J=double(R(cm_temperature)*(1.5L*tail+2/std::sqrt(pi)*X*std::sqrt(X)*std::exp(-X)));
   result.max_cm_energy_shift_fraction=double(max_shift);result.max_shell_remap_fraction=double(shell_shift);
-  return finish_source(map,n,reaction,rate,ea,eb,result,birth,out);
+  st=finish_source(map,n,reaction,rate,ea,eb,result,birth,out);
+  if(st==PB11_STATUS_OK&&budget_report)*budget_report=local_budget;
+  return st;
  }catch(...){return PB11_STATUS_EXCEPTION;}
 }
 
@@ -319,6 +415,18 @@ extern "C" int fusion_c_thermal_birth_grid(int ch,double T,const fusion_thermal_
 extern "C" int fusion_c_thermal_pair_birth_grid(int ch,double Ta,double Tb,int correlation_order,
  const fusion_thermal_birth_options_v1*op,int n,const double*edges,double*birth,fusion_thermal_birth_v1*out){
  return pair_birth_impl(ch,Ta,Tb,correlation_order,op,n,edges,birth,out);
+}
+
+extern "C" int fusion_c_pb_thermal_birth_budget_grid(double T,
+ const fusion_thermal_birth_options_v1*op,const fusion_thermal_birth_budget_policy_v1*policy,
+ int n,const double*edges,double*birth,fusion_thermal_birth_v1*out,
+ fusion_thermal_birth_budget_report_v1*report){
+ if(report)*report={};
+ if(out)*out={};
+ if(n>0&&n<=100000&&birth)std::fill(birth,birth+7*n,0.);
+ if(!report||!out||!birth)return PB11_STATUS_NULL_OUTPUT;
+ if(!policy)return PB11_STATUS_INVALID_ARGUMENT;
+ return pair_birth_impl(0,T,T,4,op,n,edges,birth,out,policy,report);
 }
 
 extern "C" int fusion_c_beam_birth_resolve_support(double energy,

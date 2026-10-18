@@ -301,3 +301,5 @@ not relabeled as experimentally resolved alpha1 spectra.
 reactant momenta into conservative five-channel events with a declared
 classical-budget or on-shell input energy convention, through
 `fusion_reaction_event.h` and its Fortran module.
+
+The explicit equal-temperature pB birth accuracy policy and C/Fortran report API are described in [THERMAL_BIRTH_BUDGET.md](docs/THERMAL_BIRTH_BUDGET.md). It does not silently enable a table or host approximation.

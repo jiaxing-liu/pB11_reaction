@@ -268,6 +268,16 @@ if(PB11_FORTRAN_AVAILABLE)
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>")
     target_link_libraries(fusion_thermal_birth_fortran PUBLIC pb11::pb11 pb11::fortran)
 
+    add_library(fusion_thermal_birth_budget_fortran STATIC fortran/fusion_thermal_birth_budget_fortran.f90)
+    add_library(pb11::fusion_thermal_birth_budget_fortran ALIAS fusion_thermal_birth_budget_fortran)
+    set_target_properties(fusion_thermal_birth_budget_fortran PROPERTIES
+        Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fortran-mod"
+        EXPORT_NAME fusion_thermal_birth_budget_fortran)
+    target_include_directories(fusion_thermal_birth_budget_fortran INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>)
+    target_link_libraries(fusion_thermal_birth_budget_fortran PUBLIC pb11::fusion_thermal_birth_fortran)
+
     add_library(fusion_reaction_event_fortran STATIC fortran/fusion_reaction_event_fortran.f90)
     add_library(pb11::fusion_reaction_event_fortran ALIAS fusion_reaction_event_fortran)
     set_target_properties(fusion_reaction_event_fortran PROPERTIES
@@ -486,6 +496,28 @@ if(PB11_BUILD_DIAGNOSTICS)
     add_subdirectory(diagnostics)
 endif()
 if(BUILD_TESTING)
+    enable_language(C)
+    add_executable(test_fusion_thermal_birth_budget tests/test_fusion_thermal_birth_budget.cpp)
+    target_link_libraries(test_fusion_thermal_birth_budget PRIVATE pb11::pb11)
+    add_test(NAME fusion_thermal_birth_budget_tests COMMAND test_fusion_thermal_birth_budget)
+    add_executable(test_fusion_thermal_birth_budget_c tests/test_fusion_thermal_birth_budget_c.c)
+    set_target_properties(test_fusion_thermal_birth_budget_c PROPERTIES LINKER_LANGUAGE CXX C_STANDARD 11)
+    target_link_libraries(test_fusion_thermal_birth_budget_c PRIVATE pb11::pb11)
+    add_test(NAME fusion_thermal_birth_budget_c_tests COMMAND test_fusion_thermal_birth_budget_c)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang" AND UNIX AND NOT APPLE)
+        add_executable(test_fusion_thermal_birth_budget_failure tests/test_fusion_thermal_birth_budget_failure.cpp)
+        target_link_libraries(test_fusion_thermal_birth_budget_failure PRIVATE pb11::pb11)
+        target_link_options(test_fusion_thermal_birth_budget_failure PRIVATE "-Wl,--wrap=fusion_c_three_equal_sequential_cm")
+        add_test(NAME fusion_thermal_birth_budget_failure_tests COMMAND test_fusion_thermal_birth_budget_failure)
+    endif()
+    if(PB11_FORTRAN_AVAILABLE)
+        add_executable(test_fusion_thermal_birth_budget_fortran tests/test_fusion_thermal_birth_budget_fortran.f90)
+        set_target_properties(test_fusion_thermal_birth_budget_fortran PROPERTIES
+            LINKER_LANGUAGE Fortran
+            Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fortran-test-mod/thermal-birth-budget")
+        target_link_libraries(test_fusion_thermal_birth_budget_fortran PRIVATE pb11::fusion_thermal_birth_budget_fortran)
+        add_test(NAME fusion_thermal_birth_budget_fortran_tests COMMAND test_fusion_thermal_birth_budget_fortran)
+    endif()
     add_executable(test_fusion_table_digest tests/test_fusion_table_digest.cpp)
     target_link_libraries(test_fusion_table_digest PRIVATE pb11::pb11)
     add_test(NAME fusion_table_digest_tests COMMAND test_fusion_table_digest)
@@ -1146,7 +1178,7 @@ if(PB11_FORTRAN_AVAILABLE)
         TARGETS pb11_fortran fusion_fortran fusion_energy_work_fortran fusion_kinetics_fortran fusion_radial_transport_fortran
                 fusion_two_component_fortran fusion_handoff_fortran fusion_birth_floor_fortran fusion_thermal_burn_fortran fusion_nuclear_data_fortran fusion_source_state_fortran fusion_source_volume_fortran fusion_source_state_numerical_fortran fusion_kinetic_geometry_fortran fusion_fast_moments_fortran
                 fusion_beam_fortran fusion_rate_model_fortran fusion_target_burn_fortran fusion_target_network_fortran fusion_fsci_fortran fusion_pb_birth_fortran fusion_pb_population_fortran fusion_reaction_event_fortran
-                fusion_products_fortran fusion_thermal_birth_fortran fusion_beam_birth_fortran fusion_birth_table_fortran fusion_beam_birth_table_fortran fusion_coupled_thermal_fortran fusion_coupled_fast_fortran fusion_coupled_sources_fortran fusion_coupled_sources_floor_fortran
+                fusion_products_fortran fusion_thermal_birth_fortran fusion_thermal_birth_budget_fortran fusion_beam_birth_fortran fusion_birth_table_fortran fusion_beam_birth_table_fortran fusion_coupled_thermal_fortran fusion_coupled_fast_fortran fusion_coupled_sources_fortran fusion_coupled_sources_floor_fortran
                 fusion_laboratory_fortran fusion_spectrum_fortran
         EXPORT pb11Targets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -1168,7 +1200,7 @@ install(
           include/fusion_thermal_burn.h include/fusion_nuclear_data.h include/fusion_source_state.h include/fusion_kinetic_geometry.h include/fusion_fast_moments.h include/fusion_flux_field.h include/fusion_flux_core.h include/fusion_flux_inverse.h include/fusion_flux_boundary.h include/fusion_magnetic_push.h include/fusion_boundary_segment.h include/fusion_prompt_orbit.h include/fusion_prompt_reduce.h include/fusion_thermal_markers.h
           include/fusion_products.h include/fusion_laboratory.h
           include/fusion_nuclear_coulomb.h include/fusion_alpha_amplitudes.h
-          include/fusion_alpha_spectrum.h include/fusion_beam_birth_table.h include/fusion_birth_table.h include/fusion_coupled_thermal.h include/fusion_coupled_fast.h include/fusion_coupled_sources.h include/fusion_thermal_birth.h include/fusion_beam_birth.h include/fusion_pb_birth.h include/fusion_pb_population.h include/fusion_reaction_event.h
+          include/fusion_alpha_spectrum.h include/fusion_beam_birth_table.h include/fusion_birth_table.h include/fusion_coupled_thermal.h include/fusion_coupled_fast.h include/fusion_coupled_sources.h include/fusion_thermal_birth.h include/fusion_thermal_birth_budget.h include/fusion_beam_birth.h include/fusion_pb_birth.h include/fusion_pb_population.h include/fusion_reaction_event.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(
