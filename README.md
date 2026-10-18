@@ -305,3 +305,5 @@ classical-budget or on-shell input energy convention, through
 The explicit equal-temperature pB birth accuracy policy and C/Fortran report API are described in [THERMAL_BIRTH_BUDGET.md](docs/THERMAL_BIRTH_BUDGET.md). It does not silently enable a table or host approximation.
 
 Immutable pB tables with explicit source-budget metadata, combined sampled error gates and format2 bytes are documented in [BIRTH_TABLE_BUDGET.md](docs/BIRTH_TABLE_BUDGET.md). Coupled/host activation remains explicit.
+
+See [explicit coupled pB source budgets](docs/COUPLED_SOURCE_BUDGET.md) for the additive covered/packet C and Fortran entry.
