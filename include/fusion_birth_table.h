@@ -5,6 +5,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+/* The explicit pB budget constructor in fusion_birth_table_budget.h shares
+ * this immutable handle and generic lifecycle/evaluation/byte functions.
+ * Its info carries combined sampled source+interpolation errors, its bytes
+ * use format2, and old full-source request/coupled matching rejects it. */
 typedef struct fusion_birth_table_v1 fusion_birth_table_v1;
 /* Raw source coefficients: K [m^3/s], reacting-energy moments [J m^3/s],
  * spill number [m^3/s] and spill energy [J m^3/s]. Species0..5, neutron6.

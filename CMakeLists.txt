@@ -187,6 +187,16 @@ if(PB11_FORTRAN_AVAILABLE)
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>)
     target_link_libraries(fusion_birth_table_fortran PUBLIC pb11::pb11 fusion_thermal_birth_fortran)
 
+    add_library(fusion_birth_table_budget_fortran STATIC fortran/fusion_birth_table_budget_fortran.f90)
+    add_library(pb11::fusion_birth_table_budget_fortran ALIAS fusion_birth_table_budget_fortran)
+    set_target_properties(fusion_birth_table_budget_fortran PROPERTIES
+        Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/fortran-mod"
+        EXPORT_NAME fusion_birth_table_budget_fortran)
+    target_include_directories(fusion_birth_table_budget_fortran INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/fortran-mod>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}/fortran/modules>)
+    target_link_libraries(fusion_birth_table_budget_fortran PUBLIC pb11::fusion_birth_table_fortran pb11::fusion_thermal_birth_budget_fortran)
+
     add_library(fusion_coupled_thermal_fortran STATIC fortran/fusion_coupled_thermal_fortran.f90)
     add_library(pb11::fusion_coupled_thermal_fortran ALIAS fusion_coupled_thermal_fortran)
     set_target_properties(fusion_coupled_thermal_fortran PROPERTIES
@@ -496,6 +506,21 @@ if(PB11_BUILD_DIAGNOSTICS)
     add_subdirectory(diagnostics)
 endif()
 if(BUILD_TESTING)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang" AND UNIX AND NOT APPLE)
+        add_executable(test_fusion_birth_table_budget tests/test_fusion_birth_table_budget.cpp)
+        target_include_directories(test_fusion_birth_table_budget PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(test_fusion_birth_table_budget PRIVATE pb11::pb11)
+        target_link_options(test_fusion_birth_table_budget PRIVATE "-Wl,--wrap=fusion_c_pb_thermal_birth_budget_grid")
+        add_test(NAME fusion_birth_table_budget_tests COMMAND test_fusion_birth_table_budget)
+    endif()
+    if(PB11_FORTRAN_AVAILABLE)
+        add_executable(test_fusion_birth_table_budget_fortran tests/test_fusion_birth_table_budget_fortran.f90)
+        set_target_properties(test_fusion_birth_table_budget_fortran PROPERTIES
+            LINKER_LANGUAGE Fortran
+            Fortran_MODULE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test-fortran-mod/birth-table-budget")
+        target_link_libraries(test_fusion_birth_table_budget_fortran PRIVATE pb11::fusion_birth_table_budget_fortran)
+        add_test(NAME fusion_birth_table_budget_fortran_tests COMMAND test_fusion_birth_table_budget_fortran)
+    endif()
     enable_language(C)
     add_executable(test_fusion_thermal_birth_budget tests/test_fusion_thermal_birth_budget.cpp)
     target_link_libraries(test_fusion_thermal_birth_budget PRIVATE pb11::pb11)
@@ -1178,7 +1203,7 @@ if(PB11_FORTRAN_AVAILABLE)
         TARGETS pb11_fortran fusion_fortran fusion_energy_work_fortran fusion_kinetics_fortran fusion_radial_transport_fortran
                 fusion_two_component_fortran fusion_handoff_fortran fusion_birth_floor_fortran fusion_thermal_burn_fortran fusion_nuclear_data_fortran fusion_source_state_fortran fusion_source_volume_fortran fusion_source_state_numerical_fortran fusion_kinetic_geometry_fortran fusion_fast_moments_fortran
                 fusion_beam_fortran fusion_rate_model_fortran fusion_target_burn_fortran fusion_target_network_fortran fusion_fsci_fortran fusion_pb_birth_fortran fusion_pb_population_fortran fusion_reaction_event_fortran
-                fusion_products_fortran fusion_thermal_birth_fortran fusion_thermal_birth_budget_fortran fusion_beam_birth_fortran fusion_birth_table_fortran fusion_beam_birth_table_fortran fusion_coupled_thermal_fortran fusion_coupled_fast_fortran fusion_coupled_sources_fortran fusion_coupled_sources_floor_fortran
+                fusion_products_fortran fusion_thermal_birth_fortran fusion_thermal_birth_budget_fortran fusion_beam_birth_fortran fusion_birth_table_fortran fusion_birth_table_budget_fortran fusion_beam_birth_table_fortran fusion_coupled_thermal_fortran fusion_coupled_fast_fortran fusion_coupled_sources_fortran fusion_coupled_sources_floor_fortran
                 fusion_laboratory_fortran fusion_spectrum_fortran
         EXPORT pb11Targets
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -1200,7 +1225,7 @@ install(
           include/fusion_thermal_burn.h include/fusion_nuclear_data.h include/fusion_source_state.h include/fusion_kinetic_geometry.h include/fusion_fast_moments.h include/fusion_flux_field.h include/fusion_flux_core.h include/fusion_flux_inverse.h include/fusion_flux_boundary.h include/fusion_magnetic_push.h include/fusion_boundary_segment.h include/fusion_prompt_orbit.h include/fusion_prompt_reduce.h include/fusion_thermal_markers.h
           include/fusion_products.h include/fusion_laboratory.h
           include/fusion_nuclear_coulomb.h include/fusion_alpha_amplitudes.h
-          include/fusion_alpha_spectrum.h include/fusion_beam_birth_table.h include/fusion_birth_table.h include/fusion_coupled_thermal.h include/fusion_coupled_fast.h include/fusion_coupled_sources.h include/fusion_thermal_birth.h include/fusion_thermal_birth_budget.h include/fusion_beam_birth.h include/fusion_pb_birth.h include/fusion_pb_population.h include/fusion_reaction_event.h
+          include/fusion_alpha_spectrum.h include/fusion_beam_birth_table.h include/fusion_birth_table.h include/fusion_birth_table_budget.h include/fusion_coupled_thermal.h include/fusion_coupled_fast.h include/fusion_coupled_sources.h include/fusion_thermal_birth.h include/fusion_thermal_birth_budget.h include/fusion_beam_birth.h include/fusion_pb_birth.h include/fusion_pb_population.h include/fusion_reaction_event.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 install(

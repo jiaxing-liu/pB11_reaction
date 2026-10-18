@@ -1,3 +1,4 @@
+#include "fusion_birth_table_budget.h"
 #include "fusion_birth_table.h"
 #include "fusion_birth_table_internal.h"
 #include "fusion_thermal_parent_internal.h"
@@ -28,7 +29,8 @@ template<class C,class F>void fields(C&c,F f){
  for(auto&v:c.above_energy_J_m3_s)f(v);
 }
 double stored(R v){require(std::isfinite(v)&&v>=0&&v<=std::numeric_limits<double>::max());return double(v);}
-struct Node {double T=0;std::vector<double> grid;fusion_birth_coefficients_v1 c{};};
+double stored_upper(R v){double out=stored(v);if(R(out)<v)out=std::nextafter(out,std::numeric_limits<double>::infinity());return out;}
+struct Node {double T=0;std::vector<double> grid;fusion_birth_coefficients_v1 c{};fusion_thermal_birth_budget_report_v1 budget_report{};};
 using Ptr=std::shared_ptr<Node>;
 using Errors=std::array<double,4>;
 R weight(double T,double a,double b){
@@ -52,6 +54,7 @@ bool balanced(R a,R b){return std::isfinite(a)&&std::isfinite(b)&&std::abs(a-b)<
 }
 struct fusion_birth_table_v1 {
  fusion_birth_table_info_v1 info{};
+ bool budget_enabled=false;fusion_birth_table_budget_info_v1 accuracy{};
  std::vector<double> edges;
  std::vector<Ptr> knots;
  fusion_nuclear_channel_v1 channel{};
@@ -69,11 +72,45 @@ void conservative(const fusion_birth_table_v1&t,const double*grid,const fusion_b
  }
  require(balanced(totalE,R(t.channel.q_J)*c.reactivity_m3_s+c.reactant_energy_moment_J_m3_s[0]+c.reactant_energy_moment_J_m3_s[1]));
 }
+bool same_policy(const fusion_thermal_birth_budget_policy_v1&a,const fusion_thermal_birth_budget_policy_v1&b){
+ return a.version==b.version&&a.coarse_nq==b.coarse_nq&&a.coarse_ncos==b.coarse_ncos&&a.reserved==b.reserved&&
+  a.number_L1_tolerance==b.number_L1_tolerance&&a.energy_L1_tolerance==b.energy_L1_tolerance;
+}
+bool valid_policy(const fusion_thermal_birth_options_v1&s,const fusion_thermal_birth_budget_policy_v1&p){
+ return p.version==1&&p.reserved==0&&p.coarse_nq>=4&&p.coarse_nq<=s.nq&&p.coarse_ncos>=4&&p.coarse_ncos<=s.ncos&&
+  std::isfinite(p.number_L1_tolerance)&&std::isfinite(p.energy_L1_tolerance)&&p.number_L1_tolerance>=0&&p.number_L1_tolerance<=2&&
+  p.energy_L1_tolerance>=0&&p.energy_L1_tolerance<=2;
+}
+R source_upper(const fusion_thermal_birth_budget_report_v1&r,bool energy){
+ if(r.reaction_weight_m3_s==0)return 0;
+ return energy?R(r.energy_L1_bound)+r.energy_roundoff_allowance:R(r.number_L1_bound)+r.number_roundoff_allowance;
+}
+void validate_budget_report(const fusion_birth_table_v1&t,const Node&node){
+ const auto&r=node.budget_report;const auto&p=t.accuracy.policy;const auto&s=t.info.source;
+ require(r.version==1&&r.full_nq==s.nq&&r.full_ncos==s.ncos&&r.coarse_nq==p.coarse_nq&&r.coarse_ncos==p.coarse_ncos,BAD);
+ for(double v:{r.number_L1_bound,r.energy_L1_bound,r.number_roundoff_allowance,r.energy_roundoff_allowance,r.reaction_weight_m3_s,r.product_energy_weight_J_m3_s})require(std::isfinite(v)&&v>=0,BAD);
+ require(r.number_L1_bound<=p.number_L1_tolerance&&r.energy_L1_bound<=p.energy_L1_tolerance&&r.number_L1_bound<=2&&r.energy_L1_bound<=2,BAD);
+ require(r.number_roundoff_allowance==1e-12&&r.energy_roundoff_allowance==1e-12,BAD);
+ int intervals=1;for(R v:{.25L,.5L,1.L,2.L,3.L,4.L,6.L,8.L})if(v<std::sqrt(R(s.cm_max_kT)))++intervals;
+ require(r.cm_nodes==uint64_t(intervals*s.cm_order)&&r.relative_nodes<=1000000,BAD);
+ require(r.relative_nodes<=std::numeric_limits<uint64_t>::max()/r.cm_nodes&&r.joint_nodes==r.relative_nodes*r.cm_nodes,BAD);
+ require(r.high_pairs<=r.joint_nodes&&r.low_pairs==r.joint_nodes-r.high_pairs&&r.mixed==int(r.low_pairs!=0),BAD);
+ require(r.high_relative_nodes<=r.relative_nodes&&r.low_relative_nodes<=r.relative_nodes&&r.high_relative_nodes+r.low_relative_nodes>=r.relative_nodes,BAD);
+ require((r.high_pairs==0)==(r.high_relative_nodes==0)&&(r.low_pairs==0)==(r.low_relative_nodes==0),BAD);
+ require(r.high_pairs>=r.high_relative_nodes&&r.high_pairs<=r.high_relative_nodes*r.cm_nodes&&r.low_pairs>=r.low_relative_nodes&&r.low_pairs<=r.low_relative_nodes*r.cm_nodes,BAD);
+ if(p.number_L1_tolerance==0||p.energy_L1_tolerance==0)require(r.low_pairs==0,BAD);
+ if(r.low_pairs==0)require(r.number_L1_bound==0&&r.energy_L1_bound==0,BAD);
+ require(r.reaction_weight_m3_s==node.c.reactivity_m3_s,BAD);
+ require(balanced(r.product_energy_weight_J_m3_s,R(t.channel.q_J)*node.c.reactivity_m3_s+node.c.reactant_energy_moment_J_m3_s[0]+node.c.reactant_energy_moment_J_m3_s[1]),BAD);
+ if(r.joint_nodes==0)require(r.reaction_weight_m3_s==0&&r.product_energy_weight_J_m3_s==0&&r.number_L1_bound==0&&r.energy_L1_bound==0,BAD);
+}
 Ptr direct(fusion_birth_table_v1&t,double T){
  require(t.info.direct_evaluations<t.info.control.max_evaluations);
  ++t.info.direct_evaluations;
  auto p=std::make_shared<Node>();p->T=T;p->grid.resize(7*t.info.cells);
- fusion_thermal_birth_v1 r{};int st=fusion_c_thermal_birth_grid(t.info.channel,T,&t.info.source,t.info.cells,t.edges.data(),p->grid.data(),&r);
+ fusion_thermal_birth_v1 r{};
+ int st=t.budget_enabled?fusion_c_pb_thermal_birth_budget_grid(T,&t.info.source,&t.accuracy.policy,t.info.cells,t.edges.data(),p->grid.data(),&r,&p->budget_report):
+  fusion_c_thermal_birth_grid(t.info.channel,T,&t.info.source,t.info.cells,t.edges.data(),p->grid.data(),&r);
  require(st==PB11_STATUS_OK,st);
  require(std::abs(r.relative_rate_discrepancy)<=t.info.control.max_direct_rate_discrepancy&&r.relative_reactant_energy_discrepancy<=t.info.control.max_direct_debit_discrepancy);
  t.info.max_sampled_direct_rate_discrepancy=std::max(t.info.max_sampled_direct_rate_discrepancy,std::abs(r.relative_rate_discrepancy));
@@ -81,7 +118,18 @@ Ptr direct(fusion_birth_table_v1&t,double T){
  auto&c=p->c;c.reactivity_m3_s=r.reactivity_m3_s;
  for(int i=0;i<2;++i)c.reactant_energy_moment_J_m3_s[i]=r.reactant_energy_moment_J_m3_s[i];
  for(int i=0;i<7;++i){c.below_number_m3_s[i]=r.below_number_m3_s[i];c.below_energy_J_m3_s[i]=r.below_energy_J_m3_s[i];c.above_number_m3_s[i]=r.above_number_m3_s[i];c.above_energy_J_m3_s[i]=r.above_energy_J_m3_s[i];}
- conservative(t,p->grid.data(),c);return p;
+ conservative(t,p->grid.data(),c);
+ if(t.budget_enabled){validate_budget_report(t,*p);const auto&r=p->budget_report;auto&a=t.accuracy;
+  const double N=stored_upper(source_upper(r,false)),E=stored_upper(source_upper(r,true));
+  require(N<=t.info.control.max_number_L1&&E<=t.info.control.max_energy_L1);
+  a.max_sampled_source_number_bound=std::max(a.max_sampled_source_number_bound,N);
+  a.max_sampled_source_energy_bound=std::max(a.max_sampled_source_energy_bound,E);
+  a.max_sampled_number_roundoff_allowance=std::max(a.max_sampled_number_roundoff_allowance,r.number_roundoff_allowance);
+  a.max_sampled_energy_roundoff_allowance=std::max(a.max_sampled_energy_roundoff_allowance,r.energy_roundoff_allowance);
+  t.info.max_validated_number_L1=std::max(t.info.max_validated_number_L1,N);
+  t.info.max_validated_energy_L1=std::max(t.info.max_validated_energy_L1,E);
+ }
+ return p;
 }
 Errors discrepancy(const fusion_birth_table_v1&t,const Node&a,const Node&b,const Node&reference){
  const R w=weight(reference.T,a.T,b.T);const auto c=mix(a,b,w);const auto&r=reference.c;
@@ -96,26 +144,37 @@ Errors discrepancy(const fusion_birth_table_v1&t,const Node&a,const Node&b,const
   N+=R(r.below_number_m3_s[species])+r.above_number_m3_s[species];E+=R(r.below_energy_J_m3_s[species])+r.above_energy_J_m3_s[species];
   for(int j=0;j<n;++j){int k=species*n+j;R center=(R(t.edges[j])+t.edges[j+1])/2;
    R v=stored((1-w)*a.grid[k]+w*b.grid[k]),diff=std::abs(v-reference.grid[k]);dN+=diff;dE+=center*diff;N+=reference.grid[k];E+=center*reference.grid[k];}
-  e[2]=std::max(e[2],double(relative(dN,N)));e[3]=std::max(e[3],double(relative(dE,E)));
+  if(t.budget_enabled&&species==4){N=3*R(r.reactivity_m3_s);E=R(t.channel.q_J)*r.reactivity_m3_s+r.reactant_energy_moment_J_m3_s[0]+r.reactant_energy_moment_J_m3_s[1];}
+  const R rn=relative(dN,N),re=relative(dE,E);
+  e[2]=std::max(e[2],t.budget_enabled&&std::isfinite(rn)?stored_upper(rn):double(rn));
+  e[3]=std::max(e[3],t.budget_enabled&&std::isfinite(re)?stored_upper(re):double(re));
  }
  return e;
 }
 void refine(fusion_birth_table_v1&t,const Ptr&a,const Ptr&b,int depth,Ptr midpoint_hint={}){
- const auto&q=t.info.control;Errors worst{};Ptr midpoint,quarter1,quarter3;
- for(int j=1;j<=3;++j){const double T=geometric(a->T,b->T,R(j)/4);auto ref=(j==2&&midpoint_hint&&T==midpoint_hint->T)?midpoint_hint:direct(t,T);const auto e=discrepancy(t,*a,*b,*ref);for(int i=0;i<4;++i)worst[i]=std::max(worst[i],e[i]);if(j==1)quarter1=ref;else if(j==2)midpoint=ref;else quarter3=ref;}
+ const auto&q=t.info.control;Errors worst{},raw_worst{};Ptr midpoint,quarter1,quarter3;
+ for(int j=1;j<=3;++j){
+  const double T=geometric(a->T,b->T,R(j)/4);auto ref=(j==2&&midpoint_hint&&T==midpoint_hint->T)?midpoint_hint:direct(t,T);
+  auto e=discrepancy(t,*a,*b,*ref);for(int i=0;i<4;++i)raw_worst[i]=std::max(raw_worst[i],e[i]);
+  if(t.budget_enabled){if(std::isfinite(e[2]))e[2]=stored_upper(R(e[2])+source_upper(ref->budget_report,false));if(std::isfinite(e[3]))e[3]=stored_upper(R(e[3])+source_upper(ref->budget_report,true));}
+  for(int i=0;i<4;++i)worst[i]=std::max(worst[i],e[i]);
+  if(j==1)quarter1=ref;else if(j==2)midpoint=ref;else quarter3=ref;
+ }
  const bool pass=worst[0]<=q.max_rate_error&&worst[1]<=q.max_debit_error&&worst[2]<=q.max_number_L1&&worst[3]<=q.max_energy_L1;
  if(pass){require(t.knots.size()+2<=size_t(q.max_knots));t.knots.push_back(a);
   t.info.max_validated_rate_error=std::max(t.info.max_validated_rate_error,worst[0]);
   t.info.max_validated_debit_error=std::max(t.info.max_validated_debit_error,worst[1]);
   t.info.max_validated_number_L1=std::max(t.info.max_validated_number_L1,worst[2]);
-  t.info.max_validated_energy_L1=std::max(t.info.max_validated_energy_L1,worst[3]);return;
+  t.info.max_validated_energy_L1=std::max(t.info.max_validated_energy_L1,worst[3]);
+  if(t.budget_enabled){auto&a=t.accuracy;a.max_validated_interpolation_number_L1=std::max(a.max_validated_interpolation_number_L1,raw_worst[2]);a.max_validated_interpolation_energy_L1=std::max(a.max_validated_interpolation_energy_L1,raw_worst[3]);}
+  return;
  }
  require(depth<q.max_depth);refine(t,a,midpoint,depth+1,quarter1);refine(t,midpoint,b,depth+1,quarter3);
 }
 }
-extern "C" int fusion_c_birth_table_create(int channel,double lower,double upper,
+static int create_impl(int channel,double lower,double upper,
  const fusion_thermal_birth_options_v1*source,const fusion_birth_table_control_v1*control,
- int n,const double*edges,fusion_birth_table_v1**out){
+ int n,const double*edges,fusion_birth_table_v1**out,const fusion_thermal_birth_budget_policy_v1*budget=nullptr){
  if(!out)return PB11_STATUS_NULL_OUTPUT;
  *out=nullptr;
  if(!source||!control||!edges||channel<0||channel>4||n<1||n>100000)return BAD;
@@ -125,10 +184,23 @@ extern "C" int fusion_c_birth_table_create(int channel,double lower,double upper
  if(q.max_knots<2||q.max_knots>100000||q.max_evaluations<5||q.max_evaluations>1000000||q.max_depth<0||q.max_depth>24)return BAD;
  if(7ULL*n*(q.max_knots+3*q.max_depth+6)>50000000ULL)return BAD;
  for(int j=0;j<=n;++j)if(!std::isfinite(edges[j])||edges[j]<0||(j&&edges[j]<=edges[j-1]))return BAD;
- try{auto t=std::make_unique<fusion_birth_table_v1>();auto&i=t->info;i.channel=channel;i.cells=n;i.lower_kT_J=lower;i.upper_kT_J=upper;i.source=*source;i.control=q;t->edges.assign(edges,edges+n+1);
+ if(budget&&(channel!=0||!valid_policy(*source,*budget)))return BAD;
+ try{auto t=std::make_unique<fusion_birth_table_v1>();if(budget){t->budget_enabled=true;t->accuracy.policy=*budget;}auto&i=t->info;i.channel=channel;i.cells=n;i.lower_kT_J=lower;i.upper_kT_J=upper;i.source=*source;i.control=q;t->edges.assign(edges,edges+n+1);
   int st=fusion_c_nuclear_channel(channel,&t->channel);require(st==PB11_STATUS_OK,st);
   auto a=direct(*t,lower),b=direct(*t,upper);refine(*t,a,b,0);t->knots.push_back(b);i.knots=int(t->knots.size());*out=t.release();return PB11_STATUS_OK;
  }catch(const Failure&f){return f.status;}catch(...){return PB11_STATUS_EXCEPTION;}
+}
+extern "C" int fusion_c_birth_table_create(int channel,double lower,double upper,
+ const fusion_thermal_birth_options_v1*source,const fusion_birth_table_control_v1*control,
+ int n,const double*edges,fusion_birth_table_v1**out){
+ return create_impl(channel,lower,upper,source,control,n,edges,out);
+}
+extern "C" int fusion_c_pb_birth_table_create_budget(double lower,double upper,
+ const fusion_thermal_birth_options_v1*source,const fusion_thermal_birth_budget_policy_v1*policy,
+ const fusion_birth_table_control_v1*control,int n,const double*edges,fusion_birth_table_v1**out){
+ if(!out)return PB11_STATUS_NULL_OUTPUT;
+ *out=nullptr;if(!policy)return BAD;
+ return create_impl(0,lower,upper,source,control,n,edges,out,policy);
 }
 extern "C" void fusion_c_birth_table_destroy(fusion_birth_table_v1*t){delete t;}
 extern "C" int fusion_c_birth_table_info(const fusion_birth_table_v1*t,fusion_birth_table_info_v1*out){
@@ -150,7 +222,7 @@ extern "C" int fusion_c_birth_table_evaluate(const fusion_birth_table_v1*t,doubl
 }
 
 namespace fusion_detail {
-bool birth_table_matches(const fusion_birth_table_v1*t,int channel,
+bool birth_table_matches_model(const fusion_birth_table_v1*t,int channel,
  const fusion_thermal_birth_options_v1&s,int n,const double*edges) noexcept {
  if(!t||!edges||channel!=t->info.channel||n!=t->info.cells)return false;
  const auto&a=t->info.source;
@@ -162,6 +234,15 @@ bool birth_table_matches(const fusion_birth_table_v1*t,int channel,
     a.broad_mode!=s.broad_mode||a.fsci_policy!=s.fsci_policy||a.relative_order!=s.relative_order||
     a.cm_order!=s.cm_order||a.nq!=s.nq||a.ncos!=s.ncos)return false;
  return std::equal(t->edges.begin(),t->edges.end(),edges);
+}
+bool birth_table_matches(const fusion_birth_table_v1*t,int channel,
+ const fusion_thermal_birth_options_v1&s,int n,const double*edges) noexcept{
+ return t&&!t->budget_enabled&&birth_table_matches_model(t,channel,s,n,edges);
+}
+bool birth_table_budget_matches(const fusion_birth_table_v1*t,int channel,
+ const fusion_thermal_birth_options_v1&s,const fusion_thermal_birth_budget_policy_v1&p,
+ int n,const double*edges) noexcept{
+ return t&&t->budget_enabled&&same_policy(t->accuracy.policy,p)&&birth_table_matches_model(t,channel,s,n,edges);
 }
 }
 
@@ -197,6 +278,22 @@ template<class I,class F,class G>void table_fields(I&i,F real,G integer){
  real(c.max_energy_L1);real(c.max_direct_rate_discrepancy);
  real(c.max_direct_debit_discrepancy);
  integer(c.max_knots);integer(c.max_evaluations);integer(c.max_depth);
+}
+
+template<class P,class F,class G>void policy_fields(P&p,F real,G integer){
+ integer(p.version);integer(p.coarse_nq);integer(p.coarse_ncos);integer(p.reserved);
+ real(p.number_L1_tolerance);real(p.energy_L1_tolerance);
+}
+template<class A,class F,class G>void accuracy_fields(A&a,F real,G integer){
+ policy_fields(a.policy,real,integer);
+ real(a.max_sampled_source_number_bound);real(a.max_sampled_source_energy_bound);
+ real(a.max_sampled_number_roundoff_allowance);real(a.max_sampled_energy_roundoff_allowance);
+ real(a.max_validated_interpolation_number_L1);real(a.max_validated_interpolation_energy_L1);
+}
+template<class P,class F,class G>void report_fields(P&p,F real,G integer){
+ integer(p.version);integer(p.full_nq);integer(p.full_ncos);integer(p.coarse_nq);integer(p.coarse_ncos);integer(p.mixed);
+ integer(p.relative_nodes);integer(p.cm_nodes);integer(p.joint_nodes);integer(p.high_pairs);integer(p.low_pairs);integer(p.high_relative_nodes);integer(p.low_relative_nodes);
+ real(p.number_L1_bound);real(p.energy_L1_bound);real(p.number_roundoff_allowance);real(p.energy_roundoff_allowance);real(p.reaction_weight_m3_s);real(p.product_energy_weight_J_m3_s);
 }
 
 uint64_t thermal_checksum(const unsigned char*p,size_t n){
@@ -237,11 +334,11 @@ size_t checked_bytes(size_t base,size_t count,size_t unit){
  require(unit==0||count<=(thermal_byte_cap-base)/unit,BAD);
  return base+count*unit;
 }
-size_t thermal_wire_size(int cells,int knots){
+size_t thermal_wire_size(int cells,int knots,bool budget=false){
  require(cells>=1&&cells<=100000&&knots>=2&&knots<=100000,BAD);
- const size_t grid_words=32+7*size_t(cells);
+ const size_t grid_words=32+7*size_t(cells)+(budget?19:0);
  const size_t node_bytes=checked_bytes(0,grid_words,8);
- size_t size=thermal_header_bytes+thermal_info_words*8+8;
+ size_t size=thermal_header_bytes+thermal_info_words*8+8+(budget?12*8:0);
  size=checked_bytes(size,size_t(cells)+1,8);
  size=checked_bytes(size,size_t(knots),node_bytes);
  return size;
@@ -329,11 +426,26 @@ void validate_node(const fusion_birth_table_v1&t,const Node&node){
  require(finite,BAD);
  for(double v:node.grid)require(std::isfinite(v)&&v>=0,BAD);
  conservative(t,node.grid.data(),node.c);
+ if(t.budget_enabled){validate_budget_report(t,node);
+  require(source_upper(node.budget_report,false)<=t.accuracy.max_sampled_source_number_bound&&
+   source_upper(node.budget_report,true)<=t.accuracy.max_sampled_source_energy_bound,BAD);
+ }
+}
+void validate_accuracy_metadata(const fusion_birth_table_v1&t){
+ if(!t.budget_enabled)return;
+ const auto&a=t.accuracy;const auto&i=t.info;
+ require(i.channel==0&&valid_policy(i.source,a.policy),BAD);
+ accuracy_fields(a,[&](double v){require(std::isfinite(v)&&v>=0,BAD);},[](auto){});
+ require(a.max_sampled_number_roundoff_allowance==1e-12&&a.max_sampled_energy_roundoff_allowance==1e-12,BAD);
+ require(a.max_sampled_source_number_bound<=stored_upper(R(a.policy.number_L1_tolerance)+a.max_sampled_number_roundoff_allowance)&&
+  a.max_sampled_source_energy_bound<=stored_upper(R(a.policy.energy_L1_tolerance)+a.max_sampled_energy_roundoff_allowance),BAD);
+ require(a.max_sampled_source_number_bound<=i.max_validated_number_L1&&a.max_sampled_source_energy_bound<=i.max_validated_energy_L1&&
+  a.max_validated_interpolation_number_L1<=i.max_validated_number_L1&&a.max_validated_interpolation_energy_L1<=i.max_validated_energy_L1,BAD);
 }
 void validate_table_structure(const fusion_birth_table_v1&t){
  fusion_nuclear_channel_v1 reaction{};
  require(fusion_c_nuclear_channel(t.info.channel,&reaction)==PB11_STATUS_OK,BAD);
- validate_table_metadata(t.info,reaction);
+ validate_table_metadata(t.info,reaction);validate_accuracy_metadata(t);
  require(t.knots.size()==size_t(t.info.knots),BAD);
  require(t.channel.product_count==reaction.product_count&&
          t.channel.q_J==reaction.q_J,BAD);
@@ -350,7 +462,7 @@ void validate_table_structure(const fusion_birth_table_v1&t){
 }
 size_t thermal_packed_size(const fusion_birth_table_v1&t){
  validate_table_structure(t);
- return thermal_wire_size(t.info.cells,t.info.knots);
+ return thermal_wire_size(t.info.cells,t.info.knots,t.budget_enabled);
 }
 }
 
@@ -391,13 +503,15 @@ extern "C" int fusion_c_birth_table_pack(
  try{
   const size_t size=thermal_packed_size(*t);require(capacity>=size,BAD);
   ThermalWriter w{static_cast<unsigned char*>(buffer),size};
-  w.integer(thermal_magic);w.integer(thermal_format);w.integer(size);
+  w.integer(thermal_magic);w.integer(t->budget_enabled?2:thermal_format);w.integer(size);
   w.bytes(fusion_detail::beam_cache_kernel_identity,64);
   table_fields(t->info,[&](double v){w.real(v);},
                [&](auto v){w.integer(uint64_t(v));});
+  if(t->budget_enabled)accuracy_fields(t->accuracy,[&](double v){w.real(v);},[&](auto v){w.integer(uint64_t(v));});
   for(double v:t->edges)w.real(v);
   for(const auto&node:t->knots){
    w.real(node->T);fields(node->c,[&](double v){w.real(v);});
+   if(t->budget_enabled)report_fields(node->budget_report,[&](double v){w.real(v);},[&](auto v){w.integer(uint64_t(v));});
    for(double v:node->grid)w.real(v);
   }
   require(w.pos==size-8,BAD);
@@ -416,11 +530,11 @@ extern "C" int fusion_c_birth_table_unpack(
   ThermalReader footer{data+length-8,8};
   require(footer.integer()==thermal_checksum(data,length-8),BAD);
   ThermalReader r{data,length-8};
-  require(r.integer()==thermal_magic&&r.integer()==thermal_format&&
-          r.integer()==length,BAD);
+  require(r.integer()==thermal_magic,BAD);const auto format=r.integer();
+  require((format==thermal_format||format==2)&&r.integer()==length,BAD);
   char identity[64];r.bytes(identity,64);
   require(std::memcmp(identity,fusion_detail::beam_cache_kernel_identity,64)==0,BAD);
-  auto t=std::make_unique<fusion_birth_table_v1>();
+  auto t=std::make_unique<fusion_birth_table_v1>();t->budget_enabled=format==2;
   table_fields(t->info,[&](double&v){v=r.real();},
    [&](auto&v){uint64_t x=r.integer();using V=std::decay_t<decltype(v)>;
     require(x<=uint64_t(std::numeric_limits<V>::max()),BAD);
@@ -428,7 +542,9 @@ extern "C" int fusion_c_birth_table_unpack(
   fusion_nuclear_channel_v1 reaction{};
   require(fusion_c_nuclear_channel(t->info.channel,&reaction)==PB11_STATUS_OK,BAD);
   validate_table_metadata(t->info,reaction);
-  require(thermal_wire_size(t->info.cells,t->info.knots)==length,BAD);
+  if(t->budget_enabled)accuracy_fields(t->accuracy,[&](double&v){v=r.real();},[&](auto&v){uint64_t x=r.integer();using V=std::decay_t<decltype(v)>;require(x<=uint64_t(std::numeric_limits<V>::max()),BAD);v=static_cast<V>(x);});
+  validate_accuracy_metadata(*t);
+  require(thermal_wire_size(t->info.cells,t->info.knots,t->budget_enabled)==length,BAD);
   t->channel=reaction;
   t->edges.resize(size_t(t->info.cells)+1);
   for(size_t j=0;j<t->edges.size();++j){
@@ -443,12 +559,40 @@ extern "C" int fusion_c_birth_table_unpack(
    require(std::isfinite(node->T)&&node->T>=t->info.lower_kT_J&&
            node->T<=t->info.upper_kT_J&&(i==0||node->T>previous),BAD);
    fields(node->c,[&](double&v){v=r.real();});
+   if(t->budget_enabled)report_fields(node->budget_report,[&](double&v){v=r.real();},[&](auto&v){uint64_t x=r.integer();using V=std::decay_t<decltype(v)>;require(x<=uint64_t(std::numeric_limits<V>::max()),BAD);v=static_cast<V>(x);});
    node->grid.resize(count);
    for(double&v:node->grid)v=r.real();
    validate_node(*t,*node);t->knots.push_back(node);previous=node->T;
   }
   require(r.pos==r.n&&t->knots.front()->T==t->info.lower_kT_J&&
           t->knots.back()->T==t->info.upper_kT_J,BAD);
+  if(t->budget_enabled)validate_table_structure(*t);
   *out=t.release();return PB11_STATUS_OK;
  }catch(const Failure&f){return f.status;}catch(...){return PB11_STATUS_EXCEPTION;}
+}
+
+extern "C" int fusion_c_pb_birth_table_budget_info(const fusion_birth_table_v1*t,fusion_birth_table_budget_info_v1*out){
+ if(!out)return PB11_STATUS_NULL_OUTPUT;
+ *out={};if(!t||!t->budget_enabled)return BAD;
+ *out=t->accuracy;out->base=t->info;return PB11_STATUS_OK;
+}
+extern "C" int fusion_c_pb_birth_table_budget_knot_report(const fusion_birth_table_v1*t,int index,double*T,fusion_thermal_birth_budget_report_v1*out){
+ if(T)*T=0;
+ if(out)*out={};
+ if(!T||!out)return PB11_STATUS_NULL_OUTPUT;
+ if(!t||!t->budget_enabled||index<0||size_t(index)>=t->knots.size())return BAD;
+ *T=t->knots[size_t(index)]->T;*out=t->knots[size_t(index)]->budget_report;return PB11_STATUS_OK;
+}
+extern "C" int fusion_c_pb_birth_table_budget_matches_request(const fusion_birth_table_v1*t,double lower,double upper,
+ const fusion_thermal_birth_options_v1*source,const fusion_thermal_birth_budget_policy_v1*policy,
+ const fusion_birth_table_control_v1*control,int n,const double*edges,int*matches){
+ if(!matches)return PB11_STATUS_NULL_OUTPUT;
+ *matches=0;if(!t||!source||!policy||!control||!edges||n<1||n>100000)return BAD;
+ if(!fusion_detail::birth_table_budget_matches(t,0,*source,*policy,n,edges))return PB11_STATUS_OK;
+ const auto&a=t->info.control;const auto&b=*control;
+ *matches=t->info.lower_kT_J==lower&&t->info.upper_kT_J==upper&&
+  a.max_rate_error==b.max_rate_error&&a.max_debit_error==b.max_debit_error&&a.max_number_L1==b.max_number_L1&&a.max_energy_L1==b.max_energy_L1&&
+  a.max_direct_rate_discrepancy==b.max_direct_rate_discrepancy&&a.max_direct_debit_discrepancy==b.max_direct_debit_discrepancy&&
+  a.max_knots==b.max_knots&&a.max_evaluations==b.max_evaluations&&a.max_depth==b.max_depth;
+ return PB11_STATUS_OK;
 }
