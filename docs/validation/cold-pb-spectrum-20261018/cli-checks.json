@@ -1,0 +1,56 @@
+{
+  "empty": {
+    "exit": 1,
+    "stderr": "truncated input"
+  },
+  "noninteger_cells": {
+    "exit": 1,
+    "stderr": "invalid integer"
+  },
+  "truncated": {
+    "exit": 1,
+    "stderr": "truncated input"
+  },
+  "duplicate": {
+    "exit": 1,
+    "stderr": "unsafe or duplicate label"
+  },
+  "negative_temperature": {
+    "exit": 1,
+    "stderr": "nonpositive temperature"
+  },
+  "nan": {
+    "exit": 1,
+    "stderr": "invalid finite number: nan"
+  },
+  "unsafe_label": {
+    "exit": 1,
+    "stderr": "unsafe or duplicate label"
+  },
+  "noninteger_policy": {
+    "exit": 1,
+    "stderr": "invalid integer"
+  },
+  "invalid_base": {
+    "exit": 1,
+    "stderr": "base requires remainder0 scale1"
+  },
+  "API_invalid_options": {
+    "exit": 1,
+    "stderr": "thermal birth API failed label=synthetic variant=base level=0 status=3"
+  },
+  "valid_zero_rate": {
+    "rows": 10,
+    "spectrum_rows": 140,
+    "orders": [
+      [
+        4,
+        4
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  }
+}

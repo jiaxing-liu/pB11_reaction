@@ -1,0 +1,8 @@
+{
+  "rows": 10,
+  "positive_rate": "7.8129724485985962e-26",
+  "max_relative_N_closure": 3.143262420077458e-16,
+  "max_relative_E_closure": 3.3566146421660304e-16,
+  "max_relative_product_E_closure": 8.345580764202508e-17,
+  "rates_bitidentical_across_variants_and_levels": true
+}
