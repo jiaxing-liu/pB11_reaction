@@ -1,0 +1,33 @@
+Root design D891: monoenergetic discrete marker compression
+
+Independent C++ public API, preferably add to fusion_thermal_markers.h/.cpp:
+fusion_c_thermal_marker_resample(int count,const fusion_thermal_marker_v1* input,
+  int draws,const double* uniforms,fusion_thermal_marker_v1* output)
+Counts1..1e6. Caller arrays disjoint. Valid output clears on entry; inputs unchanged.
+Input is ONE validated monoenergetic thermal quadrature bin, not beam marginal,
+not multiple bins/epochs/species. Every record x/u/N/K finite; N>=0,K>=0;
+all K compare equal; extensive totalN>0. Caller retains mass/epoch provenance;
+this function cannot infer isotropy/physical distribution from arbitrary markers.
+Supplied independent uniform positions must be finite0<=q<1. No library RNG or
+state. Accumulate positive weights with long double (reject unrepresentable
+positive cumulative intervals), choose first CDF>q*totalN (half-open inverseCDF),
+copy sampled x/u/K but reweight each number to totalN/draws.
+Require representable positive outputN and N*K ifK>0; no silent underflow or
+infinite totalN/energy. Prepare staged output then publish all or nothing.
+Roundoff-level N/E closure for monoenergy bin; it is a stochastic quadrature
+compression, not physical equivalence for every realization. No exact preserved
+first/second angular moments, event correlations or fixed tensor-index weight.
+Uniform generator finite precision and sample error remain caller model limits.
+Input quadrature already passed spatial/angular checks; its own approximation
+error is distinct from sampling and orbit classification uncertainty.
+Tests: known weighted CDF endpoints/nextafter endpoints, zeros, allinputunchanged,
+exact weights and copied states, differingK rejection, invalid uniforms/counts,
+NaN/inf in any input incl zeroN, totalNoverflow, outputNunderflow, stagedclear,
+representable subnormal output, deterministic replay; known stratified antithetic
+q-grid demonstrates target categorical counts but is not claimed iid variance.
+Then host offline adapter per bin uses seeded iid PCG64 draws and calls this API,
+preserves bin metadata/full mapped measure; tails/fast/neutron remain explicit.
+Statistical variance sums independent per-bin variances Nbin^2*s_bin^2/m with
+m>=2; unresolved lower/upper indicators need distinct sampling errors. No single
+SE when m=1, no confidence claim from orbit unresolved bracket alone. Separate
+replicate seeds. No production escape feedback until horizon and ownership done.

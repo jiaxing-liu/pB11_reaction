@@ -51,3 +51,44 @@ extern "C" int fusion_c_thermal_markers(int model,double N,double K,double mass,
   std::copy(result.begin(),result.end(),out);return 0;
  }catch(...){return PB11_STATUS_EXCEPTION;}
 }
+extern "C" int fusion_c_thermal_marker_resample(int count,const fusion_thermal_marker_v1*input,
+ int draws,const double*uniforms,fusion_thermal_marker_v1*output){
+ if(!output)return PB11_STATUS_NULL_OUTPUT;
+ if(draws<1||draws>1000000)return PB11_STATUS_OUT_OF_RANGE;
+ std::fill_n(output,draws,fusion_thermal_marker_v1{});
+ if(count<1||count>1000000)return PB11_STATUS_OUT_OF_RANGE;
+ if(!input||!uniforms)return PB11_STATUS_INVALID_ARGUMENT;
+ try{
+  std::vector<L> cdf(count);L total=0;
+  const double K=input[0].kinetic_energy_J;
+  for(int i=0;i<count;++i){
+   const auto&m=input[i];
+   if(!valid_number(m.number_weight)||m.number_weight<0||!valid_number(m.kinetic_energy_J)||m.kinetic_energy_J<0||m.kinetic_energy_J!=K)return PB11_STATUS_INVALID_ARGUMENT;
+   for(double q:m.initial.x_m)if(!valid_number(q))return PB11_STATUS_INVALID_ARGUMENT;
+   for(double q:m.initial.u_m_s)if(!valid_number(q))return PB11_STATUS_INVALID_ARGUMENT;
+   const L next=total+L(m.number_weight);
+   if(!std::isfinite(next)||(m.number_weight>0&&!(next>total)))return PB11_STATUS_NUMERICAL_FAILURE;
+   total=next;cdf[i]=total;
+  }
+  if(!(total>0))return PB11_STATUS_INVALID_ARGUMENT;
+  double total_double=0,energy_double=0,weight=0,marker_energy=0;
+  if(!put(total,total_double)||!put(total*L(K),energy_double)||!put(total/draws,weight)||
+     !(weight>0)||!put(L(weight)*K,marker_energy))return PB11_STATUS_NUMERICAL_FAILURE;
+  for(int j=0;j<draws;++j)if(!valid_number(uniforms[j])||uniforms[j]<0||uniforms[j]>=1)return PB11_STATUS_INVALID_ARGUMENT;
+  std::vector<fusion_thermal_marker_v1> staged(draws);
+  for(int j=0;j<draws;++j){
+   L target=L(uniforms[j])*total;
+   // Multiplication must preserve the half-open upper endpoint.
+   if(!(target<total))return PB11_STATUS_NUMERICAL_FAILURE;
+   auto it=std::upper_bound(cdf.begin(),cdf.end(),target);
+   if(it==cdf.end())return PB11_STATUS_NUMERICAL_FAILURE;
+   staged[j]=input[it-cdf.begin()];staged[j].number_weight=weight;
+  }
+  // Reweighting must also leave representable extensive totals after rounding.
+  if(!put(L(weight)*draws,total_double)||!put(L(weight)*draws*K,energy_double))return PB11_STATUS_NUMERICAL_FAILURE;
+  const L rounding_tol=64*L(std::numeric_limits<double>::epsilon());
+  if(!near(L(weight)*draws,total,rounding_tol*total)||
+     !near(L(weight)*draws*K,total*K,rounding_tol*total*K))return PB11_STATUS_NUMERICAL_FAILURE;
+  std::copy(staged.begin(),staged.end(),output);return 0;
+ }catch(...){return PB11_STATUS_EXCEPTION;}
+}

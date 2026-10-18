@@ -1,0 +1,43 @@
+{
+  "scope": "monoenergy-bin categorical compression; offline source estimate only",
+  "kernel_identity": "a5b4a289e2693094ce25c68057799d3cbcef019c5c6d670e4af0758f3f0d87d3",
+  "library_base_commit": "3babb67",
+  "full_ctest": {
+    "passed": 125,
+    "failed": 0,
+    "elapsed_s": 51.77,
+    "timeout_per_test_s": 43200
+  },
+  "source_bins": 917,
+  "markers": 7336,
+  "draws_per_bin": 8,
+  "seed": 1729,
+  "mapped_N_ratio": 1.0,
+  "mapped_E_ratio": 1.0,
+  "accounts": {
+    "thermal_charged_mapped": {
+      "number": 0.011063338500896702,
+      "energy_J": 6.006293112952652e-15
+    },
+    "thermal_charged_tails": {
+      "number": 0.0,
+      "energy_J": 0.0
+    },
+    "fast_target_charged_unsampled": {
+      "number": 0.0,
+      "energy_J": 0.0
+    },
+    "neutron_not_applicable": {
+      "number": 0.01039802430095748,
+      "energy_J": 2.277427165634923e-14
+    }
+  },
+  "orbit_status": "running_session56447_not_accepted",
+  "orbit_budget_s": 172800,
+  "source_sha256": {
+    "/home/cloud/cloud/research/pB11_reaction/include/fusion_thermal_markers.h": "1ebb7054938d8d95a3f58325f862a19cdeb7bfdea60dc558f7598796345ddae9",
+    "/home/cloud/cloud/research/pB11_reaction/src/fusion_thermal_markers.cpp": "cf2e16476c7f91d0fe5314b216a0189728af7957aac24521e564b657ddf7868e",
+    "/home/cloud/cloud/research/pB11_reaction/tests/test_fusion_thermal_marker_resample.cpp": "4dacb4bb4fd481bad1c8ce78ebc0c236dcfa80920ed3a0d064ec1e829902bc6a"
+  },
+  "active_native_modified": false
+}

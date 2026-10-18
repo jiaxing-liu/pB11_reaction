@@ -37,6 +37,28 @@ typedef struct fusion_thermal_marker_v1 {
 int fusion_c_thermal_markers(int model,double number,double kinetic_J,double mass_kg,
  double source_volume_m3,double tolerance,int spatial_count,const fusion_birth_spatial_node_v1*spatial,
  int direction_count,const fusion_birth_direction_v1*directions,int capacity,fusion_thermal_marker_v1*out);
+/* Stochastic compression of ONE validated monoenergy thermal quadrature bin.
+ * Counts/draws 1..1e6; input, uniforms and output arrays must be disjoint.
+ * All x/u/N/K finite, N>=0, equal K>=0 and extensive sum N>0. Caller owns
+ * mass/species/epoch and the original spatial/angular validation; arbitrary
+ * inputs do not establish isotropy, and beam marginals are not eligible.
+ * External independent uniforms satisfy 0<=q<1; no RNG or hidden state.
+ * Half-open inverse CDF uses long-double accumulation. Any positive weight
+ * whose cumulative interval disappears is rejected; zero weights are skipped.
+ * Finite precision uniforms may still fail to reach very small intervals:
+ * this API does NOT guarantee ideal real-number categorical probabilities.
+ * Copies sampled x/u/K with replacement and assigns sum(N)/draws to each.
+ * N and N*K must close within 64*double epsilon relative to the input totals;
+ * otherwise fail (including excessive subnormal rounding). Moments and
+ * correlations are not exact.
+ * Sampling error, original quadrature error and orbit classification uncertainty
+ * are separate caller responsibilities. No tail inference or source feedback.
+ * Positive unrepresentable output weights/energies or extensive totals fail.
+ * Valid-sized output clears at entry; publication is staged/all-or-nothing.
+ * Inputs remain unchanged. Invalid output capacity cannot be cleared safely.
+ */
+int fusion_c_thermal_marker_resample(int count,const fusion_thermal_marker_v1*input,
+ int draws,const double*uniforms,fusion_thermal_marker_v1*output);
 #ifdef __cplusplus
 }
 #endif
