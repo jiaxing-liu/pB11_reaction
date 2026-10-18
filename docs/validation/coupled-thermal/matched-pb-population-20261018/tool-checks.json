@@ -1,0 +1,9 @@
+{
+  "zero_rate_conditional_fractions_undefined": true,
+  "noninteger_policy_rejected": true,
+  "negative_kT_rejected": true,
+  "empty_input_rejected": true,
+  "binary_sha256": "aa85b6a72a3b0da711de1d7e4c4548d225ced4c5f35d8afee9198beb6ef99089",
+  "library_sha256": "fa5382394414d0da554b6a158c7bf0f895b300b0bdee931575f4a918c59c010b",
+  "kernel_identity": "54b35a3cf27a6224908c5fcc9a0bc61ade2ba46a237074e68f087f659af928dd"
+}

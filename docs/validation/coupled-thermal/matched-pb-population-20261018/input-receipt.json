@@ -1,0 +1,19 @@
+{
+  "scope": "accepted-state source-model diagnostics, not exact trial source-entry replay",
+  "selected_steps": [
+    0,
+    1280,
+    6400,
+    12801
+  ],
+  "zones": 50,
+  "selected_rows": 200,
+  "native_profiles_stored_sha256": "d86becab7b7413d2cd561f4f34a69fdfccef85e245b909cc9d21e0dccdc29d3e",
+  "kT_conversion_J_per_native_keV": 1.6021e-16,
+  "source_population_options": {
+    "continuation": 1,
+    "pb_low": 0,
+    "narrow_peak": 0.051,
+    "continuum_scale": 1
+  }
+}

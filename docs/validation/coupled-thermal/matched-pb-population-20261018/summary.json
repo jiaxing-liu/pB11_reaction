@@ -1,0 +1,52 @@
+{
+  "scope": "four accepted snapshots only; not time-integrated yield or source-entry equivalence",
+  "snapshots": [
+    {
+      "step": 0,
+      "time_s": 0.0,
+      "instantaneous_model_event_rate_s_inverse": 7.061467434958279e-29,
+      "source_weighted_continuum_extrapolated_fraction": 0.9955973831855859,
+      "source_weighted_alpha0_peak_fraction": 0.01590323240533962,
+      "min_native_Ti_keV": 0.02317674450580107,
+      "max_native_Ti_keV": 0.09999201824670753
+    },
+    {
+      "step": 1280,
+      "time_s": 0.001999687500000035,
+      "instantaneous_model_event_rate_s_inverse": 3.5848578811549583e-14,
+      "source_weighted_continuum_extrapolated_fraction": 0.9953585149585691,
+      "source_weighted_alpha0_peak_fraction": 0.015911652980555014,
+      "min_native_Ti_keV": 0.01763201602956347,
+      "max_native_Ti_keV": 0.3001342503713046
+    },
+    {
+      "step": 6400,
+      "time_s": 0.009999687499999155,
+      "instantaneous_model_event_rate_s_inverse": 1.9552665691581708e-10,
+      "source_weighted_continuum_extrapolated_fraction": 0.9952303608697117,
+      "source_weighted_alpha0_peak_fraction": 0.015916170664459068,
+      "min_native_Ti_keV": 0.01757499463356974,
+      "max_native_Ti_keV": 0.4213369012996148
+    },
+    {
+      "step": 12801,
+      "time_s": 0.02000124999999806,
+      "instantaneous_model_event_rate_s_inverse": 4.168915605602901e-09,
+      "source_weighted_continuum_extrapolated_fraction": 0.9951649909851231,
+      "source_weighted_alpha0_peak_fraction": 0.015918475081571674,
+      "min_native_Ti_keV": 0.01783526676482356,
+      "max_native_Ti_keV": 0.4875613836865386
+    }
+  ],
+  "input_sha256": {
+    "profiles.csv": "aa28ea4448dc21bee112ab8f2a4843fd5ea1f80f002cb7a7e309ce0de58e203a",
+    "populations.csv": "ef0fb1e9c7c6f8f855e35aa615f9a58c4cb7e32d34aafe09333578cdc29e8849"
+  },
+  "limitations": [
+    "Continuum table endpoint hold is explicit model extrapolation, not data-supported deconvolution.",
+    "Remainders are not declared pure alpha1. Extrapolated is an overlapping subset, not an extra population.",
+    "Accepted fluid profiles are not the pre-trial library source-entry state.",
+    "Sparse snapshots are not interpolated or integrated into a full-window yield."
+  ],
+  "m3_accepted": false
+}
