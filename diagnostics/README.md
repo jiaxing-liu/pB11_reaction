@@ -74,5 +74,29 @@ disabled; they do not claim cache use, interpolation validation or physical
 acceptance. Test outputs use exclusive fresh directories; repeated CTest runs
 preserve previous evidence. Table assets are optional and explicitly supplied.
 
-The BALDUR capture hook is not implemented yet. No actual DD rejected tuple
-has been reconstructed or its cause established by this component alone.
+This independent diagnostic library does not itself implement the host capture
+hook or establish the cause of a specific rejected DD trial. The coordinated
+BALDUR host has an optional capture hook; consult its integration receipts for
+the supported paths and evidence.
+
+## Budget capture schema2
+
+`fusion_capture_write_trial_v2(context,path,input,policy,max_bytes)` uses the
+unchanged borrowed v1 input layout with entry3 (covered budget) or4 (packets
+budget). A distinct nonnull policy is mandatory. It preserves every policy
+field exactly, including invalid version/reserved values and binary64 NaN
+payloads, so numerical failures can be replayed by the original budget API.
+Capture validates memory spans, dimensions and diagnostic resource limits; it
+does not validate the numerical policy. The Fortran binding takes the policy
+as an opaque borrowed `type(c_ptr), value` (for example `c_loc(policy)`).
+
+Schema2 retains ordered fields1..16 and adds required field17: four signed
+32-bit policy integers followed by two binary64 tolerances, 32bytes total.
+Schema1 permits only entries1/2; schema2 permits only entries3/4. The reader
+rejects all other version/entry combinations and malformed/missing fields.
+The existing v1 replay report remains unchanged and can report either schema.
+Budget replay owns a separate source accuracy observation; the output digest
+explicitly encodes all its direct and table fields without ABI padding.
+Legacy entry1/2 digest encoding and schema1 writer bytes remain unchanged.
+
+These are diagnostic reproduction checks only, not physics qualification.

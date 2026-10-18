@@ -53,6 +53,8 @@ if(BUILD_TESTING)
     enable_language(C)
     add_executable(test_diagnostic_trial_view_fortran
       tests/test_trial_view_fortran.f90 tests/trial_view_probe.c)
+    # Keep the Fortran main adapter/runtime when C++ diagnostics are linked.
+    set_target_properties(test_diagnostic_trial_view_fortran PROPERTIES LINKER_LANGUAGE Fortran)
     target_link_libraries(test_diagnostic_trial_view_fortran PRIVATE pb11::capture_fortran)
     add_test(NAME diagnostic_trial_view_fortran COMMAND test_diagnostic_trial_view_fortran)
   endif()
@@ -66,6 +68,14 @@ if(BUILD_TESTING)
     add_test(NAME diagnostic_trial_snapshot COMMAND ${CMAKE_COMMAND}
       -DTEST_PROGRAM=$<TARGET_FILE:test_diagnostic_trial_snapshot>
       -DOUTPUT_PARENT=${CMAKE_CURRENT_BINARY_DIR}/trial-test-output
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/tests/run_fresh_test.cmake)
+    add_executable(test_diagnostic_trial_budget_snapshot tests/test_trial_budget_snapshot.cpp)
+    target_include_directories(test_diagnostic_trial_budget_snapshot PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/tests)
+    target_link_libraries(test_diagnostic_trial_budget_snapshot PRIVATE pb11::diagnostics)
+    add_test(NAME diagnostic_trial_budget_snapshot COMMAND ${CMAKE_COMMAND}
+      -DTEST_PROGRAM=$<TARGET_FILE:test_diagnostic_trial_budget_snapshot>
+      -DOUTPUT_PARENT=${CMAKE_CURRENT_BINARY_DIR}/trial-budget-test-output
       -P ${CMAKE_CURRENT_SOURCE_DIR}/tests/run_fresh_test.cmake)
     add_executable(test_diagnostic_trial_tables tests/test_trial_tables.cpp)
     target_include_directories(test_diagnostic_trial_tables PRIVATE

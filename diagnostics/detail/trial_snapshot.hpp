@@ -15,6 +15,9 @@ struct BeamReference {
  TableReference table;
 };
 struct Snapshot {
+ int schema=1;
+ bool policy_present=false;
+ fusion_thermal_birth_budget_policy_v1 policy{};
  int entry=0,status=0,zone=0,cells=0,effective=0,domain=0,inert_count=0;
  double time=0,dt=0,ue=0,ui=0,ne=0;
  std::string kernel;
@@ -29,6 +32,7 @@ struct Snapshot {
 };
 struct Replay {
  int status=0;
+ fusion_coupled_source_accuracy_v1 accuracy{};
  std::array<double,6> n{};
  std::vector<double> s,t,mapped;
  fusion_coupled_thermal_v1 result{};

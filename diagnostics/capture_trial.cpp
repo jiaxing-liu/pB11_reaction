@@ -66,8 +66,10 @@ TableReference read_reference(detail::Reader &r,int expected,const std::string &
  return ref;
 }
 void write_trial(fusion_capture_context_v1 *context,const char *path,
- const fusion_capture_trial_input_v1 &v,uint64_t budget) {
- need((v.entry_point==1||v.entry_point==2)&&v.cells>=1&&v.cells<=100000&&
+ const fusion_capture_trial_input_v1 &v,uint64_t budget,
+ const fusion_thermal_birth_budget_policy_v1 *policy=nullptr,int schema=1) {
+ need(((schema==1&&(v.entry_point==1||v.entry_point==2)&&!policy)||
+  (schema==2&&(v.entry_point==3||v.entry_point==4)&&policy))&&v.cells>=1&&v.cells<=100000&&
   v.inert_count>=0&&v.inert_count<=32&&v.beam_table_count>=0&&v.beam_table_count<=10*v.cells,
   FUSION_CAPTURE_INVALID,"unsupported entry/dimensions");
  need(v.options&&v.fast_options&&v.edges_J&&v.thermal_number_m3&&v.thermal_charge_squared&&
@@ -80,6 +82,7 @@ void write_trial(fusion_capture_context_v1 *context,const char *path,
   auto end=start+length;for(auto existing:spans)
    need(end<=existing.first||start>=existing.second,FUSION_CAPTURE_UNSUPPORTED,"aliased input layout cannot be recorded as independent arrays");
   spans.emplace_back(start,end);};
+ if(policy)span(policy,sizeof(*policy));
  span(v.options,sizeof(*v.options));span(v.fast_options,sizeof(*v.fast_options));
  if(v.thermal_tables)span(v.thermal_tables,5*sizeof(*v.thermal_tables));
  span(v.beam_tables,size_t(v.beam_table_count)*sizeof(*v.beam_tables));
@@ -89,7 +92,7 @@ void write_trial(fusion_capture_context_v1 *context,const char *path,
  if(v.floor_limits)span(v.floor_limits,sizeof(*v.floor_limits));
  std::string kernel=fusion_c_beam_birth_table_kernel_identity();
  need(detail::valid_hex(kernel),FUSION_CAPTURE_IDENTITY,"invalid current kernel identity");
- detail::Writer w(path,budget);w.raw(magic,8);w.u32(1);
+ detail::Writer w(path,budget);w.raw(magic,8);w.u32(schema);
  w.field(1,64);w.raw(kernel.data(),64);w.end();
  w.field(2,88);
  for(int i:{v.entry_point,v.original_status,v.host_zone,v.cells,v.effective_charge,v.table_domain_policy,
@@ -121,18 +124,23 @@ void write_trial(fusion_capture_context_v1 *context,const char *path,
  for(int i=0;i<v.beam_table_count;++i){const auto &entry=v.beam_tables[i];
   w.i32(entry.channel);w.i32(entry.projectile_slot);w.i32(entry.energy_cell);
   write_reference(w,reference(context,2,entry.table));}
- w.end();w.publish();
+ w.end();
+ if(policy){w.field(17,32);w.i32(policy->version);w.i32(policy->coarse_nq);
+  w.i32(policy->coarse_ncos);w.i32(policy->reserved);
+  w.f64(policy->number_L1_tolerance);w.f64(policy->energy_L1_tolerance);w.end();}
+ w.publish();
 }
 }
 Snapshot read_snapshot(const char *path,uint64_t budget) {
  detail::Reader r(path,budget);unsigned char actual[8];r.raw(actual,8);
- need(std::memcmp(actual,magic,8)==0&&r.u32()==1,FUSION_CAPTURE_FORMAT,"unsupported record magic/version");
- Snapshot s;r.field(1,64);s.kernel=r.text(64);r.end();
+ auto schema=r.u32();
+ need(std::memcmp(actual,magic,8)==0&&(schema==1||schema==2),FUSION_CAPTURE_FORMAT,"unsupported record magic/version");
+ Snapshot s;s.schema=schema;r.field(1,64);s.kernel=r.text(64);r.end();
  need(s.kernel==fusion_c_beam_birth_table_kernel_identity(),FUSION_CAPTURE_IDENTITY,"snapshot kernel differs");
  r.field(2,88);s.entry=r.i32();s.status=r.i32();s.zone=r.i32();s.cells=r.i32();s.effective=r.i32();s.domain=r.i32();
  s.inert_count=r.i32();int beam_count=r.i32();s.thermal_array=r.flag();s.beam_array=r.flag();s.inert_array=r.flag();s.floor_present=r.flag();
  s.time=r.f64();s.dt=r.f64();s.ue=r.f64();s.ui=r.f64();s.ne=r.f64();r.end();
- need((s.entry==1||s.entry==2)&&s.cells>=1&&s.cells<=100000&&s.inert_count>=0&&s.inert_count<=32&&
+ need(((schema==1&&(s.entry==1||s.entry==2))||(schema==2&&(s.entry==3||s.entry==4)))&&s.cells>=1&&s.cells<=100000&&s.inert_count>=0&&s.inert_count<=32&&
   beam_count>=0&&beam_count<=10*s.cells&&(!beam_count||s.beam_array)&&(!s.inert_count||s.inert_array),
   FUSION_CAPTURE_FORMAT,"invalid shape/pointer-presence metadata");
  r.field(3,156);read_options(r,s.options);r.end();
@@ -148,13 +156,28 @@ Snapshot read_snapshot(const char *path,uint64_t budget) {
  r.field(16);need(uint64_t(beam_count)<=r.remaining()/16,FUSION_CAPTURE_FORMAT,"beam count exceeds field before allocation");s.beam.reserve(beam_count);
  for(int i=0;i<beam_count;++i){BeamReference beam;beam.channel=r.i32();beam.slot=r.i32();beam.cell=r.i32();
   beam.table=read_reference(r,2,s.kernel);s.beam.push_back(std::move(beam));}
- r.end();r.finish();return s;
+ r.end();
+ if(schema==2){r.field(17,32);s.policy.version=r.i32();s.policy.coarse_nq=r.i32();
+  s.policy.coarse_ncos=r.i32();s.policy.reserved=r.i32();
+  s.policy.number_L1_tolerance=r.f64();s.policy.energy_L1_tolerance=r.f64();
+  s.policy_present=true;r.end();}
+ r.finish();return s;
 }
 } // namespace
 extern "C" int fusion_capture_write_trial_v1(fusion_capture_context_v1 *context,
  const char *path,const fusion_capture_trial_input_v1 *input,uint64_t maximum) {
  if(!input)return FUSION_CAPTURE_INVALID;
  try{pb11_diagnostics::write_trial(context,path,*input,maximum);return FUSION_CAPTURE_OK;}
+ catch(const pb11_diagnostics::detail::Error &error){return error.status;}
+ catch(const std::bad_alloc &){return FUSION_CAPTURE_ALLOCATION;}
+ catch(...){return FUSION_CAPTURE_IO;}
+}
+
+extern "C" int fusion_capture_write_trial_v2(fusion_capture_context_v1 *context,
+ const char *path,const fusion_capture_trial_input_v1 *input,
+ const fusion_thermal_birth_budget_policy_v1 *policy,uint64_t maximum) {
+ if(!input||!policy)return FUSION_CAPTURE_INVALID;
+ try{pb11_diagnostics::write_trial(context,path,*input,maximum,policy,2);return FUSION_CAPTURE_OK;}
  catch(const pb11_diagnostics::detail::Error &error){return error.status;}
  catch(const std::bad_alloc &){return FUSION_CAPTURE_ALLOCATION;}
  catch(...){return FUSION_CAPTURE_IO;}

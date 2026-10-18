@@ -3,12 +3,12 @@
 
 namespace pb11_diagnostics {
 std::string output_digest(const Replay &out,int entry,int cells,bool floor) {
- detail::need(entry==1||entry==2,FUSION_CAPTURE_FORMAT,"invalid output entry");
+ detail::need(entry>=1&&entry<=4,FUSION_CAPTURE_FORMAT,"invalid output entry");
  detail::need(cells>=1&&cells<=100000,FUSION_CAPTURE_FORMAT,"invalid output cells");
  const size_t kinetic=6*static_cast<size_t>(cells);
  detail::need(out.s.size()==kinetic&&out.t.size()==kinetic,
               FUSION_CAPTURE_FORMAT,"invalid output kinetic shape");
- if(entry==2)detail::need(out.mapped.size()==70*static_cast<size_t>(cells),
+ if(entry==2||entry==4)detail::need(out.mapped.size()==70*static_cast<size_t>(cells),
                          FUSION_CAPTURE_FORMAT,"invalid output packet shape");
  detail::HashSink h;
  // Canonical little-endian words: metadata, populations, result declaration
@@ -49,7 +49,7 @@ std::string output_digest(const Replay &out,int entry,int cells,bool floor) {
   h.doubles(f.ion_energy_correction_J_m3,6);h.doubles(f.energy_residual_J_m3,6);
   h.f64(f.remaining_ion_energy_J_m3);
  }
- if(entry==2) {
+ if(entry==2||entry==4) {
   const auto &p=out.packets;
   for(const auto &row:p.events_m3)h.doubles(row,5);
   for(const auto &source:p.below_number_m3)for(const auto &row:source)h.doubles(row,7);
@@ -57,6 +57,36 @@ std::string output_digest(const Replay &out,int entry,int cells,bool floor) {
   for(const auto &source:p.above_number_m3)for(const auto &row:source)h.doubles(row,7);
   for(const auto &source:p.above_energy_J_m3)for(const auto &row:source)h.doubles(row,7);
   h.doubles(out.mapped.data(),out.mapped.size());
+ }
+ if(entry==3||entry==4) {
+  const auto &a=out.accuracy;
+  h.i32(a.version);h.i32(a.mode);h.f64(a.number_L1_estimate);h.f64(a.energy_L1_estimate);
+  const auto &d=a.direct;
+  for(int v:{d.version,d.full_nq,d.full_ncos,d.coarse_nq,d.coarse_ncos,d.mixed})h.i32(v);
+  for(uint64_t v:{d.relative_nodes,d.cm_nodes,d.joint_nodes,d.high_pairs,d.low_pairs,
+      d.high_relative_nodes,d.low_relative_nodes})h.u64(v);
+  for(double v:{d.number_L1_bound,d.energy_L1_bound,d.number_roundoff_allowance,
+      d.energy_roundoff_allowance,d.reaction_weight_m3_s,d.product_energy_weight_J_m3_s})h.f64(v);
+  const auto &t=a.table;const auto &b=t.base;
+  for(double v:{b.lower_kT_J,b.upper_kT_J,b.max_validated_rate_error,b.max_validated_debit_error,
+      b.max_validated_number_L1,b.max_validated_energy_L1,b.max_sampled_direct_rate_discrepancy,
+      b.max_sampled_direct_debit_discrepancy})h.f64(v);
+  for(int v:{b.channel,b.cells,b.knots,b.direct_evaluations})h.i32(v);
+  const auto &o=b.source;
+  for(double v:{o.relative_max_J,o.cm_max_kT,o.ground_state_q_J,o.cutoff_J,o.l1_fraction,
+      o.relative_phase,o.narrow_peak_fraction,o.continuum_peak_scale})h.f64(v);
+  for(int v:{o.continuation,o.pb_low,o.remainder_policy,o.broad_mode,o.fsci_policy,
+      o.relative_order,o.cm_order,o.nq,o.ncos})h.i32(v);
+  const auto &c=b.control;
+  for(double v:{c.max_rate_error,c.max_debit_error,c.max_number_L1,c.max_energy_L1,
+      c.max_direct_rate_discrepancy,c.max_direct_debit_discrepancy})h.f64(v);
+  for(int v:{c.max_knots,c.max_evaluations,c.max_depth})h.i32(v);
+  const auto &p=t.policy;
+  for(int v:{p.version,p.coarse_nq,p.coarse_ncos,p.reserved})h.i32(v);
+  h.f64(p.number_L1_tolerance);h.f64(p.energy_L1_tolerance);
+  for(double v:{t.max_sampled_source_number_bound,t.max_sampled_source_energy_bound,
+      t.max_sampled_number_roundoff_allowance,t.max_sampled_energy_roundoff_allowance,
+      t.max_validated_interpolation_number_L1,t.max_validated_interpolation_energy_L1})h.f64(v);
  }
  return detail::hex(h.hash.digest());
 }

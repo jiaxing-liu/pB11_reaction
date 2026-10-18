@@ -2,10 +2,12 @@
 #define FUSION_CAPTURE_TRIAL_H
 #include "fusion_capture_registry.h"
 #include "fusion_coupled_sources.h"
+#include "fusion_coupled_sources_budget.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
 enum fusion_capture_entry_v1 { FUSION_CAPTURE_COVERED=1, FUSION_CAPTURE_PACKETS=2 };
+enum fusion_capture_entry_v2 { FUSION_CAPTURE_COVERED_BUDGET=3, FUSION_CAPTURE_PACKETS_BUDGET=4 };
 enum fusion_capture_file_status_v1 {
  FUSION_CAPTURE_FORMAT=105, FUSION_CAPTURE_IO=106,
  FUSION_CAPTURE_IDENTITY=107, FUSION_CAPTURE_UNSUPPORTED=108
@@ -54,6 +56,11 @@ typedef struct fusion_capture_replay_report_v1 {
  */
 int fusion_capture_write_trial_v1(fusion_capture_context_v1 *context,
  const char *path,const fusion_capture_trial_input_v1 *input,uint64_t max_bytes);
+/* Version2 requires entry3/4 and a distinct nonnull policy span. Exact policy
+ * bits, including invalid controls, are retained for failed-trial replay. */
+int fusion_capture_write_trial_v2(fusion_capture_context_v1 *context,
+ const char *path,const fusion_capture_trial_input_v1 *input,
+ const fusion_thermal_birth_budget_policy_v1 *policy,uint64_t max_bytes);
 /* Validate schema/checksum/current kernel and every referenced table file's
  * exact bytes before invoking the RECORDED entry point with the original bits.
  * Returns diagnostic status; successful replay does not imply physics success.

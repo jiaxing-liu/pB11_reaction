@@ -7,6 +7,7 @@ module fusion_capture_fortran
   private
   public :: fusion_capture_trial_input_v1, fusion_capture_replay_report_v1
   public :: fusion_capture_table_identity_v1
+  public :: fusion_capture_write_trial_v2
   public :: fusion_capture_write_trial_v1, fusion_capture_replay_file_v1
   public :: fusion_capture_context_create_v1, fusion_capture_context_destroy_v1
   public :: fusion_capture_thermal_unpack_v1, fusion_capture_beam_unpack_v1
@@ -65,6 +66,15 @@ module fusion_capture_fortran
   end type
 
   interface
+    ! Mandatory distinct borrowed policy, normally c_loc(policy_target).
+    integer(c_int) function fusion_capture_write_trial_v2(context, path, input, policy, max_bytes) bind(C)
+      import :: c_int, c_ptr, c_char, c_int64_t, fusion_capture_trial_input_v1
+      type(c_ptr), value :: context, policy
+      character(kind=c_char), intent(in) :: path(*)
+      type(fusion_capture_trial_input_v1), intent(in) :: input
+      integer(c_int64_t), value :: max_bytes
+    end function
+
     integer(c_int) function fusion_capture_write_trial_v1(context, path, input, max_bytes) bind(C)
       import :: c_int, c_ptr, c_char, c_int64_t, fusion_capture_trial_input_v1
       type(c_ptr), value :: context

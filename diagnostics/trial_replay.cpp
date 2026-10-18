@@ -55,7 +55,8 @@ public:
 };
 }
 Replay run_snapshot(const Snapshot &s) {
- need((s.entry==1||s.entry==2)&&s.cells>=1&&s.cells<=100000&&s.inert_count>=0&&s.inert_count<=32&&
+ need(((s.schema==1&&!s.policy_present&&(s.entry==1||s.entry==2))||
+  (s.schema==2&&s.policy_present&&(s.entry==3||s.entry==4)))&&s.cells>=1&&s.cells<=100000&&s.inert_count>=0&&s.inert_count<=32&&
   s.beam.size()<=size_t(10*s.cells)&&(!s.beam.size()||s.beam_array)&&(!s.inert_count||s.inert_array),
   FUSION_CAPTURE_FORMAT,"invalid replay layout");
  size_t count=size_t(s.cells)*6;
@@ -79,17 +80,26 @@ Replay run_snapshot(const Snapshot &s) {
  const auto *thermal_pointer=s.thermal_array?thermal.data():nullptr;
  const auto *limits=s.floor_present?&s.floor:nullptr;
  Replay out;out.s.resize(count);out.t.resize(count);
- if(s.entry==2)out.mapped.resize(size_t(s.cells)*70);
+ if(s.entry==2||s.entry==4)out.mapped.resize(size_t(s.cells)*70);
  auto *floor=s.floor_present?&out.floor:nullptr;
  if(s.entry==1)out.status=fusion_c_coupled_sources_covered_trial(s.dt,&s.options,&s.fast,
   thermal_pointer,int(beam.size()),beam_pointer,s.effective,s.cells,s.edges.data(),s.n.data(),s.ue,s.ui,s.ne,
   s.z2.data(),s.inert_count,inert_pointer,s.logs.data(),s.s.data(),s.t.data(),s.birth.data(),s.escape.data(),
   out.n.data(),out.s.data(),out.t.data(),&out.result,&out.handoff,&out.usage,limits,floor,s.domain,&out.outside);
- else out.status=fusion_c_coupled_sources_packets_trial(s.dt,&s.options,&s.fast,
+ else if(s.entry==2)out.status=fusion_c_coupled_sources_packets_trial(s.dt,&s.options,&s.fast,
   thermal_pointer,int(beam.size()),beam_pointer,s.effective,s.cells,s.edges.data(),s.n.data(),s.ue,s.ui,s.ne,
   s.z2.data(),s.inert_count,inert_pointer,s.logs.data(),s.s.data(),s.t.data(),s.birth.data(),s.escape.data(),
   out.n.data(),out.s.data(),out.t.data(),&out.result,&out.handoff,&out.usage,limits,floor,s.domain,&out.outside,
   out.mapped.data(),&out.packets);
+ else if(s.entry==3)out.status=fusion_c_coupled_sources_covered_budget_trial(s.dt,&s.options,&s.fast,
+  thermal_pointer,int(beam.size()),beam_pointer,s.effective,s.cells,s.edges.data(),s.n.data(),s.ue,s.ui,s.ne,
+  s.z2.data(),s.inert_count,inert_pointer,s.logs.data(),s.s.data(),s.t.data(),s.birth.data(),s.escape.data(),
+  out.n.data(),out.s.data(),out.t.data(),&out.result,&out.handoff,&out.usage,limits,floor,s.domain,&out.outside,&s.policy,&out.accuracy);
+ else out.status=fusion_c_coupled_sources_packets_budget_trial(s.dt,&s.options,&s.fast,
+  thermal_pointer,int(beam.size()),beam_pointer,s.effective,s.cells,s.edges.data(),s.n.data(),s.ue,s.ui,s.ne,
+  s.z2.data(),s.inert_count,inert_pointer,s.logs.data(),s.s.data(),s.t.data(),s.birth.data(),s.escape.data(),
+  out.n.data(),out.s.data(),out.t.data(),&out.result,&out.handoff,&out.usage,limits,floor,s.domain,&out.outside,
+  out.mapped.data(),&out.packets,&s.policy,&out.accuracy);
  return out;
 }
 } // namespace
