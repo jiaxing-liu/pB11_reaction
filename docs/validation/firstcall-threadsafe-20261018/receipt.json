@@ -1,0 +1,24 @@
+{
+  "scope": "independent library first-call thread-safety; not deployed to live host",
+  "base_commit": "5d2e0a26ff6b598936bd53d0196dedf92bc11aad",
+  "kernel_identity": "87747ef25aab70db3470b62e5681d0481bf66304d6646e8bbfa59f04cd43337c",
+  "tests": {
+    "total": 124,
+    "initial_passed": 82,
+    "initial_environment_failures": 42,
+    "environment_failure": "Intel shared libraries missing from loader search path; affected programs did not start",
+    "corrected_environment": "LD_LIBRARY_PATH=/opt/intel/oneapi/compiler/2026.1/lib",
+    "rerun_failed_passed": 42,
+    "remaining_failures": 0,
+    "new_concurrent_firstcall_modes_passed": 4,
+    "per_test_budget_s": 43200
+  },
+  "active_D880_library_replaced": false,
+  "source_sha256": {
+    "src/fusion_coupled_thermal.cpp": "b30b27c1dd52a89a17275b2bd0952a8251975ecdf89356a3d7819cf25ed83740",
+    "CMakeLists.txt": "99162897d13f545b6f763b0fb040e2c08338ae71fdfb77ff7b9c423931a4991a",
+    "tests/test_fusion_coupled_firstcall.cpp": "4afe0a07bb3b1a9492f1bf5c404407285c75567555d90e044bd683af61454ffa",
+    "tests/check_fusion_coupled_firstcall.cmake": "cb97e71c949b4b274be8c84c076043a591f678c6c66379dd061ae27a65353846"
+  },
+  "static_library_sha256": "9ae1de3f253ebf4fec91b9b124bb995566fe3cd92d60dc2601b60b8517dde21c"
+}

@@ -747,6 +747,15 @@ if(BUILD_TESTING)
     add_test(NAME fusion_prompt_orbit_tests COMMAND test_fusion_prompt_orbit)
 
     find_package(Threads REQUIRED)
+    add_executable(test_fusion_coupled_firstcall tests/test_fusion_coupled_firstcall.cpp)
+    target_link_libraries(test_fusion_coupled_firstcall PRIVATE pb11::pb11 Threads::Threads)
+    foreach(mode IN ITEMS unset empty one zero)
+        add_test(NAME fusion_coupled_firstcall_${mode}_tests
+            COMMAND ${CMAKE_COMMAND}
+                -DTEST_PROGRAM=$<TARGET_FILE:test_fusion_coupled_firstcall>
+                -DMODE=${mode}
+                -P ${CMAKE_CURRENT_SOURCE_DIR}/tests/check_fusion_coupled_firstcall.cmake)
+    endforeach()
     add_executable(test_fusion_boundary_prepared tests/test_fusion_boundary_prepared.cpp)
     target_link_libraries(test_fusion_boundary_prepared PRIVATE pb11::pb11 Threads::Threads)
     add_test(NAME fusion_boundary_prepared_tests COMMAND test_fusion_boundary_prepared)

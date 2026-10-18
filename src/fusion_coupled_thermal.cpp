@@ -27,9 +27,11 @@ constexpr double MeV=1.602176634e-13;
 bool finite_value(double x){return std::isfinite(x);}
 bool nonnegative(double x){return finite_value(x)&&x>=0;}
 bool trial_timing_enabled(){
- static int enabled=-1;
- if(enabled<0){const char*v=std::getenv("BALDUR_FUSION_TRIAL_TIMING");enabled=(v&&*v)?1:0;}
- return enabled==1;
+ static const bool enabled=[](){
+  const char*v=std::getenv("BALDUR_FUSION_TRIAL_TIMING");
+  return v&&*v;
+ }();
+ return enabled;
 }
 void trial_stage(const char*name){
  if(trial_timing_enabled()){std::fprintf(stdout,"FUSION_CXX_STAGE %s\n",name);std::fflush(stdout);}
