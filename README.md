@@ -217,6 +217,12 @@ add_subdirectory(path/to/pB11_reaction)
 target_link_libraries(your_target PRIVATE pb11::pb11)
 ```
 
+For an installed-library caller that advances thermal burn, charged birth,
+fast-particle collisions and bath heat together, see the standalone
+[C++ coupled 0D example](examples/coupled_0d/README.md). It demonstrates caller-owned
+trial/discard/commit and charge/energy checks for DT and pB tutorial states;
+it is not a matched-fuel device comparison.
+
 ## Test and comparison drivers
 
 `test_pb11` checks the 148 keV resonance, the 0.400 and 0.668 MeV piece

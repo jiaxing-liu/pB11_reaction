@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.16)
+project(pb11_coupled_0d LANGUAGES CXX)
+find_package(pb11_reaction CONFIG REQUIRED)
+add_executable(coupled_0d main.cpp)
+target_link_libraries(coupled_0d PRIVATE pb11::pb11)
+target_compile_features(coupled_0d PRIVATE cxx_std_17)
