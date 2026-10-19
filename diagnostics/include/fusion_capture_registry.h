@@ -12,7 +12,9 @@ extern "C" {
  * remaining handles. Do not destroy a context concurrently with any operation
  * or use any returned handle after removal/context destruction. Immutable
  * numerical evaluation can borrow registered handles while their owner lives.
- * No registration of arbitrary existing handles is supported.
+ * Existing handles are supported only through the explicit ownership and
+ * packed-content identity constrained adopt APIs below. No arbitrary-pointer
+ * validity check is possible; these APIs do not change numerical physics.
  * Paths are absolute, <=4096 bytes, and identify the exact supplied packed
  * bytes. Replay must independently verify the referenced file against digest.
  * This registry does not certify table interpolation accuracy.
@@ -46,6 +48,23 @@ int fusion_capture_thermal_unpack_v1(fusion_capture_context_v1 *context,
 int fusion_capture_beam_unpack_v1(fusion_capture_context_v1 *context,
  const void *bytes,size_t length,const char *qualified_path,
  fusion_beam_birth_table_v1 **out,int *unpack_status);
+/* Adopt a valid, sole-owned typed raw handle, not registered in another
+ * context. Success transfers ownership without replacing/reconstructing the
+ * handle: use the matching registry destroy hook thereafter. Failure never
+ * destroys the raw handle, changes registered entries, or modifies inputs.
+ * pack_status is mandatory: -1 until the core content_digest is called, then
+ * its actual status (separate from the diagnostic return). Digest/size mismatch
+ * or core rejection returns INVALID. Duplicate returns INVALID; capacity returns
+ * CAPACITY. Caller must already have saved the exact packed bytes to the
+ * absolute qualified_path (<=4096 bytes); no file is read here. Replay verifies
+ * the file independently. Limits are thermal 512MiB and beam 256MiB.
+ */
+int fusion_capture_thermal_adopt_v1(fusion_capture_context_v1 *context,
+ fusion_birth_table_v1 *table,const void *packed_bytes,size_t length,
+ const char *qualified_path,int *pack_status);
+int fusion_capture_beam_adopt_v1(fusion_capture_context_v1 *context,
+ fusion_beam_birth_table_v1 *table,const void *packed_bytes,size_t length,
+ const char *qualified_path,int *pack_status);
 int fusion_capture_table_identity_v1_get(fusion_capture_context_v1 *context,
  int kind,const void *handle,fusion_capture_table_identity_v1 *out);
 /* Wrong kind/unknown handle rejects without releasing or clearing the handle. */

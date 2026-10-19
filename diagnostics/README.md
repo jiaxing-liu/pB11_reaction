@@ -100,3 +100,25 @@ explicitly encodes all its direct and table fields without ABI padding.
 Legacy entry1/2 digest encoding and schema1 writer bytes remain unchanged.
 
 These are diagnostic reproduction checks only, not physics qualification.
+
+## Explicit adoption after numerical table creation
+
+The additive thermal/beam `fusion_capture_*_adopt_v1` APIs register a valid
+sole-owned raw handle only after its caller-saved packed bytes match its
+immutable content digest and length. Success transfers ownership to the context
+without replacing the handle; use registry destruction thereafter. Failure
+retains caller ownership and all existing entries. Caller pointer validity and
+absence of ownership in another context are preconditions. Duplicate adoption
+is rejected; there is no arbitrary pointer validation or global registry.
+
+`pack_status` reports the core serialization/digest operation separately from
+the diagnostic return; it is not a reaction trial status. No file is opened by
+adoption: the caller must have saved exactly that buffer at the absolute path,
+and replay verifies it independently. Wire1/2, existing APIs, numerical source
+code and cache kernel identity are unchanged. The host may register after save
+without substituting diagnostic failure for its physical result.
+
+On GNU/Clang Linux, optional `diagnostic_created_table_adoption` uses qualified
+thermal/beam files to check ownership, identity, failure atomicity, destructor
+calls and simulated serializer rejection. Link wrappers belong only to the test
+executable. These are engineering tests, never nuclear/trajectory acceptance.

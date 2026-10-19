@@ -79,6 +79,36 @@ int unpack(fusion_capture_context_v1 *context,const void *bytes,size_t length,
   return FUSION_CAPTURE_INVALID;
  }
 }
+// Only explicit sole-owner adoption is supported; raw pointer validity and
+// ownership outside this context are caller preconditions.
+template<typename T,typename ContentDigest>
+int adopt(fusion_capture_context_v1 *context,T *table,const void *bytes,
+ size_t length,const char *path,int *pack_status,int kind,ContentDigest original) noexcept {
+ if(pack_status)*pack_status=-1;
+ if(!context||!table||!bytes||!length||!pack_status||!path_valid(path)||
+  length>(kind==FUSION_CAPTURE_THERMAL_TABLE?512ULL:256ULL)*1024*1024)
+  return FUSION_CAPTURE_INVALID;
+ try {
+  std::lock_guard<std::mutex> lock(context->mutex);
+  if(context->entries.find(table)!=context->entries.end())return FUSION_CAPTURE_INVALID;
+  if(context->entries.size()>=context->capacity)return FUSION_CAPTURE_CAPACITY;
+  unsigned char actual[32]{};
+  size_t actual_size=0;
+  *pack_status=original(table,actual,&actual_size);
+  if(*pack_status!=0)return FUSION_CAPTURE_INVALID;
+  pb11_diagnostics::detail::Sha256 supplied;
+  supplied.update(bytes,length);
+  const auto digest=supplied.digest();
+  if(actual_size!=length||!std::equal(digest.begin(),digest.end(),actual))
+   return FUSION_CAPTURE_INVALID;
+  Entry entry{kind,static_cast<uint64_t>(length),path,hex(digest),
+   fusion_c_beam_birth_table_kernel_identity()};
+  if(!context->entries.emplace(table,std::move(entry)).second)
+   return FUSION_CAPTURE_INVALID;
+  return FUSION_CAPTURE_OK;
+ } catch(const std::bad_alloc &) {return FUSION_CAPTURE_ALLOCATION;}
+ catch(...) {return FUSION_CAPTURE_INVALID;}
+}
 template<typename T>
 int destroy(fusion_capture_context_v1 *context,T **handle,int kind) noexcept {
  if(!context||!handle||!*handle)return FUSION_CAPTURE_INVALID;
@@ -138,4 +168,15 @@ extern "C" int fusion_capture_thermal_destroy_v1(fusion_capture_context_v1 *cont
 extern "C" int fusion_capture_beam_destroy_v1(fusion_capture_context_v1 *context,
  fusion_beam_birth_table_v1 **handle) {
  return destroy(context,handle,FUSION_CAPTURE_BEAM_TABLE);
+}
+
+extern "C" int fusion_capture_thermal_adopt_v1(fusion_capture_context_v1 *context,
+ fusion_birth_table_v1 *table,const void *bytes,size_t length,const char *path,int *status) {
+ return adopt(context,table,bytes,length,path,status,FUSION_CAPTURE_THERMAL_TABLE,
+  fusion_c_birth_table_content_digest);
+}
+extern "C" int fusion_capture_beam_adopt_v1(fusion_capture_context_v1 *context,
+ fusion_beam_birth_table_v1 *table,const void *bytes,size_t length,const char *path,int *status) {
+ return adopt(context,table,bytes,length,path,status,FUSION_CAPTURE_BEAM_TABLE,
+  fusion_c_beam_birth_table_content_digest);
 }

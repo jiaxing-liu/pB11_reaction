@@ -12,6 +12,7 @@ module fusion_capture_fortran
   public :: fusion_capture_context_create_v1, fusion_capture_context_destroy_v1
   public :: fusion_capture_thermal_unpack_v1, fusion_capture_beam_unpack_v1
   public :: fusion_capture_thermal_destroy_v1, fusion_capture_beam_destroy_v1
+  public :: fusion_capture_thermal_adopt_v1, fusion_capture_beam_adopt_v1
   public :: fusion_capture_table_identity_v1_get
 
   type, bind(C) :: fusion_capture_trial_input_v1
@@ -134,6 +135,24 @@ module fusion_capture_fortran
       import :: c_int, c_ptr
       type(c_ptr), value :: context
       type(c_ptr), intent(inout) :: handle
+    end function
+
+    integer(c_int) function fusion_capture_thermal_adopt_v1(context, table, bytes, length, &
+        qualified_path, pack_status) bind(C)
+      import :: c_int, c_ptr, c_size_t, c_char
+      type(c_ptr), value :: context, table, bytes
+      integer(c_size_t), value :: length
+      character(kind=c_char), intent(in) :: qualified_path(*)
+      integer(c_int), intent(out) :: pack_status
+    end function
+
+    integer(c_int) function fusion_capture_beam_adopt_v1(context, table, bytes, length, &
+        qualified_path, pack_status) bind(C)
+      import :: c_int, c_ptr, c_size_t, c_char
+      type(c_ptr), value :: context, table, bytes
+      integer(c_size_t), value :: length
+      character(kind=c_char), intent(in) :: qualified_path(*)
+      integer(c_int), intent(out) :: pack_status
     end function
 
     integer(c_int) function fusion_capture_table_identity_v1_get(context, kind, handle, out) bind(C)

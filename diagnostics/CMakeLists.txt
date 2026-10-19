@@ -45,6 +45,11 @@ if(BUILD_TESTING)
   target_include_directories(test_diagnostic_registry PRIVATE ${PROJECT_SOURCE_DIR}/src)
   target_link_libraries(test_diagnostic_registry PRIVATE pb11::diagnostics)
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_executable(test_diagnostic_created_adoption tests/test_created_adoption.cpp)
+    target_link_libraries(test_diagnostic_created_adoption PRIVATE pb11::diagnostics)
+    target_link_options(test_diagnostic_created_adoption PRIVATE
+      -Wl,--wrap=fusion_c_birth_table_destroy -Wl,--wrap=fusion_c_beam_birth_table_destroy
+      -Wl,--wrap=fusion_c_birth_table_content_digest -Wl,--wrap=fusion_c_beam_birth_table_content_digest)
     target_compile_definitions(test_diagnostic_registry PRIVATE PB11_DIAGNOSTIC_DESTROY_OBSERVATION)
     target_link_options(test_diagnostic_registry PRIVATE
       -Wl,--wrap=fusion_c_birth_table_destroy -Wl,--wrap=fusion_c_beam_birth_table_destroy)
@@ -86,6 +91,10 @@ if(BUILD_TESTING)
   set(PB11_DIAGNOSTIC_BEAM_TEST_FILE "" CACHE FILEPATH "Qualified packed beam table for optional lifecycle test")
   if(PB11_DIAGNOSTIC_THERMAL_TEST_FILE)
     if(PB11_DIAGNOSTIC_BEAM_TEST_FILE)
+      if(TARGET test_diagnostic_created_adoption)
+        add_test(NAME diagnostic_created_table_adoption COMMAND test_diagnostic_created_adoption
+          ${PB11_DIAGNOSTIC_THERMAL_TEST_FILE} ${PB11_DIAGNOSTIC_BEAM_TEST_FILE})
+      endif()
       add_test(NAME diagnostic_registry_lifecycle COMMAND test_diagnostic_registry
         ${PB11_DIAGNOSTIC_THERMAL_TEST_FILE} ${PB11_DIAGNOSTIC_BEAM_TEST_FILE})
       if(UNIX)
