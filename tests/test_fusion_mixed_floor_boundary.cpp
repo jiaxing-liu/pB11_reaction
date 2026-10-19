@@ -11,11 +11,15 @@
 #include <limits>
 #include <stdexcept>
 static int provider_calls=0;
+static bool subnormal_fixture=false;
 extern "C" int __wrap_fusion_c_thermal_birth_grid(int ch,double,const fusion_thermal_birth_options_v1*,int n,const double*,double*grid,fusion_thermal_birth_v1*out){
  ++provider_calls; if(ch!=3) return PB11_STATUS_INVALID_ARGUMENT;
  std::fill(grid,grid+7*n,0.); *out={}; out->reactivity_m3_s=1e-10;
  const double q=std::numeric_limits<double>::denorm_min();
- out->below_number_m3_s[0]=1990*q; out->below_number_m3_s[4]=2*q;
+ if(subnormal_fixture){
+  out->below_number_m3_s[4]=10*0x1.67bc89ab2fe12p-988;
+  out->below_energy_J_m3_s[4]=6*q;
+ }else{out->below_number_m3_s[0]=1990*q;out->below_number_m3_s[4]=2*q;}
  return 0;
 }
 void check(bool x,const char*m){if(!x)throw std::runtime_error(m);}
@@ -23,7 +27,9 @@ template<class T>void poison(T&v){std::memset(&v,0xa5,sizeof(v));}
 template<class T>void zero(T&v,const char*m){const unsigned char*p=reinterpret_cast<const unsigned char*>(&v); for(size_t i=0;i<sizeof(v);++i)check(p[i]==0,m);}
 int main(int argc,char**argv){try{
  check(argc==2,"mode required"); const bool high=std::string(argv[1])=="high";
- const double tiny=std::numeric_limits<double>::denorm_min(),dt=.1,Ui=.1991,center=.001;
+ subnormal_fixture=std::string(argv[1])=="subnormal";
+ const double tiny=std::numeric_limits<double>::denorm_min(),dt=.1,Ui=.1991;
+ const double center=subnormal_fixture?0x1.3d5801c2435afp-87:.001;
  double edges[2]={0,2*center},thermal[6]={0,1,1,0,0,0},charge[6]={1,1,1,4,4,25};
  double old[6]={},logs[42];std::fill(logs,logs+42,15.);
  fusion_coupled_thermal_options_v1 op{};
@@ -39,16 +45,27 @@ int main(int argc,char**argv){try{
  const long double scale=(long double)burn.events_m3[3]/rates[3];
  const long double normalN=scale*(1990*tiny),preciseN=scale*(2*tiny);
  const long double normalBorrow=(long double)(double)normalN*center,preciseBorrow=preciseN*center,limit=(long double)tiny*Ui;
+ if(subnormal_fixture){
+  const long double physicalN=scale*(10*0x1.67bc89ab2fe12p-988);
+  const long double physicalE=scale*(6*tiny),mapped=physicalN*center;
+  check((double)physicalN>=std::numeric_limits<double>::min(),"number is normal");
+  check((double)physicalE>0 && std::fpclassify((double)physicalE)==FP_SUBNORMAL,"energy remains nonzero subnormal");
+  check(physicalE<=mapped && (long double)(double)physicalE>mapped,"only rounding violates floor range");
+ }else{
  check((double)normalN>0 && (double)normalBorrow==0,"normal mapped energy underflows");
  check(preciseN>0 && (double)preciseN==0 && (double)(preciseN/dt)>0,"precise rate-only number");
  check(normalBorrow<limit && preciseBorrow<limit && normalBorrow+preciseBorrow>limit,"mixed strict boundary separates");
  std::cout<<std::setprecision(24)<<"fixture scale="<<scale<<" normalN="<<normalN<<" preciseN="<<preciseN<<" normalBorrow="<<normalBorrow<<" preciseBorrow="<<preciseBorrow<<" limit="<<limit<<" total="<<normalBorrow+preciseBorrow<<"\n";
+ }
  double outputN[6],s[6],t[6],packets[70];fusion_coupled_thermal_v1 result;fusion_handoff_diagnostics_v1 diagnostics;fusion_beam_table_usage_v1 usage;fusion_birth_floor_ledger_v1 ledger;fusion_birth_packets_v1 meta;uint64_t outside;
  poison(outputN);poison(s);poison(t);poison(packets);poison(result);poison(diagnostics);poison(usage);poison(ledger);poison(meta);poison(outside);
- fusion_coupled_floor_limits_v1 limits{.1,high?2*tiny:tiny};
+ fusion_coupled_floor_limits_v1 limits{.1,subnormal_fixture?.001:(high?2*tiny:tiny)};
  int status=fusion_c_coupled_sources_packets_trial(dt,&op,&fast,nullptr,0,nullptr,0,1,edges,thermal,.2,Ui,2,charge,0,nullptr,logs,old,old,old,old,outputN,s,t,&result,&diagnostics,&usage,&limits,&ledger,FUSION_BEAM_TABLE_STRICT,&outside,packets,&meta);
  check(provider_calls==1,"actual direct thermal provider call");
- check(status==(high?PB11_STATUS_NUMERICAL_FAILURE:PB11_STATUS_OUT_OF_RANGE),"synthetic mixed borrowing boundary status");
+ // This synthetic provider intentionally violates the nuclear yield ledger.
+ // The nonzero-subnormal case must get past the spurious floor range error
+ // and still fail later as NUMERICAL_FAILURE, with all outputs cleared.
+ check(status==((high||subnormal_fixture)?PB11_STATUS_NUMERICAL_FAILURE:PB11_STATUS_OUT_OF_RANGE),"synthetic mixed boundary status");
  zero(outputN,"clear thermal");zero(s,"clear s");zero(t,"clear t");zero(packets,"clear packet array");zero(result,"clear result");zero(diagnostics,"clear diagnostics");zero(usage,"clear usage");zero(ledger,"clear floor");zero(meta,"clear metadata");zero(outside,"clear outside counter");
  std::cout<<"RESULT mode="<<argv[1]<<" status="<<status<<" all_outputs_zero=1 physics_accepted=0\n";return 0;
  }catch(const std::exception&e){std::cerr<<e.what()<<"\n";return 1;}}

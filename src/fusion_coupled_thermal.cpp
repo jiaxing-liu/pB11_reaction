@@ -378,7 +378,13 @@ int coupled_trial(double dt,const fusion_coupled_thermal_options_v1*op,
    double N[6]{},E[6]{};bool rate_only=false;std::array<bool,6> precise_species{};
    for(int i=0;i<6;++i){
     if(!put(belowN[i],N[i])||!put(belowE[i],E[i]))return NUM;
-    precise_species[i]=(N[i]==0&&belowN[i]>0)||(E[i]==0&&belowE[i]>0);rate_only=rate_only||precise_species[i];
+    // Nonzero subnormals can round upward beyond N*first_center too.
+    // Preserve the physical moment before binary64 conversion, including the
+    // boundary that rounds up to the smallest normal double.
+    const R min_normal=std::numeric_limits<double>::min();
+    precise_species[i]=(belowN[i]>0&&belowN[i]<min_normal)||
+                       (belowE[i]>0&&belowE[i]<min_normal);
+    rate_only=rate_only||precise_species[i];
    }
    if(rate_only){
     precise_floor_active=true;original_floor_reservoir=ionU;

@@ -54,6 +54,19 @@ int main() {
    (std::abs(out.mapped_energy[i])+std::abs(out.correction[i]));
   assert(residual<=arithmetic_bound);
  }
+ // Actual failed-call witness: binary64 rounds a valid positive energy upward
+ // to denorm_min, above the mapped bound. Extended amounts retain its sign,
+ // physical range and independently reconstructed correction.
+ n={};e={};
+ n[4]=0xb.3de44d597f08da4p-991L;
+ e[4]=0x8.661bc1d8cd4027dp-1078L;
+ const R center=0x1.3d5801c2435afp-87L;
+ assert(double(e[4])==std::numeric_limits<double>::denorm_min());
+ assert(e[4]<=n[4]*center && R(double(e[4]))>R(double(n[4]))*center);
+ assert(fusion_detail::project_floor_precise(center,1,1,1,1,n,e,out)==0);
+ assert(out.number[4]==n[4] && out.physical_energy[4]==e[4]);
+ assert(std::abs(out.mapped_energy[4]+out.correction[4]-e[4])<=
+        4*std::numeric_limits<R>::epsilon()*out.mapped_energy[4]);
  // Invalid input after success clears the complete output candidate.
  e[4]=-1;
  assert(fusion_detail::project_floor_precise(.125L,1,1,1,.5,n,e,out)==PB11_STATUS_INVALID_ARGUMENT);

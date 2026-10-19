@@ -679,6 +679,7 @@ if(BUILD_TESTING)
         target_link_options(test_fusion_mixed_floor_boundary PRIVATE "-Wl,--wrap=fusion_c_thermal_birth_grid")
         add_test(NAME fusion_mixed_floor_boundary_tests COMMAND test_fusion_mixed_floor_boundary strict)
         add_test(NAME fusion_mixed_floor_boundary_high_tests COMMAND test_fusion_mixed_floor_boundary high)
+        add_test(NAME fusion_mixed_floor_boundary_subnormal_tests COMMAND test_fusion_mixed_floor_boundary subnormal)
     endif()
 
     add_executable(test_fusion_birth_floor tests/test_fusion_birth_floor.cpp)
