@@ -122,3 +122,34 @@ On GNU/Clang Linux, optional `diagnostic_created_table_adoption` uses qualified
 thermal/beam files to check ownership, identity, failure atomicity, destructor
 calls and simulated serializer rejection. Link wrappers belong only to the test
 executable. These are engineering tests, never nuclear/trajectory acceptance.
+
+## Enclosed Fourier/core volume diagnostic
+
+`fusion_c_flux_core_enclosed_volume_diagnostic_v1` is a stateless C ABI in the
+optional diagnostics component. It reuses the existing symmetric Fourier/core
+field model and computes signed toroidal volume from `pi integral R² Z_theta`
+on one boundary. A uniform power-of-two angular grid greater than three times
+the harmonic count integrates that finite Fourier polynomial exactly in exact
+arithmetic; floating-point evaluation and very small/thin-volume conditioning
+remain the caller's responsibility. Constant-radius terms that integrate to zero
+are removed before summation to reduce cancellation. The zero-mean radius is
+recovered by Fourier projection of its angular derivative, avoiding subtraction
+of nearly equal absolute radii near the axis. Axis volume is zero.
+
+The API checks sampled boundary orientation and reports the minimum sampled
+absolute Jacobian. It does not prove global nesting, interior regularity, physical
+equilibrium, field epoch, source-volume consistency or any orbit/loss fraction.
+Shells require differences and monotonicity/conditioning checks by the caller.
+There is no volume/density rescaling, state mutation, host-specific convention
+or change to core reaction kernels or cache identities. All inputs/layouts are
+explicit, errors clear outputs, and no C++ exception crosses the C boundary.
+
+This permits cheap repeated geometry checks by a host without exporting every
+full birth packet. It does not itself add a host runtime monitor or qualify a
+physical trajectory. The external host must compare independently identified
+geometry and transport/source epochs over its actual accepted time window.
+
+The optional `pb11::capture_fortran` component also supplies
+`fusion_flux_volume_fortran`, a direct ISO_C_BINDING type/interface with the same
+explicit arrays and units. C++ and Fortran analytic volume/error-path tests are
+registered with CTest when their languages are available.

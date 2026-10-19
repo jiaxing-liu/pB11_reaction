@@ -1,5 +1,5 @@
 find_package(Threads REQUIRED)
-add_library(pb11_diagnostics STATIC capture_registry.cpp capture_trial.cpp trial_replay.cpp trial_output_digest.cpp)
+add_library(pb11_diagnostics STATIC capture_registry.cpp capture_trial.cpp trial_replay.cpp trial_output_digest.cpp flux_volume.cpp)
 add_library(pb11::diagnostics ALIAS pb11_diagnostics)
 set_target_properties(pb11_diagnostics PROPERTIES EXPORT_NAME diagnostics)
 target_compile_features(pb11_diagnostics PUBLIC cxx_std_17)
@@ -16,11 +16,11 @@ install(TARGETS pb11_diagnostics EXPORT pb11Targets
 add_executable(fusion_trial_replay trial_replay_main.cpp)
 target_link_libraries(fusion_trial_replay PRIVATE pb11::diagnostics)
 install(TARGETS fusion_trial_replay RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES include/fusion_capture_registry.h include/fusion_capture_trial.h
+install(FILES include/fusion_capture_registry.h include/fusion_capture_trial.h include/fusion_flux_volume_diagnostic.h
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 if(PB11_FORTRAN_AVAILABLE)
-  add_library(fusion_capture_fortran STATIC fortran/fusion_capture_fortran.f90)
+  add_library(fusion_capture_fortran STATIC fortran/fusion_capture_fortran.f90 fortran/fusion_flux_volume_fortran.f90)
   add_library(pb11::capture_fortran ALIAS fusion_capture_fortran)
   set_target_properties(fusion_capture_fortran PROPERTIES
     EXPORT_NAME capture_fortran
@@ -37,6 +37,9 @@ if(PB11_FORTRAN_AVAILABLE)
 endif()
 
 if(BUILD_TESTING)
+  add_executable(test_diagnostic_flux_volume tests/test_flux_volume.cpp)
+  target_link_libraries(test_diagnostic_flux_volume PRIVATE pb11::diagnostics)
+  add_test(NAME diagnostic_flux_volume COMMAND test_diagnostic_flux_volume)
   add_executable(test_diagnostic_sha256 tests/test_sha256_stream.cpp)
   target_include_directories(test_diagnostic_sha256 PRIVATE ${PROJECT_SOURCE_DIR}/src)
   target_compile_features(test_diagnostic_sha256 PRIVATE cxx_std_17)
@@ -55,6 +58,9 @@ if(BUILD_TESTING)
       -Wl,--wrap=fusion_c_birth_table_destroy -Wl,--wrap=fusion_c_beam_birth_table_destroy)
   endif()
   if(PB11_FORTRAN_AVAILABLE)
+    add_executable(test_diagnostic_flux_volume_fortran tests/test_flux_volume_fortran.f90)
+    target_link_libraries(test_diagnostic_flux_volume_fortran PRIVATE pb11::capture_fortran)
+    add_test(NAME diagnostic_flux_volume_fortran COMMAND test_diagnostic_flux_volume_fortran)
     enable_language(C)
     add_executable(test_diagnostic_trial_view_fortran
       tests/test_trial_view_fortran.f90 tests/trial_view_probe.c)
